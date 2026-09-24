@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# EC2 安全強化（網站上線後執行一次）：bash /opt/toddler-music-box/deploy/harden.sh
+# EC2 security hardening (run once after the site is live): bash /opt/toddler-music-box/deploy/harden.sh
 #
-#  1. SSH：只允許金鑰登入、禁止 root、禁止密碼、只允許 ubuntu 帳號
-#  2. 防火牆 (ufw)：80/443 只接受 Cloudflare 的連線（別人無法繞過 Cloudflare 直連主機）
-#  3. fail2ban：SSH 連續輸錯就封鎖該 IP
-#  4. 自動安裝安全性更新
-#  5. 程式唯讀：後端改用低權限帳號 toddler 執行，程式檔案它只能讀不能寫
-#  6. 憑證私鑰只有 root 能讀
+#  1. SSH: key-only login, no root, no passwords, only the ubuntu user
+#  2. Firewall (ufw): ports 80/443 only accept Cloudflare (nobody can bypass Cloudflare to hit the server)
+#  3. fail2ban: bans IPs after repeated failed SSH logins
+#  4. Automatic security updates
+#  5. Read-only app: the backend runs as the low-privilege user "toddler", which can read but not write the code
+#  6. Only root can read the certificate private key
 #
-# ⚠ 執行前：保持目前這個 SSH 視窗不要關；執行後另開一個新視窗測試能否登入。
+# ⚠ Before running: keep this SSH window open; afterwards, test logging in from a NEW window.
 set -euo pipefail
 APP_DIR="/opt/toddler-music-box"
 
-echo "==> 1/6 SSH 強化"
-# 檔名用 00- 開頭：sshd 採用「第一個讀到的值」，要比 cloud-init 的 50- 設定優先
+echo "==> 1/6 Hardening SSH"
+# File name starts with 00-: sshd uses the first value it reads, so this must win over cloud-init's 50- file
 sudo tee /etc/ssh/sshd_config.d/00-hardening.conf > /dev/null <<'EOF'
 PermitRootLogin no
 PasswordAuthentication no
@@ -29,24 +29,24 @@ AllowTcpForwarding no
 ClientAliveInterval 300
 ClientAliveCountMax 2
 EOF
-sudo sshd -t                       # 設定有錯就停止，不會把自己鎖在外面
+sudo sshd -t                       # stop if the config is invalid, so you cannot lock yourself out
 sudo systemctl reload ssh || sudo systemctl restart ssh
 
-echo "==> 2/6 防火牆：80/443 只允許 Cloudflare"
+echo "==> 2/6 Firewall: ports 80/443 from Cloudflare only"
 sudo apt-get install -y ufw curl > /dev/null
 sudo ufw --force reset > /dev/null
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow 22/tcp comment 'SSH (AWS Security Group 再限制來源 IP)'
+sudo ufw allow 22/tcp comment 'SSH (restrict source IPs in the AWS Security Group)'
 CF_V4=$(curl -fsSL https://www.cloudflare.com/ips-v4)
 CF_V6=$(curl -fsSL https://www.cloudflare.com/ips-v6)
 for ip in $CF_V4 $CF_V6; do
   sudo ufw allow proto tcp from "$ip" to any port 80,443 comment 'Cloudflare' > /dev/null
 done
 sudo ufw --force enable
-echo "   已加入 $(echo $CF_V4 $CF_V6 | wc -w) 個 Cloudflare 網段"
+echo "   Added $(echo $CF_V4 $CF_V6 | wc -w) Cloudflare IP ranges"
 
-echo "==> 3/6 fail2ban（SSH 防暴力破解）"
+echo "==> 3/6 fail2ban (SSH brute-force protection)"
 sudo apt-get install -y fail2ban python3-systemd > /dev/null
 sudo tee /etc/fail2ban/jail.d/sshd.local > /dev/null <<'EOF'
 [sshd]
@@ -59,23 +59,23 @@ EOF
 sudo systemctl enable --now fail2ban
 sudo systemctl restart fail2ban
 
-echo "==> 4/6 自動安全性更新"
+echo "==> 4/6 Automatic security updates"
 sudo apt-get install -y unattended-upgrades > /dev/null
 sudo tee /etc/apt/apt.conf.d/20auto-upgrades > /dev/null <<'EOF'
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 EOF
 
-echo "==> 5/6 程式唯讀 + 低權限帳號"
+echo "==> 5/6 Read-only app + low-privilege user"
 id toddler &>/dev/null || sudo useradd --system --no-create-home --shell /usr/sbin/nologin toddler
 sudo chown -R ubuntu:ubuntu "$APP_DIR"
-sudo chmod -R go-w "$APP_DIR"            # 只有 ubuntu 能改檔案；toddler 和 nginx 只能讀
+sudo chmod -R go-w "$APP_DIR"            # only ubuntu can change files; toddler and nginx can only read
 sed "s|__APP_DIR__|$APP_DIR|g" "$APP_DIR/deploy/toddler-music-box.service" \
   | sudo tee /etc/systemd/system/toddler-music-box.service > /dev/null
 sudo systemctl daemon-reload
 sudo systemctl restart toddler-music-box
 
-echo "==> 6/6 憑證私鑰權限"
+echo "==> 6/6 Certificate private key permissions"
 if [ -d /etc/ssl/cloudflare ]; then
   sudo chown -R root:root /etc/ssl/cloudflare
   sudo chmod 700 /etc/ssl/cloudflare
@@ -85,14 +85,14 @@ fi
 
 sleep 2
 echo
-echo "================ 檢查結果 ================"
-printf "後端健康檢查：    "; curl -s http://127.0.0.1:8000/api/health; echo
-printf "後端執行帳號：    "; ps -o user= -p "$(systemctl show -p MainPID --value toddler-music-box)"
-printf "toddler 能寫程式嗎："; sudo -u toddler touch "$APP_DIR/test" 2>/dev/null && { echo "能 ✗"; rm -f "$APP_DIR/test"; } || echo "不能 ✓（唯讀）"
-printf "SSH 密碼登入：    "; sudo sshd -T | grep -i '^passwordauthentication'
-printf "SSH root 登入：   "; sudo sshd -T | grep -i '^permitrootlogin'
-printf "fail2ban：        "; sudo fail2ban-client status sshd | grep 'Currently banned' | xargs
-printf "systemd 安全評分："; systemd-analyze security toddler-music-box --no-pager 2>/dev/null | tail -1
+echo "================ Results ================"
+printf "Backend health:        "; curl -s http://127.0.0.1:8000/api/health; echo
+printf "Backend runs as:       "; ps -o user= -p "$(systemctl show -p MainPID --value toddler-music-box)"
+printf "Can toddler write code? "; sudo -u toddler touch "$APP_DIR/test" 2>/dev/null && { echo "yes ✗"; rm -f "$APP_DIR/test"; } || echo "no ✓ (read-only)"
+printf "SSH password login:    "; sudo sshd -T | grep -i '^passwordauthentication'
+printf "SSH root login:        "; sudo sshd -T | grep -i '^permitrootlogin'
+printf "fail2ban:              "; sudo fail2ban-client status sshd | grep 'Currently banned' | xargs
+printf "systemd security score: "; systemd-analyze security toddler-music-box --no-pager 2>/dev/null | tail -1
 sudo ufw status | head -5
 echo
-echo "⚠ 現在請另開一個新的 PowerShell 視窗，用同樣的 ssh 指令測試能否登入，成功後才關閉這個視窗。"
+echo "⚠ Now open a NEW PowerShell window and log in with the same ssh command. Only close this window after that works."

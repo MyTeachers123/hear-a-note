@@ -1,7 +1,7 @@
 {
-  "name": "Toddler Music Box 寶寶音樂盒",
-  "short_name": "音樂盒",
-  "description": "給幼兒的彩色鋼琴，可離線使用，無廣告、不收集資料。",
+  "name": "Toddler Music Box",
+  "short_name": "Music Box",
+  "description": "A colorful piano that teaches toddlers to read treble and bass clef. Works offline, no ads, no data collected.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

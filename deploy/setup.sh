@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# 在全新的 EC2 (Ubuntu 24.04 或 26.04 LTS) 上執行一次即可：
+# Run once on a fresh EC2 instance (Ubuntu 24.04 or 26.04 LTS):
 #   curl -fsSL https://raw.githubusercontent.com/MyTeachers123/toddler-music-box/main/deploy/setup.sh | bash
-# 會完成：安裝套件 → 下載程式 → 產生音檔 → 啟動 Python 後端 → 設定 Nginx → 設定 HTTPS
+# It installs packages → downloads the code → generates sounds → starts the Python backend → configures Nginx → sets up HTTPS
 #
-# HTTPS 有兩種模式（SSL_MODE）：
-#   cloudflare（預設）：網域在 Cloudflare、橘色雲朵開啟。需先把 Cloudflare Origin Certificate
-#                       存到 /etc/ssl/cloudflare/origin.pem 與 origin.key
-#   letsencrypt       ：DNS 直接指向 EC2（灰色雲朵），自動申請 Let's Encrypt 憑證
+# Two HTTPS modes (SSL_MODE):
+#   cloudflare (default): domain on Cloudflare with the orange cloud on. First save the Cloudflare Origin Certificate
+#                         to /etc/ssl/cloudflare/origin.pem and origin.key
+#   letsencrypt         : DNS points straight at EC2 (grey cloud); a Let's Encrypt certificate is requested automatically
 #     SSL_MODE=letsencrypt bash setup.sh
 set -euo pipefail
 
@@ -16,12 +16,12 @@ REPO="${REPO:-https://github.com/MyTeachers123/toddler-music-box.git}"
 APP_DIR="/opt/toddler-music-box"
 SSL_MODE="${SSL_MODE:-cloudflare}"
 
-echo "==> 1/6 安裝系統套件"
+echo "==> 1/6 Installing system packages"
 sudo apt-get update -y
 sudo apt-get install -y git nginx python3-venv
 if [ "$SSL_MODE" = "letsencrypt" ]; then sudo apt-get install -y certbot python3-certbot-nginx; fi
 
-echo "==> 2/6 下載程式碼到 $APP_DIR"
+echo "==> 2/6 Downloading code to $APP_DIR"
 if [ -d "$APP_DIR/.git" ]; then
   sudo git -C "$APP_DIR" pull
 else
@@ -30,14 +30,14 @@ fi
 sudo chown -R ubuntu:ubuntu "$APP_DIR"
 sudo chmod 755 /opt "$APP_DIR"
 
-echo "==> 3/6 建立 Python 環境並產生音檔/圖示"
+echo "==> 3/6 Creating the Python environment and generating sounds/icons"
 cd "$APP_DIR"
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip -q
 .venv/bin/pip install -r requirements.txt -q
 .venv/bin/python generate_assets.py
 
-echo "==> 4/6 啟動 Python 後端 (systemd，低權限帳號 toddler)"
+echo "==> 4/6 Starting the Python backend (systemd, low-privilege user toddler)"
 id toddler &>/dev/null || sudo useradd --system --no-create-home --shell /usr/sbin/nologin toddler
 sudo chmod -R go-w "$APP_DIR"
 sed "s|__APP_DIR__|$APP_DIR|g" deploy/toddler-music-box.service \
@@ -46,18 +46,18 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now toddler-music-box
 sudo systemctl restart toddler-music-box
 
-echo "==> 5/6 設定 Nginx（模式：$SSL_MODE）"
+echo "==> 5/6 Configuring Nginx (mode: $SSL_MODE)"
 sudo mkdir -p /etc/nginx/snippets
 sudo cp deploy/security-headers.conf /etc/nginx/snippets/toddler-music-box-security.conf
 sed "s|__APP_DIR__|$APP_DIR|g" deploy/app-locations.conf \
   | sudo tee /etc/nginx/snippets/toddler-music-box-app.conf > /dev/null
 if [ "$SSL_MODE" = "cloudflare" ]; then
   if [ ! -s /etc/ssl/cloudflare/origin.pem ] || [ ! -s /etc/ssl/cloudflare/origin.key ]; then
-    echo "✗ 找不到 Cloudflare Origin 憑證。請先建立："
+    echo "✗ Cloudflare Origin certificate not found. Create it first:"
     echo "    sudo mkdir -p /etc/ssl/cloudflare"
-    echo "    sudo nano /etc/ssl/cloudflare/origin.pem   # 貼上 Origin Certificate"
-    echo "    sudo nano /etc/ssl/cloudflare/origin.key   # 貼上 Private Key"
-    echo "  然後重新執行本腳本。"
+    echo "    sudo nano /etc/ssl/cloudflare/origin.pem   # paste the Origin Certificate"
+    echo "    sudo nano /etc/ssl/cloudflare/origin.key   # paste the Private Key"
+    echo "  Then run this script again."
     exit 1
   fi
   sudo chmod 600 /etc/ssl/cloudflare/origin.key
@@ -74,15 +74,15 @@ sudo systemctl reload nginx
 
 echo "==> 6/6 HTTPS"
 if [ "$SSL_MODE" = "cloudflare" ]; then
-  echo "✓ 使用 Cloudflare Origin 憑證。請確認 Cloudflare → SSL/TLS 模式為 Full (strict)。"
+  echo "✓ Using the Cloudflare Origin certificate. Make sure Cloudflare → SSL/TLS mode is Full (strict)."
 elif sudo certbot --nginx -d "$DOMAIN" -m "$EMAIL" --agree-tos --redirect --non-interactive; then
-  echo "✓ Let's Encrypt HTTPS 完成"
+  echo "✓ Let's Encrypt HTTPS done"
 else
-  echo "⚠ 憑證申請失敗：通常是 DNS 還沒生效。等 DNS 指向這台主機後，重新執行本腳本即可。"
+  echo "⚠ Certificate request failed — usually DNS has not propagated yet. Once DNS points to this server, run this script again."
 fi
 
 echo
-echo "完成！檢查："
+echo "Done! Checks:"
 curl -s http://127.0.0.1:8000/api/health && echo
-echo "打開 https://$DOMAIN"
-echo "建議接著執行安全強化：bash $APP_DIR/deploy/harden.sh"
+echo "Open https://$DOMAIN"
+echo "Recommended next step — security hardening: bash $APP_DIR/deploy/harden.sh"

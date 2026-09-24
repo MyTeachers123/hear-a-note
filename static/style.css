@@ -15,7 +15,7 @@ html, body {
   background: var(--bg);
   color: var(--ink);
   font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", sans-serif;
-  /* 防止幼兒誤觸：不能選取文字、不能長按選單、不能縮放 */
+  /* Prevent accidental toddler actions: no text selection, no long-press menu, no zoom */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -23,7 +23,7 @@ html, body {
   overscroll-behavior: none;
 }
 
-/* #app 是整個 App 的畫布；裡面的尺寸用 cqw/cqh（相對於畫布），轉向後比例才會正確 */
+/* #app is the whole app canvas; sizes inside use cqw/cqh (relative to it) so rotation keeps proportions */
 #app {
   position: fixed;
   top: 0; left: 0;
@@ -36,8 +36,8 @@ html, body {
            env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
-/* 直立的手機／平板：把畫面轉 90 度，強制橫向顯示
-   （Android 全螢幕時會直接鎖定橫向，就不會用到這段） */
+/* Portrait phones/tablets: rotate the screen 90° to force landscape
+      (on Android fullscreen the orientation is locked directly, so this is not used there) */
 @media (orientation: portrait) and (pointer: coarse) {
   #app {
     width: 100dvh;
@@ -48,7 +48,7 @@ html, body {
   }
 }
 
-/* ---------- 上方選歌列（給家長用，字小、放角落） ---------- */
+/* ---------- Top toolbar (for parents: small text, in the corner) ---------- */
 .bar {
   display: flex;
   align-items: center;
@@ -70,9 +70,9 @@ html, body {
 .chip.active { background: var(--chip-active); color: var(--bg); }
 .status { font-size: 13px; opacity: .7; white-space: nowrap; }
 
-/* ---------- 琴鍵 ---------- */
+/* ---------- Keys ---------- */
 .keys {
-  position: relative;   /* 黑鍵圖層以這裡為定位基準 */
+  position: relative;   /* positioning reference for the black-key layer */
   flex: 1;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -82,27 +82,32 @@ html, body {
 .key {
   position: relative;
   border: none;
-  border-radius: clamp(12px, 3cqw, 28px);
-  background: var(--c);
-  box-shadow: 0 8px 0 var(--shade);
+  border-radius: 0 0 clamp(10px, 2.2cqw, 22px) clamp(10px, 2.2cqw, 22px);
+  background: linear-gradient(#fff 85%, #f1f1f1);
+  box-shadow: 0 8px 0 #c9c3bb, inset 0 0 0 1px #d9d4cc;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: 16px;
-  color: #fff;
-  font-weight: 800;
-  font-size: clamp(16px, 4cqw, 34px);
-  text-shadow: 0 2px 0 rgba(0,0,0,.18);
+  gap: 4%;
+  padding: 0 6% 7%;
   transition: transform 60ms ease-out, box-shadow 60ms ease-out, filter 60ms;
   cursor: pointer;
   min-width: 0;
 }
+/* Lower half of white keys (not covered by black keys): shape + staff */
 .key .shape {
-  width: 46%;
+  width: 38%;
   aspect-ratio: 1;
-  background: rgba(255,255,255,.85);
-  margin: auto 0 14%;   /* 放在下半部，不被黑鍵擋住 */
+  background: var(--c);
+  flex: none;
+}
+.key-staff {
+  width: 100%;
+  max-height: 30%;
+  object-fit: contain;
+  pointer-events: none;
+  flex: none;
 }
 .key[data-shape="circle"] .shape   { border-radius: 50%; }
 .key[data-shape="square"] .shape   { border-radius: 14%; }
@@ -111,32 +116,18 @@ html, body {
 .key[data-shape="hexagon"] .shape  { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
 .key[data-shape="diamond"] .shape  { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .key[data-shape="heart"] .shape,
-.key[data-shape="arrow"] .shape    { background: none; }
+.key[data-shape="arrow"] .shape,
+.key[data-shape="arrowDown"] .shape { background: none; }
 .key .shape svg                    { width: 100%; height: 100%; display: block; }
-.key .shape svg path               { fill: rgba(255,255,255,.85); }
-
-/* 高八度的 Do：文字頭頂加一個點（簡譜的高音記號） */
-.label { position: relative; display: inline-block; }
-.label.high::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -0.32em;
-  width: 0.26em;
-  height: 0.26em;
-  border-radius: 50%;
-  background: #fff;
-  transform: translateX(-50%);
-  box-shadow: 0 2px 0 rgba(0,0,0,.18);
-}
+.key .shape svg path               { fill: var(--c); }
 
 .key.down {
-  transform: translateY(8px) scale(.98);
-  box-shadow: 0 0 0 var(--shade);
-  filter: brightness(1.12);
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 #c9c3bb, inset 0 0 0 1px #d9d4cc;
+  background: #f2f0ec;
 }
 
-/* ---------- 黑鍵圖層 ---------- */
+/* ---------- Black-key layer ---------- */
 .key.black {
   position: absolute;
   z-index: 2;
@@ -151,19 +142,11 @@ html, body {
   box-shadow: 0 0 0 #000;
   filter: brightness(1.6);
 }
-/* 隱藏黑鍵：往上滑出畫面 */
-.keys.no-black .key.black {
-  transform: translateY(-115%);
-  opacity: 0;
-  pointer-events: none;
-}
-.chip.toggle { margin-left: auto; }
-.chip.toggle + .status { margin-left: 8px; }
 
-/* 跟唱模式：下一個要按的鍵會跳動發光 */
+/* Play-along: the next key to press bounces and glows */
 .key.next {
   animation: hop 700ms ease-in-out infinite;
-  outline: 6px solid #fff;
+  outline: 6px solid var(--c);     /* outline in the key's own color */
   outline-offset: -6px;
 }
 @keyframes hop {
@@ -171,7 +154,7 @@ html, body {
   50%      { transform: translateY(-10px); }
 }
 
-/* 按下時飄出的音符泡泡 */
+/* Bubble that floats up when a key is pressed */
 .bubble {
   position: fixed;
   width: 44px; height: 44px;
@@ -186,7 +169,7 @@ html, body {
   to   { transform: translate(-50%, -260%) scale(1.2); opacity: 0; }
 }
 
-/* 完成一首歌的慶祝 */
+/* Celebration when a song is finished */
 .celebrate { animation: party 1.2s ease-in-out; }
 @keyframes party {
   0%, 100% { filter: none; }
@@ -195,7 +178,7 @@ html, body {
   75% { filter: hue-rotate(300deg); }
 }
 
-/* ---------- 開始畫面 ---------- */
+/* ---------- Start screen ---------- */
 .overlay {
   position: fixed; inset: 0;
   background: var(--bg);
@@ -219,13 +202,156 @@ html, body {
 }
 .start-hint { font-size: 20px; font-weight: 700; margin: 0; }
 
-/* 電腦上把視窗拉成很窄時：琴鍵變窄、文字縮小 */
+/* Very narrow desktop window: narrower keys, smaller text */
 @media (orientation: portrait) and (pointer: fine) and (max-width: 600px) {
   .keys { --gap: 4px; }
-  .key { font-size: 15px; padding-bottom: 12px; }
   .chip { font-size: 12px; padding: 5px 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .key.next, .start-btn { animation: none; }
 }
+
+/* ---------- Dropdowns (song, language) ---------- */
+.select {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--ink);
+  font: 600 14px/1 inherit;
+  font-family: inherit;
+  padding: 5px 8px;
+}
+.song-select { max-width: 16em; }
+.lang { margin-left: auto; max-width: 9.5em; }
+.piano-btn.active { background: #E53935; border-color: #E53935; color: #fff; }
+.piano-status { font-size: 13px; font-weight: 700; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Note heard from a real piano: the key lights up */
+.key.heard { background: color-mix(in srgb, var(--c) 22%, #fff); }
+.key.black.heard { background: linear-gradient(#666, #333); }
+
+/* ---------- "Current note" layer ---------- */
+.now {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: clamp(64px, 24cqh, 150px);
+  padding: 0 var(--gap, 8px) 6px;
+}
+.now-label {
+  font-weight: 800;
+  font-size: clamp(12px, 1.6cqw, 18px);
+  opacity: .75;
+  writing-mode: horizontal-tb;
+}
+.now-card {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.5cqw, 18px);
+  background: #fff;
+  border-radius: 18px;
+  padding: 6px clamp(8px, 2cqw, 20px);
+  box-shadow: 0 4px 0 rgba(74,63,53,.15);
+}
+.now.empty .now-card { opacity: .6; }
+.now.empty .now-arrow, .now.empty .now-key-wrap { visibility: hidden; }   /* nothing played yet: show only the clef */
+.now-staff { height: 100%; width: auto; aspect-ratio: 1; object-fit: contain; }
+.now-arrow {
+  width: clamp(18px, 3cqw, 34px);
+  aspect-ratio: 1;
+  background: var(--ink);
+  opacity: .5;
+  clip-path: polygon(0 35%, 55% 35%, 55% 10%, 100% 50%, 55% 90%, 55% 65%, 0 65%);
+}
+.now-key-wrap { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.mini-key {
+  height: 72%;
+  aspect-ratio: .8;
+  border-radius: 4px 4px 12px 12px;
+  background: #fff;
+  box-shadow: 0 4px 0 #c9c3bb, inset 0 0 0 1px #d9d4cc;
+  display: grid;
+  place-items: center;
+}
+.mini-key .shape { width: 58%; margin: 0; }
+.mini-key[data-shape="circle"] .shape   { border-radius: 50%; }
+.mini-key[data-shape="square"] .shape   { border-radius: 14%; }
+.mini-key[data-shape="triangle"] .shape { clip-path: polygon(50% 6%, 96% 92%, 4% 92%); }
+.mini-key[data-shape="star"] .shape     { clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+.mini-key[data-shape="hexagon"] .shape  { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
+.mini-key[data-shape="diamond"] .shape  { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.mini-key .shape { aspect-ratio: 1; background: var(--c); }
+.mini-key .shape svg { width: 100%; height: 100%; display: block; }
+.mini-key .shape svg path { fill: var(--c); }
+.mini-key[data-shape="heart"] .shape, .mini-key[data-shape="arrow"] .shape,
+.mini-key[data-shape="arrowDown"] .shape { background: none; }
+.mini-key.black { background: linear-gradient(#444, #1c1c1c); box-shadow: 0 4px 0 #000; aspect-ratio: .55; }
+.now.pop .now-card { animation: pop 300ms ease-out; }
+@keyframes pop { 0% { transform: scale(.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .now.pop .now-card { animation: none; } }
+
+
+/* ---------- Microphone permission dialog ---------- */
+.dialog-backdrop {
+  position: absolute; inset: 0; z-index: 20;
+  background: rgba(40, 32, 25, .45);
+  display: grid; place-items: center;
+  padding: 16px;
+}
+.dialog-backdrop[hidden] { display: none; }
+.dialog {
+  width: min(460px, 92cqw);
+  max-height: 92cqh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  text-align: center;
+}
+.dialog-icon { font-size: 36px; line-height: 1; }
+.dialog h2 { margin: 8px 0 6px; font-size: 20px; }
+.dialog p { margin: 0 0 16px; font-size: 15px; line-height: 1.5; }
+.dialog-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.chip.primary { background: #E53935; border-color: #E53935; color: #fff; }
+
+/* ---------- Clef menu ---------- */
+.clef-pick {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: #fff; border: 2px solid var(--ink); border-radius: 999px;
+  padding: 0 2px 0 4px; height: 34px;
+}
+.clef-icon { height: 30px; width: 44px; object-fit: cover; object-position: left center; }
+.clef-pick .select { border: none; padding-left: 2px; background: transparent; }
+
+/* ---------- Quiz ---------- */
+.quiz-btn.active { background: #7E57C2; border-color: #7E57C2; color: #fff; }
+.keys.quiz .key-staff { visibility: hidden; }          /* during the quiz, read the card — no matching pictures on keys */
+.key.reveal { animation: reveal 450ms ease-in-out 4; }  /* wrong answer: the correct key flashes */
+@keyframes reveal {
+  0%, 100% { background: #fff; outline: 0 solid var(--c); }
+  50%      { background: color-mix(in srgb, var(--c) 45%, #fff); outline: 6px solid var(--c); }
+}
+.key.black.reveal { animation: reveal-black 450ms ease-in-out 4; }
+@keyframes reveal-black { 50% { background: var(--c); } }
+.mini-key.ask { display: grid; place-items: center; }
+.ask-mark { font-size: clamp(22px, 5cqh, 44px); font-weight: 900; color: #b8b0a6; }
+.praise {
+  position: absolute; left: 50%; top: 42%; z-index: 15;
+  font-size: clamp(48px, 16cqh, 120px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.praise.show { animation: praise 2.4s ease-out forwards; }
+@keyframes praise {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  35% { transform: translate(-50%, -50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -90%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .key.reveal, .key.black.reveal, .praise.show { animation-duration: 1ms; } }
+/* During the quiz, pressed keys only show grey feedback so they are not confused with the correct-answer flash */
+.keys.quiz .key.heard:not(.reveal) { background: #ece9e4; }

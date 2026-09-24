@@ -19,7 +19,7 @@
   "songs": [
     {
       "id": "twinkle",
-      "title": "小星星 Twinkle Twinkle",
+      "title": "twinkle",
       "notes": [
         "C4",
         "C4",
@@ -67,7 +67,7 @@
     },
     {
       "id": "mary",
-      "title": "瑪莉有隻小綿羊 Mary Had a Little Lamb",
+      "title": "mary",
       "notes": [
         "E4",
         "D4",
@@ -92,28 +92,6 @@
         "E4",
         "D4",
         "D4",
-        "E4",
-        "D4",
-        "C4"
-      ]
-    },
-    {
-      "id": "scale",
-      "title": "音階 Do Re Mi",
-      "notes": [
-        "C4",
-        "D4",
-        "E4",
-        "F4",
-        "G4",
-        "A4",
-        "B4",
-        "C5",
-        "C5",
-        "B4",
-        "A4",
-        "G4",
-        "F4",
         "E4",
         "D4",
         "C4"

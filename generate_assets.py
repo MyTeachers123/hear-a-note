@@ -1,10 +1,12 @@
 """
-generate_assets.py — 用 Python 產生 PWA 需要的所有素材
-  1. static/sounds/*.wav  : 用 numpy 合成的 13 個鋼琴音 (C4 ~ C5，含 5 個黑鍵)
-  2. static/icons/*.png   : App 圖示 (192 / 512 / maskable)，不需要 Pillow
-  3. static/songs.json    : 兒歌旋律資料 (公領域曲目)
+generate_assets.py — generates every asset the PWA needs, with Python
+    1. static/sounds/*.wav  : 25 piano notes synthesized with numpy (C3 to C5, including black keys)
+    2. static/icons/*.png   : app icons (192 / 512 / maskable), no Pillow needed
+    3. static/songs.json    : nursery song melodies (public-domain tunes)
+    4. static/i18n.json     : UI text in 12 languages (source: i18n.py)
+    5. static/staff/*.svg   : staff notation image for every note (engraved with verovio)
 
-執行：python generate_assets.py
+Run: python generate_assets.py
 """
 import json
 import struct
@@ -14,39 +16,43 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).parent / "static"
-SAMPLE_RATE = 22050      # 幼兒 App 不需要 44.1kHz，檔案小一半
-DURATION = 1.6           # 每個音 1.6 秒
+import i18n
 
-# 白鍵：C 大調一個八度 + 高音 C
+ROOT = Path(__file__).parent / "static"
+SAMPLE_RATE = 22050      # a toddler app does not need 44.1 kHz; half the file size
+DURATION = 1.6           # each note lasts 1.6 s
+
+# White keys: one octave of C major + high C
 WHITE = {
     "C4": 261.63, "D4": 293.66, "E4": 329.63, "F4": 349.23,
     "G4": 392.00, "A4": 440.00, "B4": 493.88, "C5": 523.25,
 }
-# 黑鍵（升記號）。檔名用 s 代替 #，因為 # 在網址裡有特殊意義：C#4 → Cs4
+# Black keys (sharps). File names use "s" instead of "#", because "#" is special in URLs: C#4 → Cs4
 BLACK = {
     "Cs4": 277.18, "Ds4": 311.13, "Fs4": 369.99, "Gs4": 415.30, "As4": 466.16,
 }
-NOTES = {**WHITE, **BLACK}
+# One octave lower for the bass clef (C3–B3, including sharps): exactly half the frequency
+LOW = {n[:-1] + "3": round(f / 2, 2) for n, f in {**WHITE, **BLACK}.items() if n != "C5"}
+NOTES = {**WHITE, **BLACK, **LOW}
 
 
-# ---------------------------------------------------------------- 1. 聲音
+# ---------------------------------------------------------------- 1. Sound
 def synth_piano(freq: float) -> np.ndarray:
-    """加法合成 (additive synthesis)：基頻 + 泛音，每個泛音衰減速度不同，
-    高泛音衰減較快 → 聽起來像「叮～」的鋼琴/鐵琴，而不是電子嗶聲。"""
+    """Additive synthesis: fundamental + overtones, each decaying at a different rate.
+    Higher overtones fade faster → sounds like a gentle piano/glockenspiel "ding", not an electronic beep."""
     t = np.linspace(0, DURATION, int(SAMPLE_RATE * DURATION), endpoint=False)
     harmonics = [(1, 1.0, 3.0), (2, 0.45, 4.5), (3, 0.22, 6.0),
-                 (4, 0.12, 8.0), (5, 0.06, 10.0)]     # (倍數, 音量, 衰減率)
+                 (4, 0.12, 8.0), (5, 0.06, 10.0)]     # (multiple, volume, decay rate)
     tone = np.zeros_like(t)
     for n, amp, decay in harmonics:
-        # 輕微走音 (inharmonicity) 讓聲音更自然
+        # Slight inharmonicity makes it sound more natural
         f = freq * n * (1 + 0.0004 * n * n)
         tone += amp * np.exp(-decay * t) * np.sin(2 * np.pi * f * t)
 
-    attack = np.minimum(t / 0.005, 1.0)                  # 5ms 起音，避免「啪」聲
-    release = np.clip((DURATION - t) / 0.15, 0.0, 1.0)   # 尾巴淡出
+    attack = np.minimum(t / 0.005, 1.0)                  # 5 ms attack avoids a "click"
+    release = np.clip((DURATION - t) / 0.15, 0.0, 1.0)   # fade out at the end
     tone *= attack * release
-    return tone / np.max(np.abs(tone)) * 0.8             # 正規化並留 headroom
+    return tone / np.max(np.abs(tone)) * 0.8             # normalize and keep headroom
 
 
 def write_wav(path: Path, data: np.ndarray) -> None:
@@ -58,9 +64,9 @@ def write_wav(path: Path, data: np.ndarray) -> None:
         w.writeframes(pcm.tobytes())
 
 
-# ---------------------------------------------------------------- 2. 圖示
+# ---------------------------------------------------------------- 2. Icons
 def write_png(path: Path, rgb: np.ndarray) -> None:
-    """用標準函式庫 zlib 手寫 PNG（教學重點：PNG 就是 header + 壓縮過的像素）"""
+    """Writes a PNG by hand with the standard-library zlib (lesson: a PNG is just a header + compressed pixels)"""
     h, w, _ = rgb.shape
     raw = b"".join(b"\x00" + rgb[y].astype(np.uint8).tobytes() for y in range(h))
 
@@ -76,12 +82,12 @@ def write_png(path: Path, rgb: np.ndarray) -> None:
 
 
 def make_icon(size: int, maskable: bool = False) -> np.ndarray:
-    """畫一個 8 色琴鍵的圖示"""
+    """Draws an icon with 8 colored piano keys"""
     img = np.zeros((size, size, 3), dtype=np.uint8)
-    img[:] = (255, 248, 231)                              # 奶油色背景
+    img[:] = (255, 248, 231)                              # cream background
     colors = [(239, 83, 80), (255, 167, 38), (255, 213, 79), (102, 187, 106),
               (38, 198, 218), (66, 165, 245), (171, 71, 188), (239, 83, 80)]
-    pad = int(size * (0.22 if maskable else 0.12))        # maskable 要留安全區
+    pad = int(size * (0.22 if maskable else 0.12))        # maskable icons need a safe zone
     top, bottom = pad + int(size * 0.08), size - pad - int(size * 0.08)
     key_w = (size - 2 * pad) / 8
     for i, c in enumerate(colors):
@@ -91,27 +97,75 @@ def make_icon(size: int, maskable: bool = False) -> np.ndarray:
     return img
 
 
-# ---------------------------------------------------------------- 3. 兒歌
+# ---------------------------------------------------------------- 3. Songs
 SONGS = [
     {
         "id": "twinkle",
-        "title": "小星星 Twinkle Twinkle",
+        "title": "twinkle",   # i18n key
         "notes": "C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4 "
                  "G4 G4 F4 F4 E4 E4 D4 G4 G4 F4 F4 E4 E4 D4 "
                  "C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4".split(),
     },
     {
         "id": "mary",
-        "title": "瑪莉有隻小綿羊 Mary Had a Little Lamb",
+        "title": "mary",
         "notes": "E4 D4 C4 D4 E4 E4 E4 D4 D4 D4 E4 G4 G4 "
                  "E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4".split(),
     },
-    {
-        "id": "scale",
-        "title": "音階 Do Re Mi",
-        "notes": list(WHITE) + list(reversed(WHITE)),
-    },
 ]
+
+
+# ---------------------------------------------------------------- 5. Staff notation
+# Colors: everything pink in treble clef, light blue in bass clef (must match CLEF_COLOR in app.js)
+CLEF_COLOR = {"G": "#EC407A", "F": "#29B6F6"}
+# Notes drawn for each clef: treble C4–C5, bass C3–C4 (middle C appears in both)
+CLEF_NOTES = {
+    "G": ["C4", "Cs4", "D4", "Ds4", "E4", "F4", "Fs4", "G4", "Gs4", "A4", "As4", "B4", "C5"],
+    "F": ["C3", "Cs3", "D3", "Ds3", "E3", "F3", "Fs3", "G3", "Gs3", "A3", "As3", "B3", "C4"],
+}
+
+
+def staff_mei(note, clef_name: str) -> str:
+    """Converts a note like 'Cs4' into MEI music notation (one whole note); note=None draws only the clef"""
+    clef = ("G", 2) if clef_name == "G" else ("F", 4)     # treble clef on line 2, bass clef on line 4
+    if note is None:
+        body = '<space dur="1"/>'
+    else:
+        pname, accid, octave = note[0].lower(), ("s" if note[1] == "s" else ""), int(note[-1])
+        # Middle C (C4) is always pink, reminding kids "this is middle C" on the bass staff too
+        color = CLEF_COLOR["G"] if note == "C4" else CLEF_COLOR[clef_name]
+        acc = f' accid="{accid}"' if accid else ""
+        body = f'<note pname="{pname}" oct="{octave}" dur="1"{acc} color="{color}"/><space dur="8"/>'
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1"><meiHead><fileDesc><titleStmt><title/></titleStmt><pubStmt/></fileDesc></meiHead>
+<music><body><mdiv><score><scoreDef><staffGrp><staffDef n="1" lines="5" clef.shape="{clef[0]}" clef.line="{clef[1]}"/></staffGrp></scoreDef>
+<section><measure n="1" right="invis"><staff n="1"><layer n="1">
+{body}
+</layer></staff></measure></section></score></mdiv></body></music></mei>"""
+
+
+def write_staff() -> None:
+    try:
+        import verovio
+    except ImportError:
+        print("⚠ verovio is not installed — skipping staff images (keeping existing static/staff/*.svg)")
+        return
+    verovio.enableLog(verovio.LOG_OFF) if hasattr(verovio, "enableLog") else None
+    tk = verovio.toolkit()
+    tk.setOptions({"adjustPageHeight": True, "adjustPageWidth": True, "scale": 100,
+                   "header": "none", "footer": "none", "svgViewBox": True, "svgRemoveXlink": True,
+                   "pageMarginTop": 20, "pageMarginBottom": 20, "pageMarginLeft": 10,
+                   "pageMarginRight": 20, "removeIds": True,
+                   "spacingLinear": 0.12, "spacingNonLinear": 0.5, "spacingStaff": 4})
+    total = 0
+    for clef_name, notes in CLEF_NOTES.items():
+        folder = ROOT / "staff" / clef_name
+        folder.mkdir(parents=True, exist_ok=True)
+        for n in [None] + notes:                          # None = clef-only image (used as the menu icon)
+            tk.loadData(staff_mei(n, clef_name))
+            (folder / f"{n or 'clef'}.svg").write_text(tk.renderToSVG(1), encoding="utf-8")
+            total += 1
+    print(f"✓ {total} staff images (treble staff/G, bass staff/F) → static/staff/")
 
 
 def main() -> None:
@@ -120,17 +174,25 @@ def main() -> None:
 
     for name, freq in NOTES.items():
         write_wav(ROOT / "sounds" / f"{name}.wav", synth_piano(freq))
-    print(f"✓ {len(NOTES)} 個音檔 → static/sounds/")
+    print(f"✓ {len(NOTES)} sound files → static/sounds/")
 
     write_png(ROOT / "icons" / "icon-192.png", make_icon(192))
     write_png(ROOT / "icons" / "icon-512.png", make_icon(512))
     write_png(ROOT / "icons" / "icon-maskable-512.png", make_icon(512, maskable=True))
-    print("✓ 3 個圖示 → static/icons/")
+    print("✓ 3 icons → static/icons/")
 
     (ROOT / "songs.json").write_text(
         json.dumps({"notes": list(WHITE), "black": list(BLACK), "songs": SONGS}, ensure_ascii=False, indent=2),
         encoding="utf-8")
-    print(f"✓ {len(SONGS)} 首兒歌 → static/songs.json")
+    print(f"✓ {len(SONGS)} songs → static/songs.json")
+
+    i18n.check()
+    (ROOT / "i18n.json").write_text(
+        json.dumps({"langs": i18n.LANGS, "strings": i18n.STRINGS}, ensure_ascii=False, indent=1),
+        encoding="utf-8")
+    print(f"✓ {len(i18n.LANGS)} languages → static/i18n.json")
+
+    write_staff()
 
 
 if __name__ == "__main__":

@@ -1,18 +1,26 @@
-/* Service Worker：第一次開啟時把所有檔案存進快取，之後完全離線可用。
- * 更新內容時，把 VERSION 加 1，舊快取會被自動清掉。 */
-const VERSION = "toddler-music-box-v4";
-const NOTES = ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "Cs4", "Ds4", "Fs4", "Gs4", "As4"];
+/* Service Worker: caches every file on first visit so the app then works fully offline.
+  * When you change content, bump VERSION; old caches are deleted automatically. */
+const VERSION = "toddler-music-box-1.0.0";   // bump on every frontend change (e.g. 1.0.1)
+const PCS = ["C", "Cs", "D", "Ds", "E", "F", "Fs", "G", "Gs", "A", "As", "B"];
+const NOTES = [...PCS.map((p) => p + 3), ...PCS.map((p) => p + 4), "C5"];                // 25 notes
+const STAFF = [
+  ...[...PCS.map((p) => p + 4), "C5", "clef"].map((n) => `staff/G/${n}.svg`),         // treble clef
+  ...[...PCS.map((p) => p + 3), "C4", "clef"].map((n) => `staff/F/${n}.svg`),         // bass clef
+];
 const PRECACHE = [
   "./",
   "index.html",
   "style.css",
   "app.js",
+  "piano.js",
   "songs.json",
+  "i18n.json",
   "manifest.webmanifest",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "icons/icon-maskable-512.png",
   ...NOTES.map((n) => `sounds/${n}.wav`),
+  ...STAFF,
 ];
 
 self.addEventListener("install", (e) => {
@@ -32,7 +40,7 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;
 
-  // API：網路優先（拿最新旋律），離線時退回快取
+  // API: network first (latest melodies), fall back to cache when offline
   if (url.pathname.endsWith("/api/songs")) {
     e.respondWith(
       fetch(e.request)
@@ -42,7 +50,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // 其他靜態檔：快取優先 → 最快、可離線
+  // Other static files: cache first → fastest and works offline
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || fetch(e.request))
   );

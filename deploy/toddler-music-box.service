@@ -1,5 +1,5 @@
-# systemd 服務：開機自動啟動 Python 後端，當掉會自動重啟
-# 安全：用專屬的低權限帳號 toddler 執行，整個檔案系統對它都是「唯讀」
+# systemd service: starts the Python backend at boot and restarts it if it crashes
+# Security: runs as the dedicated low-privilege user "toddler"; the whole filesystem is read-only for it
 [Unit]
 Description=Toddler Music Box API (FastAPI + uvicorn)
 After=network.target
@@ -13,7 +13,7 @@ ExecStart=__APP_DIR__/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --w
 Restart=always
 RestartSec=3
 
-# ---- 沙盒（只讀不能寫）----
+# ---- Sandbox (read-only) ----
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 程式更新後，在 EC2 上執行：bash /opt/toddler-music-box/deploy/update.sh
+# After updating the code, run on EC2: bash /opt/toddler-music-box/deploy/update.sh
 set -euo pipefail
 cd /opt/toddler-music-box
 git pull
@@ -13,4 +13,4 @@ sed "s|__APP_DIR__|/opt/toddler-music-box|g" deploy/toddler-music-box.service | 
 sudo systemctl daemon-reload
 sudo systemctl restart toddler-music-box
 sudo nginx -t && sudo systemctl reload nginx
-echo "✓ 已更新。記得：前端有改動時，要把 static/sw.js 的 VERSION 加 1。"
+echo "✓ Updated. Remember: after frontend changes, bump VERSION in static/sw.js."

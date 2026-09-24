@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Toddler Music Box 寶寶音樂盒</title>
-  <meta name="description" content="給幼兒的彩色鋼琴，可離線使用，無廣告、不收集資料。">
+  <title>Toddler Music Box</title>
+  <meta name="description" content="A colorful piano that teaches toddlers to read treble and bass clef. Works offline, no ads, no data collected.">
   <meta name="theme-color" content="#FFF8E7">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
@@ -15,27 +15,64 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- #app：直立的手機會把整個畫面轉 90 度，變成橫向顯示 -->
+<!-- #app: on portrait phones the whole screen is rotated 90° into landscape -->
 <div id="app">
-  <!-- 開始畫面：瀏覽器規定要先有一次點擊才能發出聲音 -->
+  <!-- Start screen: browsers require one tap before any sound can play -->
   <div id="start" class="overlay">
-    <button id="startBtn" class="start-btn" aria-label="開始彈琴">
+    <button id="startBtn" class="start-btn" aria-label="Start">
       <span class="play-icon" aria-hidden="true"></span>
     </button>
-    <p class="start-hint" id="startHint">點一下開始 · Tap to play</p>
+    <p class="start-hint" id="startHint">▶</p>
   </div>
 
   <header class="bar">
-    <div class="songs" id="songs" role="group" aria-label="選歌">
-      <button class="chip active" data-song="">自由彈 Free</button>
-    </div>
-    <button id="blackToggle" class="chip toggle" aria-pressed="true">♯ 黑鍵</button>
+    <span class="clef-pick">
+      <img id="clefIcon" class="clef-icon" alt="" draggable="false">
+      <select id="clef" class="select clef-select">
+        <option value="G"></option>
+        <option value="F"></option>
+      </select>
+    </span>
+    <select id="song" class="select song-select"></select>
+    <button id="pianoBtn" class="chip piano-btn"></button>
+    <button id="quizBtn" class="chip quiz-btn"></button>
+    <span id="pianoStatus" class="piano-status" aria-live="polite"></span>
+    <select id="lang" class="select lang"></select>
     <span id="status" class="status" aria-live="polite"></span>
   </header>
 
-  <main id="keys" class="keys" aria-label="琴鍵"></main>
+  <!-- "Current note" layer: staff → key to press (for learning to read music) -->
+  <section id="now" class="now empty" aria-live="polite">
+    <span id="nowLabel" class="now-label"></span>
+    <div class="now-card">
+      <img id="nowStaff" class="now-staff" alt="">
+      <span class="now-arrow" aria-hidden="true"></span>
+      <div class="now-key-wrap">
+        <div id="nowKey" class="mini-key"></div>
+      </div>
+    </div>
+  </section>
+
+  <main id="keys" class="keys" aria-label="Piano keys"></main>
+
+  <!-- Praise shown when the quiz is all correct -->
+  <div id="praise" class="praise" hidden aria-hidden="true">⭐⭐⭐</div>
+
+  <!-- Microphone permission dialog (for parents) -->
+  <div id="micDialog" class="dialog-backdrop" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="micTitle">
+      <div class="dialog-icon" aria-hidden="true">🎤</div>
+      <h2 id="micTitle"></h2>
+      <p id="micBody"></p>
+      <div class="dialog-actions">
+        <button id="micClose" class="chip"></button>
+        <button id="micOk" class="chip primary"></button>
+      </div>
+    </div>
+  </div>
 </div>
 
+  <script src="piano.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
