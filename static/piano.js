@@ -1,39 +1,18 @@
 /* piano.js — listens to the child's real piano
  *
-  * Two methods, chosen automatically:
-  *  1. Web MIDI: digital piano / keyboard over USB or Bluetooth → most accurate (Chrome, Edge, Android)
-  *  2. Microphone pitch detection: acoustic upright / grand piano → works on every device (incl. iPhone, iPad)
+  * Microphone pitch detection: works with any piano or keyboard, on every device (incl. iPhone, iPad)
  *
   * Privacy: microphone audio is analyzed for pitch on this device only — never recorded, stored or uploaded.
  *
-  * API: startMidi(onNote), startMic(onNote), micPermission(), stop() → onNote(midi, source), source = "midi" | "mic"
+  * API: startMic(onNote), micPermission(), stop() → onNote(noteNumber, "mic")  (60 = middle C)
  *       PianoInput.stop()
  */
 (() => {
   "use strict";
 
-  let midiAccess = null, micStream = null, micCtx = null, timer = null, noteCb = null;
+  let micStream = null, micCtx = null, timer = null, noteCb = null;
 
-  // ---------------- 1. Web MIDI ----------------
-  function onMidiMessage(e) {
-    const [status, note, velocity] = e.data;
-    if ((status & 0xf0) === 0x90 && velocity > 0) noteCb && noteCb(note, "midi");   // Note On
-  }
-  function attachInputs() {
-    let n = 0;
-    for (const input of midiAccess.inputs.values()) { input.onmidimessage = onMidiMessage; n++; }
-    return n;
-  }
-  async function tryMidi() {
-    if (!navigator.requestMIDIAccess) return 0;
-    try {
-      midiAccess = await navigator.requestMIDIAccess();
-      midiAccess.onstatechange = attachInputs;           // keyboards plugged in later also work
-      return attachInputs();
-    } catch (_) { return 0; }
-  }
-
-  // ---------------- 2. Microphone + pitch detection (McLeod Pitch Method) ----------------
+  // ---------------- Microphone + pitch detection (McLeod Pitch Method) ----------------
   // Returns frequency in Hz, or 0 when there is no clear pitch
   function detectPitch(buf, sampleRate) {
     const n = buf.length, minLag = Math.floor(sampleRate / 1100), maxLag = Math.floor(sampleRate / 100);   // down to ~100 Hz (bass C3 = 131 Hz)
@@ -59,7 +38,7 @@
     const shift = (a - c) / (2 * (a - 2 * b + c) || 1);
     return sampleRate / (tau + shift);
   }
-  const freqToMidi = (f) => Math.round(69 + 12 * Math.log2(f / 440));
+  const freqToNum = (f) => Math.round(69 + 12 * Math.log2(f / 440));
 
   async function startMic() {
     micStream = await navigator.mediaDevices.getUserMedia({
@@ -87,7 +66,7 @@
       if (waiting > 0) {
         waiting--;
         const f = detectPitch(buf, micCtx.sampleRate);
-        if (f) votes.push(freqToMidi(f));
+        if (f) votes.push(freqToNum(f));
         // Two consecutive identical estimates → confirmed
         const k = votes.length;
         if (k >= 2 && votes[k - 1] === votes[k - 2]) {
@@ -100,11 +79,6 @@
 
   // ---------------- Public API ----------------
   window.PianoInput = {
-    // Start listening to connected MIDI keyboards; returns how many are connected (0 = none)
-    async startMidi(onNote) {
-      noteCb = onNote;
-      return tryMidi();
-    },
     // Start listening through the microphone; throws if the user denies it or there is no mic
     async startMic(onNote) {
       noteCb = onNote;
@@ -122,7 +96,6 @@
       if (timer) clearInterval(timer), (timer = null);
       if (micStream) micStream.getTracks().forEach((t) => t.stop()), (micStream = null);
       if (micCtx) micCtx.close(), (micCtx = null);
-      if (midiAccess) for (const i of midiAccess.inputs.values()) i.onmidimessage = null;
     },
     detectPitch,     // exposed for testing
   };

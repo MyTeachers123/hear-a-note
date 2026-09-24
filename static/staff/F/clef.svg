@@ -1,38 +1,38 @@
-<svg viewBox="0 0 232 148" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" overflow="visible" id="x1j41lq7">
+<svg viewBox="0 0 232 148" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" overflow="visible" id="v2keej3">
    <desc>Engraved by Verovio 6.3.0-425dd7b</desc>
    <defs>
-      <g id="E062-x1j41lq7">
+      <g id="E062-v2keej3">
          <path transform="scale(1,-1)" d="M582 -120c0 32 26 58 58 58s58 -26 58 -58s-26 -58 -58 -58s-58 26 -58 58zM582 120c0 32 26 58 58 58s58 -26 58 -58s-26 -58 -58 -58s-58 26 -58 58zM158 96c51 0 73 -14 88 -49l16 -39c0 -17 -2 -30 -7 -40c-3 -11 -10 -21 -19 -31c-17 -18 -49 -43 -84 -43 c-55 0 -77 13 -112 44c-24 21 -35 55 -35 100c0 46 14 81 32 112c30 52 71 79 137 93l36 6l26 2c154 0 235 -68 274 -182c11 -32 18 -68 18 -107c0 -103 -26 -182 -68 -250c-89 -145 -234 -230 -412 -288l-30 -5c-9 0 -14 3 -14 8c3 10 5 11 10 16c35 15 70 30 96 44l78 43 c96 57 162 136 197 258c9 33 17 60 22 100c3 22 5 35 6 39c-7 69 -16 115 -23 140s-4 22 -16 40c-8 12 -19 23 -31 34c-24 21 -62 44 -118 44c-48 0 -84 -8 -113 -28c-28 -19 -42 -44 -42 -73v-16c2 -5 3 -9 4 -11c24 22 52 39 84 39z" />
       </g>
    </defs>
-   <style type="text/css">#x1j41lq7 g.ending, #x1j41lq7 g.fing, #x1j41lq7 g.reh, #x1j41lq7 g.tempo {font-weight:bold;}#x1j41lq7 g.dir, #x1j41lq7 g.dynam, #x1j41lq7 g.mNum {font-style:italic;}#x1j41lq7 g.label {font-weight:normal;}#x1j41lq7 ellipse, #x1j41lq7 path, #x1j41lq7 polygon, #x1j41lq7 polyline, #x1j41lq7 rect {stroke:currentColor}#x1j41lq7 g.cursor {fill:dodgerblue; color:dodgerblue;}#x1j41lq7 g.cursor.chord {fill:limegreen; color:limegreen;}</style>
+   <style type="text/css">#v2keej3 g.ending, #v2keej3 g.fing, #v2keej3 g.reh, #v2keej3 g.tempo {font-weight:bold;}#v2keej3 g.dir, #v2keej3 g.dynam, #v2keej3 g.mNum {font-style:italic;}#v2keej3 g.label {font-weight:normal;}#v2keej3 ellipse, #v2keej3 path, #v2keej3 polygon, #v2keej3 polyline, #v2keej3 rect {stroke:currentColor}#v2keej3 g.cursor {fill:dodgerblue; color:dodgerblue;}#v2keej3 g.cursor.chord {fill:limegreen; color:limegreen;}</style>
    <svg class="definition-scale" color="black" font-family="Times, serif" viewBox="0 0 2320 1480">
       <g class="page-margin" transform="translate(100, 200)">
-         <g id="y1r1512b" class="mdiv pageMilestone" />
-         <g id="z8ziaz0" class="score pageMilestone" />
-         <g id="s1fp2u6f" class="system">
-            <g id="m1bmemm5" class="section systemMilestone" />
-            <g id="n1n3rae5" class="measure">
-               <g id="wt2odba" class="staff">
+         <g id="w4f72ds" class="mdiv pageMilestone" />
+         <g id="x1v8n05a" class="score pageMilestone" />
+         <g id="q1l5k8o0" class="system">
+            <g id="kcmejb1" class="section systemMilestone" />
+            <g id="l1xmtg96" class="measure">
+               <g id="u1ffyp93" class="staff">
                   <path d="M0 180 L2029 180" stroke-width="13" />
                   <path d="M0 360 L2029 360" stroke-width="13" />
                   <path d="M0 540 L2029 540" stroke-width="13" />
                   <path d="M0 720 L2029 720" stroke-width="13" />
                   <path d="M0 900 L2029 900" stroke-width="13" />
-                  <g id="p1l0a8dc" class="clef">
-                     <use href="#E062-x1j41lq7" transform="translate(88, 360) scale(0.72, 0.72)" />
+                  <g id="n1c33ovq" class="clef">
+                     <use href="#E062-v2keej3" transform="translate(88, 360) scale(0.72, 0.72)" />
                   </g>
-                  <g id="q1jo9bes" class="keySig" />
-                  <g id="x1o4bnnl" class="layer">
-                     <g id="y1hgxt65" class="space" />
+                  <g id="o116y2t5" class="keySig" />
+                  <g id="v1n2isrb" class="layer">
+                     <g id="wohrthu" class="space" />
                   </g>
                </g>
-               <g id="vny8n82" class="barLine" />
+               <g id="tjfk05q" class="barLine" />
             </g>
-            <g id="g8mp3e" class="systemMilestoneEnd m1bmemm5" />
+            <g id="evmi8ex" class="systemMilestoneEnd kcmejb1" />
          </g>
-         <g id="hxlcg2u" class="pageMilestoneEnd z8ziaz0" />
-         <g id="i15piwt0" class="pageMilestoneEnd y1r1512b" />
+         <g id="fertsi5" class="pageMilestoneEnd x1v8n05a" />
+         <g id="gu1xx3o" class="pageMilestoneEnd w4f72ds" />
       </g>
    </svg>
 </svg>

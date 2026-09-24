@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Toddler Music Box</title>
   <meta name="description" content="A colorful piano that teaches toddlers to read treble and bass clef. Works offline, no ads, no data collected.">
-  <meta name="theme-color" content="#FFF8E7">
+  <meta name="theme-color" content="#0B0B0C">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -18,41 +18,44 @@
 <body>
 <!-- #app: on portrait phones the whole screen is rotated 90° into landscape -->
 <div id="app">
-  <!-- Start screen: browsers require one tap before any sound can play -->
-  <div id="start" class="overlay">
-    <button id="startBtn" class="start-btn" aria-label="Start">
-      <span class="play-icon" aria-hidden="true"></span>
-    </button>
-    <p class="start-hint" id="startHint">▶</p>
-  </div>
-
-  <header class="bar">
-    <span class="clef-pick">
-      <img id="clefIcon" class="clef-icon" alt="" draggable="false">
-      <select id="clef" class="select clef-select">
-        <option value="G"></option>
-        <option value="F"></option>
-      </select>
-    </span>
-    <select id="song" class="select song-select"></select>
-    <button id="pianoBtn" class="chip piano-btn"></button>
-    <button id="quizBtn" class="chip quiz-btn"></button>
-    <span id="pianoStatus" class="piano-status" aria-live="polite"></span>
-    <select id="lang" class="select lang"></select>
-    <span id="status" class="status" aria-live="polite"></span>
-  </header>
-
-  <!-- "Current note" layer: staff → key to press (for learning to read music) -->
-  <section id="now" class="now empty" aria-live="polite">
-    <span id="nowLabel" class="now-label"></span>
-    <div class="now-card">
-      <img id="nowStaff" class="now-staff" alt="">
-      <span class="now-arrow" aria-hidden="true"></span>
-      <div class="now-key-wrap">
-        <div id="nowKey" class="mini-key"></div>
+  <!-- Top row: big "current note" card on the left (for the child), menus on the right (for parents) -->
+  <div class="top">
+    <!-- "Current note" layer: staff → key to press (for learning to read music) -->
+    <section id="now" class="now empty" aria-live="polite">
+      <span id="nowLabel" class="now-label"></span>
+      <div class="now-card">
+        <img id="nowStaff" class="now-staff" alt="">
+        <span class="now-arrow" aria-hidden="true"></span>
+        <div class="now-key-wrap">
+          <div id="nowKey" class="mini-key"></div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+    <header class="bar">
+      <!-- Row 1: clef, play on my piano, language -->
+      <div class="bar-row">
+        <span class="clef-pick">
+          <img id="clefIcon" class="clef-icon" alt="" draggable="false">
+          <select id="clef" class="select clef-select">
+            <option value="G"></option>
+            <option value="F"></option>
+          </select>
+        </span>
+        <select id="mode" class="select mode-select">
+          <option value="screen"></option>
+          <option value="piano"></option>
+        </select>
+        <select id="lang" class="select lang"></select>
+      </div>
+      <!-- Row 2: everything else -->
+      <div class="bar-row">
+        <select id="song" class="select song-select"></select>
+        <button id="quizBtn" class="chip quiz-btn"></button>
+        <span id="pianoStatus" class="piano-status" aria-live="polite"></span>
+        <span id="status" class="status" aria-live="polite"></span>
+      </div>
+    </header>
+  </div>
 
   <main id="keys" class="keys" aria-label="Piano keys"></main>
 

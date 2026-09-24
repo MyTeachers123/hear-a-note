@@ -12,7 +12,7 @@ Free, no ads, no accounts, no data collected. Works offline once it has been ope
 ## Getting started
 
 1. Open the app in a browser on a phone, tablet or computer.
-2. Tap the big green **▶** button. The app goes fullscreen and turns sideways (landscape).
+2. Tap anywhere — the first tap turns the sound on, goes fullscreen and turns the screen sideways (landscape).
 3. Tap the keys and play!
 
 **Install it like an app (recommended)**
@@ -25,7 +25,8 @@ Opened from the home-screen icon, it runs fullscreen and works without internet.
 
 ### The keys
 - Black and white keys, just like a real piano.
-- Each white key shows a **shape** and **its note on the staff**.
+- Each white key shows one big, simple **shape** (circle, square, triangle, star, hexagon, diamond, heart, arrow) — all the same size.
+- The **current note card** above the keys shows the note on the staff, so children learn to match the staff to the shape.
 - **Middle C** is always a **circle**. The C one octave higher is an **up arrow ↑**; the C one octave lower is a **down arrow ↓**.
 
 ### Treble clef and bass clef
@@ -49,21 +50,21 @@ Pick a song from the **song menu**: *Twinkle Twinkle Little Star* or *Mary Had a
 The next key to press bounces. Wrong notes are never punished — the song simply waits for the right one.
 Both songs work in treble clef and in bass clef.
 
-### 🎹 Play on my piano
-Have a real piano or keyboard at home? Choose a song, tap **🎹**, and play on your own instrument.
-Each correct note moves the song forward until it's finished.
+### Play mode: on-screen keys or a real piano
+Use the **play mode menu** (top right):
 
-| Your instrument | How the app listens |
+| Play mode | What happens |
 |---|---|
-| Digital piano / keyboard (USB or Bluetooth MIDI) | Connects automatically — the most accurate. Works in Chrome, Edge and on Android. |
-| Acoustic piano | Uses the microphone. Works on every device, including iPhone and iPad. |
+| 🎹 **Play on-screen keys** (default) | Tap the keys on the screen. The microphone is never used. |
+| 🎤 **Play a real piano** | Have a real piano or keyboard at home? The app listens through the microphone (on every device, including iPhone and iPad). Each correct note moves the song or the quiz forward. |
 
-The first time, the browser asks for microphone permission. If it was blocked, the app shows how to turn it back on.
+The microphone is only requested when you choose **Play a real piano**. The first time, the browser asks for permission; if it was blocked, the app shows how to turn it back on.
+Switch back to **Play on-screen keys** to turn the microphone off.
 
 ### 🎯 Quiz
 Tap **🎯** to test reading notes in the selected clef:
-- The app picks **3 random notes**. The card shows the note on the staff; the pictures on the keys are hidden, so the child has to read the staff.
-- Answer on a keyboard, a real piano, or the on-screen keys.
+- The app picks **3 random notes**. The card shows only the note on the staff (the answer is a "?"), so the child has to read the staff.
+- Answer on the on-screen keys, or on a real piano when the play mode is **Play a real piano**.
 - Wrong → the correct key flashes. Right → next note.
 - All 3 done → ⭐⭐⭐ Well done!
 - Five wrong answers in a row → the quiz ends gently. Try again anytime.
@@ -74,7 +75,7 @@ The app picks your device language automatically and remembers your choice.
 
 ## Tips for parents
 
-The app goes fullscreen, stays in landscape, blocks zooming and the back button, and caps the volume at 70%.
+The app goes fullscreen (and back again after a swipe out, on the next tap), stays in landscape, blocks zooming and the back button, and caps the volume at 70%.
 A web app can't block the phone's "home" gesture, so for full lock-down:
 
 - **iPhone / iPad — Guided Access:** Settings → Accessibility → Guided Access → On (set a passcode).
@@ -85,7 +86,7 @@ A web app can't block the phone's "home" gesture, so for full lock-down:
 ## Privacy
 
 - No accounts, no personal data, no ads, no tracking.
-- The microphone is only used after you tap 🎹 or start a quiz. Sound is analyzed **on your device only** — it is never recorded, stored or uploaded.
+- The microphone is only used when the play mode is set to **Play a real piano**. Sound is analyzed **on your device only** — it is never recorded, stored or uploaded.
 
 ## For developers
 

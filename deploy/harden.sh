@@ -79,8 +79,9 @@ echo "==> 6/6 Certificate private key permissions"
 if [ -d /etc/ssl/cloudflare ]; then
   sudo chown -R root:root /etc/ssl/cloudflare
   sudo chmod 700 /etc/ssl/cloudflare
-  sudo chmod 600 /etc/ssl/cloudflare/*.key
-  sudo chmod 644 /etc/ssl/cloudflare/*.pem
+  # the glob must run as root: after chmod 700 the ubuntu user can no longer list this folder
+  sudo find /etc/ssl/cloudflare -type f -name '*.key' -exec chmod 600 {} +
+  sudo find /etc/ssl/cloudflare -type f -name '*.pem' -exec chmod 644 {} +
 fi
 
 sleep 2

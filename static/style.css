@@ -1,6 +1,10 @@
 :root {
-  --bg: #FFF8E7;
+  --bg: #0B0B0C;              /* glossy piano black */
+  --on-bg: #F3EEE6;           /* text drawn directly on the black background */
   --ink: #4A3F35;
+  /* Menus for parents: 16px text, touch targets of at least 44px (WCAG 2.2 / ADA friendly) */
+  --menu-fs: 16px;
+  --target: 44px;
   --chip: #FFFFFF;
   --chip-active: #4A3F35;
 }
@@ -13,7 +17,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   background: var(--bg);
-  color: var(--ink);
+  color: var(--on-bg);
   font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", sans-serif;
   /* Prevent accidental toddler actions: no text selection, no long-press menu, no zoom */
   user-select: none;
@@ -27,6 +31,7 @@ html, body {
 #app {
   position: fixed;
   top: 0; left: 0;
+  background: linear-gradient(#1c1c1e, var(--bg) 30%);   /* soft highlight, like a lacquered piano lid */
   width: 100dvw;
   height: 100dvh;
   display: flex;
@@ -67,7 +72,7 @@ html, body {
   white-space: nowrap;
   cursor: pointer;
 }
-.chip.active { background: var(--chip-active); color: var(--bg); }
+.chip.active { background: var(--chip-active); color: #fff; }
 .status { font-size: 13px; opacity: .7; white-space: nowrap; }
 
 /* ---------- Keys ---------- */
@@ -95,31 +100,8 @@ html, body {
   cursor: pointer;
   min-width: 0;
 }
-/* Lower half of white keys (not covered by black keys): shape + staff */
-.key .shape {
-  width: 38%;
-  aspect-ratio: 1;
-  background: var(--c);
-  flex: none;
-}
-.key-staff {
-  width: 100%;
-  max-height: 30%;
-  object-fit: contain;
-  pointer-events: none;
-  flex: none;
-}
-.key[data-shape="circle"] .shape   { border-radius: 50%; }
-.key[data-shape="square"] .shape   { border-radius: 14%; }
-.key[data-shape="triangle"] .shape { clip-path: polygon(50% 6%, 96% 92%, 4% 92%); }
-.key[data-shape="star"] .shape     { clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
-.key[data-shape="hexagon"] .shape  { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
-.key[data-shape="diamond"] .shape  { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.key[data-shape="heart"] .shape,
-.key[data-shape="arrow"] .shape,
-.key[data-shape="arrowDown"] .shape { background: none; }
-.key .shape svg                    { width: 100%; height: 100%; display: block; }
-.key .shape svg path               { fill: var(--c); }
+/* Lower half of white keys (not covered by black keys): one big shape (sized at the end of this file) */
+.key .shape { flex: none; }
 
 .key.down {
   transform: translateY(6px);
@@ -178,30 +160,6 @@ html, body {
   75% { filter: hue-rotate(300deg); }
 }
 
-/* ---------- Start screen ---------- */
-.overlay {
-  position: fixed; inset: 0;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 20px; z-index: 10;
-}
-.overlay.hidden { display: none; }
-.start-btn {
-  width: min(40cqw, 48cqh); aspect-ratio: 1;
-  border-radius: 50%; border: none;
-  background: #66BB6A;
-  box-shadow: 0 12px 0 #43A047;
-  cursor: pointer;
-  animation: hop 1.2s ease-in-out infinite;
-  display: grid; place-items: center;
-}
-.play-icon {
-  width: 40%; aspect-ratio: 1; background: #fff;
-  clip-path: polygon(25% 10%, 90% 50%, 25% 90%);
-}
-.start-hint { font-size: 20px; font-weight: 700; margin: 0; }
-
 /* Very narrow desktop window: narrower keys, smaller text */
 @media (orientation: portrait) and (pointer: fine) and (max-width: 600px) {
   .keys { --gap: 4px; }
@@ -209,7 +167,7 @@ html, body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .key.next, .start-btn { animation: none; }
+  .key.next { animation: none; }
 }
 
 /* ---------- Dropdowns (song, language) ---------- */
@@ -218,13 +176,15 @@ html, body {
   border-radius: 999px;
   background: var(--chip);
   color: var(--ink);
-  font: 600 14px/1 inherit;
+  font-weight: 600;
+  font-size: var(--menu-fs);
+  line-height: 1.2;
   font-family: inherit;
-  padding: 5px 8px;
+  padding: .3em .5em;
 }
 .song-select { max-width: 16em; }
 .lang { margin-left: auto; max-width: 9.5em; }
-.piano-btn.active { background: #E53935; border-color: #E53935; color: #fff; }
+.mode-select.active { background: #E53935; border-color: #E53935; color: #fff; }
 .piano-status { font-size: 13px; font-weight: 700; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Note heard from a real piano: the key lights up */
 .key.heard { background: color-mix(in srgb, var(--c) 22%, #fff); }
@@ -275,18 +235,7 @@ html, body {
   display: grid;
   place-items: center;
 }
-.mini-key .shape { width: 58%; margin: 0; }
-.mini-key[data-shape="circle"] .shape   { border-radius: 50%; }
-.mini-key[data-shape="square"] .shape   { border-radius: 14%; }
-.mini-key[data-shape="triangle"] .shape { clip-path: polygon(50% 6%, 96% 92%, 4% 92%); }
-.mini-key[data-shape="star"] .shape     { clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
-.mini-key[data-shape="hexagon"] .shape  { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
-.mini-key[data-shape="diamond"] .shape  { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.mini-key .shape { aspect-ratio: 1; background: var(--c); }
-.mini-key .shape svg { width: 100%; height: 100%; display: block; }
-.mini-key .shape svg path { fill: var(--c); }
-.mini-key[data-shape="heart"] .shape, .mini-key[data-shape="arrow"] .shape,
-.mini-key[data-shape="arrowDown"] .shape { background: none; }
+.mini-key .shape { margin: 0; }
 .mini-key.black { background: linear-gradient(#444, #1c1c1c); box-shadow: 0 4px 0 #000; aspect-ratio: .55; }
 .now.pop .now-card { animation: pop 300ms ease-out; }
 @keyframes pop { 0% { transform: scale(.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
@@ -321,14 +270,13 @@ html, body {
 .clef-pick {
   display: inline-flex; align-items: center; gap: 2px;
   background: #fff; border: 2px solid var(--ink); border-radius: 999px;
-  padding: 0 2px 0 4px; height: 34px;
+  padding: 0 2px 0 4px; height: calc(var(--menu-fs) * 2.1);
 }
-.clef-icon { height: 30px; width: 44px; object-fit: cover; object-position: left center; }
+.clef-icon { height: 88%; width: auto; aspect-ratio: 1.47; object-fit: cover; object-position: left center; }
 .clef-pick .select { border: none; padding-left: 2px; background: transparent; }
 
 /* ---------- Quiz ---------- */
 .quiz-btn.active { background: #7E57C2; border-color: #7E57C2; color: #fff; }
-.keys.quiz .key-staff { visibility: hidden; }          /* during the quiz, read the card — no matching pictures on keys */
 .key.reveal { animation: reveal 450ms ease-in-out 4; }  /* wrong answer: the correct key flashes */
 @keyframes reveal {
   0%, 100% { background: #fff; outline: 0 solid var(--c); }
@@ -355,3 +303,111 @@ html, body {
 @media (prefers-reduced-motion: reduce) { .key.reveal, .key.black.reveal, .praise.show { animation-duration: 1ms; } }
 /* During the quiz, pressed keys only show grey feedback so they are not confused with the correct-answer flash */
 .keys.quiz .key.heard:not(.reveal) { background: #ece9e4; }
+
+/* ---------- Black background: text and borders that sit directly on it ---------- */
+.now-label, .status, .piano-status { color: var(--on-bg); }
+.now-card { box-shadow: 0 4px 0 rgba(255,255,255,.12); }
+.key { box-shadow: 0 8px 0 #9d978f, inset 0 0 0 1px #d9d4cc; }
+.key.down { box-shadow: 0 2px 0 #9d978f, inset 0 0 0 1px #d9d4cc; }
+
+/* Small screens: the bigger dropdowns shrink (text is cut with an ellipsis) instead of pushing the toolbar off-screen */
+.bar-row > * { flex-shrink: 0; }
+.bar-row > .select, .bar-row > .clef-pick { flex-shrink: 1; min-width: 4.5em; }
+.clef-pick .select { min-width: 0; flex: 1 1 auto; }
+.bar-row > .piano-status { flex-shrink: 1; min-width: 0; }
+
+/* ---------- Top row: current note (left, as big as possible) + menus (right, may wrap) ---------- */
+.top {
+  display: flex;
+  align-items: stretch;
+  gap: var(--gap, 8px);
+  padding: 8px clamp(4px, 1.2cqw, 12px) 10px;
+  height: clamp(110px, 40cqh, 340px);
+  flex: none;
+}
+.top .now {
+  flex: none;
+  height: 100%;
+  padding: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.top .now-label { font-size: 14px; line-height: 1; }
+.top .now-card { flex: 1; min-height: 0; height: auto; }
+.top .mini-key { height: 86%; }
+.top .now-arrow { width: clamp(18px, 4cqh, 40px); }
+.top .bar {
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-content: flex-start;
+  align-items: center;
+  padding: 0;
+  row-gap: 6px;
+  overflow-y: auto;
+}
+.top .lang { margin-left: 0; }
+.top .chip, .top .select { font-size: var(--menu-fs); min-height: var(--target); }
+.top .clef-pick { height: var(--target); }
+.top .status, .top .piano-status { font-size: 14px; opacity: .85; }
+/* Keyboard users: clear focus ring on every control */
+.top .chip:focus-visible, .top .select:focus-visible, .dialog .chip:focus-visible {
+  outline: 3px solid #FFD54F; outline-offset: 2px;
+}
+.clef-pick:focus-within { outline: 3px solid #FFD54F; outline-offset: 2px; }
+.clef-pick .select:focus-visible { outline: none; }
+
+/* ---------- Padding on all four sides of both top-row areas; menus in two rows ---------- */
+.top { --pad: clamp(6px, 1.4cqw, 16px); }
+.top .now {
+  padding: var(--pad);
+  background: rgba(255,255,255,.06);
+  border-radius: 22px;
+}
+.top .now-card { padding: var(--pad) calc(var(--pad) * 1.5); }
+.top .bar {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: var(--pad);
+  background: rgba(255,255,255,.06);
+  border-radius: 22px;
+}
+.bar-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+/* The card's width follows its height (square staff + arrow + key), so size the panel from its height */
+.top .now { aspect-ratio: 2.05; align-items: stretch; }
+.top .now-card { justify-content: center; min-width: 0; }
+.top .now-staff { min-width: 0; }
+/* Keep exactly two rows: on narrow screens the dropdowns shorten (ellipsis) instead of wrapping to a third row */
+.bar-row { flex-wrap: nowrap; }
+.bar-row > .select, .bar-row > .clef-pick { min-width: 5em; }
+
+/* ---------- Key shapes: one size, one boldness for every shape ---------- */
+.key { padding: 0 12% max(14%, 5cqh); }
+.key .shape, .mini-key .shape {
+  background: none !important;
+  clip-path: none !important;
+  border-radius: 0 !important;
+  aspect-ratio: 1;
+}
+.key .shape { width: 74%; max-height: 34%; }
+.key .shape svg, .mini-key .shape svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.key .shape svg path, .mini-key .shape svg path {
+  fill: var(--c);
+  stroke: var(--c);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+.mini-key .shape { width: 66%; }
