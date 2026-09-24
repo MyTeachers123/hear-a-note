@@ -54,6 +54,7 @@
         <select id="song" class="select song-select"></select>
         <button id="playBtn" class="chip play-btn" disabled></button>
         <button id="quizBtn" class="chip quiz-btn"></button>
+        <button id="exitBtn" class="chip exit-btn" type="button" aria-pressed="false"></button>
         <span id="pianoStatus" class="piano-status" aria-live="polite"></span>
         <span id="status" class="status" aria-live="polite"></span>
       </div>
@@ -61,9 +62,6 @@
   </div>
 
   <main id="keys" class="keys" aria-label="Piano keys"></main>
-
-  <!-- Praise shown when the quiz is all correct -->
-  <img id="praise" class="praise" src="icons/praise.png" alt="" hidden aria-hidden="true" draggable="false">
 
   <!-- Microphone permission dialog (for parents) -->
   <div id="micDialog" class="dialog-backdrop" hidden>

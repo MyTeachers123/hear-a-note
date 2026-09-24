@@ -131,6 +131,7 @@
     menuBtn.setAttribute("aria-label", T.menu);
     menuBtn.title = T.menu;
     setPlayBtn();
+    setExitBtn();
     if (pianoState) pianoStatus.textContent = T[pianoState] || "";
     nowEl.setAttribute("aria-label", T.now);          // no visible label; screen readers still hear "Current note"
     langSel.setAttribute("aria-label", T.language);
@@ -191,6 +192,28 @@
       nowKey.className = "mini-key ask";
       nowKey.innerHTML = `<span class="ask-mark">?</span>`;
     }
+    applyCue();
+  }
+
+  // The note to press: its shape on the card and the same shape on the right key bounce and blink
+  // together, in step (both animations are restarted at the same moment). In the quiz only the "?" moves,
+  // so the answer is not given away. Nothing moves during the Listen demo or in free play.
+  function currentTarget() {
+    if (demo) return null;
+    if (quiz) return quiz.notes[quiz.pos];
+    if (song) return curNotes[songPos];
+    return null;
+  }
+  function applyCue() {
+    document.querySelectorAll(".cue").forEach((e) => e.classList.remove("cue"));
+    const target = currentTarget();
+    if (!target) return;
+    const els = [];
+    if (nowNote === target) els.push(nowKey.querySelector(".shape, .ask-mark"));
+    if (!quiz && keyEls[target]) els.push(keyEls[target].querySelector(".shape"));
+    const live = els.filter(Boolean);
+    void document.body.offsetWidth;                  // restart both animations at the same time
+    live.forEach((e) => e.classList.add("cue"));
   }
 
   // Show the next target — but if the child just played a right note, wait until its answer has been seen
@@ -202,29 +225,123 @@
     } else showNow(note, hideAnswer);
   }
 
-  // Right note (songs and quiz): the card shows the answer (staff + shape) with a happy pulse,
-  // and a little card with the same staff note and shape flies up out of the key.
+  // Right note (songs and quiz): the card shows the answer (staff + shape) with a happy pulse.
   function rightNote(note) {
     showNow(note);
     nowEl.classList.remove("right"); void nowEl.offsetWidth; nowEl.classList.add("right");
     holdUntil = performance.now() + HOLD_MS;
-    flyOut(note);
+    reward(note);
   }
-  function flyOut(note) {
+
+  /* ---------------- Right-note reward (chosen by the parent: #1, #2, #4, #5, #10, at random) ---------------- */
+  // Above the key that was played: the note on the staff (transparent background) + its shape, with one of
+  // five little effects around it: confetti, twinkling stars, hearts, ripple rings or orbiting music notes.
+  // Colors: Sakura Sky pink + blue, beige, black, white only. It never blocks the keys (pointer-events: none).
+  const RW_COLORS = ["#FBC8D8", "#C04877", "#C3E5F8", "#2A78A8", "#EADBC8", "#FFFFFF"];
+  const RW_STAR = '<svg viewBox="-50 -50 100 100"><path d="M0-46C6-10 10-6 46 0 10 6 6 10 0 46-6 10-10 6-46 0-10-6-6-10 0-46Z"/></svg>';
+  const RW_HEART = '<svg viewBox="-6 -6 112 112"><path d="M50 88 C22 68 6 52 6 33 C6 18 17 8 30 8 C39 8 46 13 50 21 C54 13 61 8 70 8 C83 8 94 18 94 33 C94 52 78 68 50 88 Z"/></svg>';
+  const RW_NOTE = '<svg viewBox="0 0 40 40"><path d="M15 30V8l18-4v20" fill="none" stroke="#111" stroke-width="3"/><ellipse cx="10.5" cy="30.5" rx="6" ry="4.6"/><ellipse cx="28.5" cy="25.5" rx="6" ry="4.6"/></svg>';
+  const rw = (i, s) => { const x = Math.sin(i * 999 + s * 77 + Math.random()) * 10000; return x - Math.floor(x); };
+  const RW_BUILD = {
+    confetti(L, add) { for (let i = 0; i < 22; i++) { const a = rw(i, 1) * Math.PI * 2, r = 18 + rw(i, 2) * 26;
+      add("", { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r * .8 - 10 + "cqw", "--r": (rw(i, 3) * 720 - 360) + "deg", "--d": rw(i, 4) * .12 + "s", "--c": RW_COLORS[i % 5] }); } },
+    sparkle(L, add) { for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2, r = 36 + rw(i, 2) * 8;
+      add(RW_STAR, { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r * .75 + "cqw", "--d": (i % 5) * .08 + "s", "--c": RW_COLORS[[0, 2, 4, 1, 3][i % 5]] }); } },
+    hearts(L, add) { for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + (rw(i, 1) - .5) * 2.6, r = 30 + rw(i, 2) * 16;
+      add(RW_HEART, { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r + "cqw", "--r": (rw(i, 3) * 60 - 30) + "deg", "--s": (7 + rw(i, 4) * 6) + "cqw", "--d": rw(i, 5) * .3 + "s", "--c": RW_COLORS[[0, 2, 1, 0, 2, 3][i % 6]] }); } },
+    ripple(L, add) { [0, .3, .6].forEach((d, i) => add("", { "--d": d + "s", "--c": RW_COLORS[[0, 2, 1][i]] })); },
+    orbit(L, add) { for (let i = 0; i < 6; i++) add(RW_NOTE, { "--a": (i * 60) + "deg", "--d": (i * .04) + "s", "--c": RW_COLORS[[0, 2, 1, 3, 0, 2][i]] }); },
+  };
+  const RW_KINDS = Object.keys(RW_BUILD);
+  let lastKind = "";
+  function reward(note) {
     const key = keyEls[note];
-    if (!key || key.classList.contains("black")) return;
-    const fly = document.createElement("div");
-    fly.className = "fly";
-    fly.setAttribute("aria-hidden", "true");
-    fly.style.setProperty("--c", key.style.getPropertyValue("--c"));
-    fly.innerHTML = `<img src="staff/${clef}/${note}.svg" alt="" draggable="false">${key.querySelector(".shape").outerHTML}`;
+    if (!key) return;
+    let kind = RW_KINDS[Math.floor(Math.random() * RW_KINDS.length)];
+    if (kind === lastKind) kind = RW_KINDS[(RW_KINDS.indexOf(kind) + 1) % RW_KINDS.length];   // never twice in a row
+    lastKind = kind;
+    const box = document.createElement("div");
+    box.className = "reward rw-" + kind;
+    box.setAttribute("aria-hidden", "true");
+    const shape = key.classList.contains("black") ? "" : key.querySelector(".shape").outerHTML;
+    box.style.setProperty("--c", key.style.getPropertyValue("--c"));
+    box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/${note}.svg" alt="" draggable="false">${shape}</div>`;
+    const w = Math.min(Math.max(key.offsetWidth * 2.1, 150), 300);
+    box.style.width = w + "px";
     // layout coordinates (not screen coordinates), so it also works on rotated phones
-    fly.style.left = key.offsetLeft + key.offsetWidth / 2 + "px";
-    fly.style.top = key.offsetTop + key.offsetHeight * 0.35 + "px";
-    fly.style.width = Math.min(key.offsetWidth * 1.25, 170) + "px";
-    keysEl.appendChild(fly);
-    setTimeout(() => fly.remove(), 1300);
+    box.style.left = key.offsetLeft + key.offsetWidth / 2 + "px";
+    box.style.top = Math.max(key.offsetTop + key.offsetHeight * 0.3, w * 0.5) + "px";
+    const L = box.querySelector(".rw-layer");
+    RW_BUILD[kind](L, (html, vars) => {
+      const d = document.createElement("div");
+      d.className = "rw-p";
+      for (const k in vars) d.style.setProperty(k, vars[k]);
+      d.innerHTML = html;
+      L.appendChild(d);
+    });
+    keysEl.appendChild(box);
+    setTimeout(() => box.remove(), 2100);
   }
+
+  /* ---------------- Quiz finished: a burst of see-through bubbles that the child can pop ---------------- */
+  let party = null;
+  function bubbleParty() {
+    endBubbleParty();
+    const app = document.getElementById("app");
+    party = document.createElement("div");
+    party.className = "bubble-party";
+    party.setAttribute("aria-hidden", "true");
+    const COLS = 7, ROWS = 4;                                 // a loose grid, so the bubbles fill the whole screen
+    for (let i = 0; i < COLS * ROWS; i++) {
+      const b = document.createElement("div");
+      b.className = "pb";
+      const s = 11 + Math.random() * 10;                      // size, % of the app height
+      const x = ((i % COLS) + 0.2 + Math.random() * 0.6) / COLS * 100;
+      const y = (Math.floor(i / COLS) + 0.2 + Math.random() * 0.6) / ROWS * 100;
+      b.style.setProperty("--s", s + "cqh");
+      b.style.setProperty("--x", Math.min(94, Math.max(6, x)) + "cqw");
+      b.style.setProperty("--y", Math.min(90, Math.max(10, y)) + "cqh");
+      b.style.setProperty("--d", (Math.random() * 0.25) + "s");
+      b.style.setProperty("--f", (5 + Math.random() * 4) + "s");
+      b.style.setProperty("--tint", ["#FBC8D8", "#C3E5F8", "#EADBC8"][i % 3]);
+      b.addEventListener("pointerdown", (e) => { e.stopPropagation(); popBubble(b); });
+      party.appendChild(b);
+    }
+    app.appendChild(party);
+    party._t = setTimeout(endBubbleParty, 30000);             // they drift away by themselves after 30 s
+  }
+  function popBubble(b) {
+    if (b.classList.contains("popped")) return;
+    b.classList.add("popped");
+    popSound();
+    setTimeout(() => {
+      b.remove();
+      if (party && !party.querySelector(".pb:not(.popped)")) endBubbleParty();
+    }, 320);
+  }
+  function endBubbleParty() {
+    if (!party) return;
+    clearTimeout(party._t);
+    const p = party;
+    party = null;
+    p.classList.add("bye");
+    setTimeout(() => p.remove(), 600);
+  }
+  function popSound() {                                       // a soft little "pop" (low, very short)
+    if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(620, t);
+    o.frequency.exponentialRampToValueAtTime(180, t + 0.09);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.35, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    o.connect(g).connect(master);
+    o.start(t);
+    o.stop(t + 0.14);
+  }
+
 
   /* ---------------- Keys (built for the current clef) ---------------- */
   function buildKeys() {
@@ -303,7 +420,7 @@
                w: BLACK_SLOTS[0], e: BLACK_SLOTS[1], t: BLACK_SLOTS[2], y: BLACK_SLOTS[3], u: BLACK_SLOTS[4] };
   const kbNote = (key) => (KB[key.toLowerCase()] ? noteOf(KB[key.toLowerCase()]) : null);
   document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "SELECT") return;
+    if (e.target.tagName === "SELECT" || (e.target.closest && e.target.closest(".cs"))) return;
     const note = kbNote(e.key);
     if (note && !e.repeat) {
       const el = keyEls[note];
@@ -331,7 +448,7 @@
       return;
     }
     play(note);
-    if (target) rightNote(note);                      // songs and quiz: show the answer + a flying note card
+    if (target) rightNote(note);                      // songs and quiz: show the answer on the card
     else bubble(el, x, y);                           // free play: the little bubble
     if (quiz) quizAnswer(note);
     else if (song) advanceSong(note);
@@ -352,9 +469,27 @@
   /* ---------------- Sound ---------------- */
   // The AudioContext is created at page load so all sounds are decoded before the first tap.
   // Browsers keep it "suspended" until a tap → unlockAudio() resumes it inside that tap.
+  // iPhone / iPad fixes:
+  //  * the ring/silent switch mutes Web Audio unless the page says it is a music player ("playback")
+  //  * older iOS: a silent <audio> element started inside the tap moves the page into the playback session
+  //  * after the screen was locked or another app played sound, iOS leaves the audio "interrupted" → resume
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (_) {}
+  const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+                 (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let silentEl = null;
   function unlockAudio() {
+    try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch (_) {}
+    if (IS_IOS && !silentEl) {
+      silentEl = new Audio("media/silence.wav");
+      silentEl.loop = true;
+      silentEl.setAttribute("playsinline", "");
+      silentEl.play().catch(() => { silentEl = null; });   // try again on the next tap
+    }
     if (ctx && ctx.state !== "running") ctx.resume().catch(() => {});
   }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && ctx && ctx.state !== "running") ctx.resume().catch(() => {});
+  });
 
   async function initAudio() {
     if (ctx) return;
@@ -462,6 +597,7 @@
     highlightNext();
     setPlayBtn();
     if (listening) pianoStatus.textContent = T[pianoState] || "";
+    if (song) startDemo();                           // a song was picked → first show the child how it goes
   });
 
   function advanceSong(note) {
@@ -582,10 +718,9 @@
 
   /* ---------------- Quiz ---------------- */
   // Every quiz tests all 8 white-key notes of the current clef exactly once, in a new random order;
-  // wrong → the correct key flashes; right → next note; all 8 done → praise; 5 wrong in a row → end gently
+  // wrong → the correct key flashes; right → next note; all 8 done → celebration; 5 wrong in a row → end gently
   const QUIZ_LEN = WHITE_SLOTS.length, MAX_WRONG = 5;
   const quizBtn = document.getElementById("quizBtn");
-  const praiseEl = document.getElementById("praise");
   let quiz = null;
 
   function pickQuizNotes() {
@@ -632,18 +767,14 @@
     }
   }
 
-  function praise() {
-    praiseEl.hidden = false;
-    praiseEl.classList.remove("show"); void praiseEl.offsetWidth; praiseEl.classList.add("show");
-    setTimeout(() => (praiseEl.hidden = true), 2600);
-  }
+
 
   function finishQuiz(success) {
     quizProgress();
     if (success) {
       keysEl.classList.add("celebrate");
       setTimeout(() => keysEl.classList.remove("celebrate"), 1200);
-      praise();
+      setTimeout(bubbleParty, 500);                  // after the last answer's reward
     }
     const msg = success ? T.quizPraise : T.quizTryLater;
     endQuiz();
@@ -652,6 +783,7 @@
 
   function startQuiz() {
     stopDemo();
+    endBubbleParty();
     holdUntil = 0; clearTimeout(holdT);              // a new quiz starts at once (no answer still on hold)
     if (song) { songSel.value = ""; song = null; updateNotes(); }
     quiz = { notes: pickQuizNotes(), pos: 0, wrong: 0 };
@@ -771,6 +903,7 @@
 
   function highlightNext() {
     Object.values(keyEls).forEach((k) => k.classList.remove("next"));
+    setTimeout(applyCue, 0);                         // the key cue follows at once (the card may wait for its hold)
     if (song) {
       keyEls[curNotes[songPos]].classList.add("next");
       showTarget(curNotes[songPos]);                  // play-along: show the next note to play
@@ -788,10 +921,15 @@
     navigator.standalone === true;                       // iOS "Add to Home Screen"
   const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
 
-  function enterFullscreen() {
+  // Computers: no automatic fullscreen — browsers always show a "Press Esc to exit full screen" banner that
+  // covers the screen, and a mouse cannot swipe out by accident anyway. Phones and tablets go fullscreen.
+  const TOUCH_DEVICE = matchMedia("(pointer: coarse)").matches;
+  let exited = false;                                // a grown-up tapped "Exit": no more fullscreen or back trap
+  function enterFullscreen(force = false) {
     const el = document.documentElement;
     const req = el.requestFullscreen || el.webkitRequestFullscreen;
     if (!req || fsElement() || isInstalled()) return;
+    if (!force && (exited || !TOUCH_DEVICE)) return;
     // Must be called synchronously inside the tap, or the browser refuses
     Promise.resolve(req.call(el, { navigationUI: "hide" })).then(lockLandscape).catch(() => {});
   }
@@ -803,33 +941,69 @@
   // Trap the "back" gesture/button so a toddler pressing back does not leave the app
   function trapBack() {
     history.pushState({ toddler: true }, "");
-    window.addEventListener("popstate", () => history.pushState({ toddler: true }, ""));
+    window.addEventListener("popstate", () => { if (!exited) history.pushState({ toddler: true }, ""); });
   }
 
-  let started = false;
-  /* ---------------- Keep the screen awake (up to 30 minutes without play) ---------------- */
-  // Phones and tablets usually turn the screen off after about 1 minute. While the child plays, the app holds a
-  // Screen Wake Lock; after 30 minutes with no taps, keys or piano notes it lets go, so the device's normal
-  // auto-lock takes over again. The next tap brings the wake lock back.
-  const IDLE_LIMIT_MS = 30 * 60 * 1000;
-  let wakeLock = null, lastPlay = 0;
-  async function holdScreen() {
-    if (!("wakeLock" in navigator) || wakeLock || document.visibilityState !== "visible") return;
-    try {
-      wakeLock = await navigator.wakeLock.request("screen");
-      wakeLock.addEventListener("release", () => { wakeLock = null; });
-    } catch (_) { wakeLock = null; }                 // e.g. low battery mode: the device decides
+  // "Exit" (for grown-ups, in the menus): leave fullscreen and stop holding the child in the app.
+  // After that the same button says "Full screen" and brings the child-safe mode back.
+  const exitBtn = document.getElementById("exitBtn");
+  function setExitBtn() {
+    exitBtn.textContent = exited ? T.fullscreen : T.exit;
+    exitBtn.setAttribute("aria-pressed", String(exited));
   }
-  function stillPlaying() {
-    lastPlay = Date.now();
-    holdScreen();
-  }
-  setInterval(() => {
-    if (wakeLock && Date.now() - lastPlay > IDLE_LIMIT_MS) { wakeLock.release().catch(() => {}); wakeLock = null; }
-  }, 30 * 1000);
-  document.addEventListener("visibilitychange", () => {   // the browser drops the lock when the app is hidden
-    if (document.visibilityState === "visible" && Date.now() - lastPlay < IDLE_LIMIT_MS) holdScreen();
+  exitBtn.addEventListener("click", () => {
+    if (!exited) {
+      exited = true;
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (fsElement() && exit) Promise.resolve(exit.call(document)).catch(() => {});
+      try { screen.orientation.unlock(); } catch (_) {}
+    } else {
+      exited = false;
+      enterFullscreen(true);                         // inside the tap, so the browser allows it
+    }
+    setExitBtn();
   });
+
+  let started = false;
+  /* ---------------- Keep the screen awake (like a video player) ---------------- */
+  // While the app is open and visible, the screen never dims or locks (phones, tablets and computers).
+  //  1. Screen Wake Lock API (Chrome, Edge, Android, Safari 16.4+, Firefox 126+), requested at once and again
+  //     after every return to the app (browsers drop it when the app is hidden)
+  //  2. Fallback for browsers without it (or when it is refused): a tiny silent looping video, which
+  //     phones treat like a playing video and keep the screen on
+  let wakeLock = null, keepVideo = null;
+  async function holdScreen() {
+    if (document.visibilityState !== "visible") return;
+    if ("wakeLock" in navigator) {
+      if (wakeLock) return;
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => { wakeLock = null; });
+        return;
+      } catch (_) { wakeLock = null; }               // refused (e.g. no tap yet on Safari) → fallback too
+    }
+    playKeepAwakeVideo();
+  }
+  function playKeepAwakeVideo() {
+    if (!keepVideo) {
+      keepVideo = document.createElement("video");
+      keepVideo.setAttribute("playsinline", "");
+      keepVideo.setAttribute("muted", "");
+      keepVideo.muted = true;
+      keepVideo.loop = true;
+      keepVideo.setAttribute("aria-hidden", "true");
+      keepVideo.style.cssText = "position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0";
+      for (const [src, type] of [["media/keep-awake.webm", "video/webm"], ["media/keep-awake.mp4", "video/mp4"]]) {
+        const so = document.createElement("source"); so.src = src; so.type = type; keepVideo.appendChild(so);
+      }
+      document.body.appendChild(keepVideo);
+    }
+    if (keepVideo.paused) keepVideo.play().catch(() => {});
+  }
+  function stillPlaying() { holdScreen(); }
+  holdScreen();                                      // Chrome / Edge / Android allow it without a tap
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") holdScreen(); });
+  setInterval(holdScreen, 20 * 1000);                // safety net: take it back if the system dropped it
 
   function onAnyTap(e) {
     stillPlaying();
@@ -838,11 +1012,11 @@
     // Opening a dropdown should not be interrupted; fullscreen then starts on the next tap elsewhere
     // (and not while the microphone prompt is open or the microphone dialog is showing)
     const t = e.target.closest ? e.target : document.body;
-    if (!micPending && micDialog.hidden && !t.closest("select")) enterFullscreen();
+    if (!micPending && micDialog.hidden && !t.closest("select, .cs")) enterFullscreen();
   }
   // Capture phase: runs before the key's own handler, so the very first tap on a key also plays it.
   // Browsers allow fullscreen on different events (mouse: pointerdown; touch: pointerup), so listen to both.
-  for (const type of ["pointerdown", "pointerup", "keydown"]) document.addEventListener(type, onAnyTap, true);
+  for (const type of ["pointerdown", "pointerup", "touchend", "click", "keydown"]) document.addEventListener(type, onAnyTap, true);
 
   const onFsChange = () => setTimeout(layoutBlackKeys, 100);
   document.addEventListener("fullscreenchange", onFsChange);
@@ -878,6 +1052,151 @@
     highlightNext();
     if (T.notes) applyLang();
   });
+
+  nowEl.addEventListener("pointerdown", () => {
+    if (!nowNote || nowEl.classList.contains("empty")) return;
+    play(nowNote);
+    nowEl.classList.remove("pop"); void nowEl.offsetWidth; nowEl.classList.add("pop");
+  });
+
+  /* ---------------- Custom dropdowns ---------------- */
+  // The native pop-up lists of <select> open in the phone's own orientation (upright) even though the app
+  // is turned sideways, and they cannot show pictures. So every menu gets a drawn list instead: it opens
+  // inside the app (always landscape), scrolls with a visible scroll bar, and shows little icons.
+  // The real <select> stays (hidden) and keeps the value, so all the other code is unchanged.
+  // Accessible: button + listbox roles, arrow keys, Enter / Space, Escape.
+  const ICON = {
+    note:   '<svg viewBox="0 0 24 24"><path d="M9 17V5.5l10-2.2V15" fill="none"/><circle cx="6.4" cy="17.2" r="2.8"/><circle cx="16.4" cy="15.2" r="2.8"/></svg>',
+    star:   '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.1l-5.7 3.2 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>',
+    lamb:   '<svg viewBox="0 0 24 24"><path d="M7 16.5a3.2 3.2 0 0 1-.4-6.3 3.6 3.6 0 0 1 6.8-1.8 3.3 3.3 0 0 1 4.6 2.8 2.8 2.8 0 0 1-.8 5.3z"/><circle cx="18.6" cy="12.6" r="2.3" class="i-dark"/><path d="M9 16.5v3M14.5 16.5v3" fill="none"/></svg>',
+    joy:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M8.3 13.6a4.3 4.3 0 0 0 7.4 0" fill="none"/><circle cx="9" cy="10" r="1" class="i-ink"/><circle cx="15" cy="10" r="1" class="i-ink"/></svg>',
+    bell:   '<svg viewBox="0 0 24 24"><path d="M12 3.6a1.5 1.5 0 0 1 1.5 1.5v.6A6 6 0 0 1 18 11.5v4l2 2.4H4l2-2.4v-4a6 6 0 0 1 4.5-5.8v-.6A1.5 1.5 0 0 1 12 3.6z"/><circle cx="12" cy="20.2" r="1.7"/></svg>',
+    keys:   '<svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M8.2 5v14M13.8 5v14M19.4 5v14" fill="none"/><rect x="6.6" y="5" width="3.2" height="7.5" class="i-ink"/><rect x="12.2" y="5" width="3.2" height="7.5" class="i-ink"/></svg>',
+    mic:    '<svg viewBox="0 0 24 24"><rect x="8.5" y="3" width="7" height="11.5" rx="3.5"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M8.5 21h7" fill="none"/></svg>',
+    globe:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2M12 3.4c2.6 2.4 2.6 14.8 0 17.2M12 3.4c-2.6 2.4-2.6 14.8 0 17.2" fill="none"/></svg>',
+  };
+  const SONG_ICON = { "": "note", twinkle: "star", mary: "lamb", ode: "joy", jingle: "bell" };
+  const iconOf = {
+    song: (v) => ICON[SONG_ICON[v] || "note"],
+    mode: (v) => ICON[v === "piano" ? "mic" : "keys"],
+    clef: (v) => `<img src="staff/${v || clef}/clef.svg" alt="">`,
+    lang: () => ICON.globe,
+  };
+  const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const customSelects = [];
+
+  function enhanceSelect(sel) {
+    const kind = sel.id, iconFn = iconOf[kind] || (() => "");
+    const wrap = document.createElement("span");
+    wrap.className = "cs cs-" + kind;
+    const pick = sel.parentNode.classList.contains("clef-pick") ? sel.parentNode : null;
+    if (pick) {                                      // the clef menu: its picture now lives inside the button
+      pick.parentNode.insertBefore(wrap, pick);
+      wrap.append(...pick.children);
+      pick.remove();
+    } else {
+      sel.parentNode.insertBefore(wrap, sel);
+      wrap.appendChild(sel);
+    }
+    sel.classList.add("cs-native");
+    sel.tabIndex = -1;
+    sel.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "select cs-btn " + [...sel.classList].filter((c) => c !== "select" && c !== "cs-native").join(" ");
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false");
+    const list = document.createElement("div");
+    list.className = "cs-list";
+    list.id = kind + "List";
+    list.setAttribute("role", "listbox");
+    list.hidden = true;
+    btn.setAttribute("aria-controls", list.id);
+    wrap.append(btn, list);
+
+    let shown = "";
+    function render() {
+      const o = sel.options[sel.selectedIndex];
+      const key = [sel.selectedIndex, o ? o.textContent : "", sel.disabled, sel.getAttribute("aria-label"), sel.className].join("|");
+      if (key === shown) return;
+      shown = key;
+      btn.innerHTML = `<span class="cs-ico" aria-hidden="true">${iconFn(o ? o.value : "")}</span><span class="cs-label">${esc(o ? o.textContent : "")}</span>`;
+      btn.disabled = sel.disabled;
+      btn.classList.toggle("active", sel.classList.contains("active"));
+      btn.setAttribute("aria-label", `${sel.getAttribute("aria-label") || ""}: ${o ? o.textContent : ""}`);
+    }
+    function close(focusBtn) {
+      if (list.hidden) return;
+      list.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      wrap.classList.remove("open");
+      if (focusBtn) btn.focus();
+    }
+    function choose(value) {
+      if (sel.value !== value) {
+        sel.value = value;
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      render();
+      close(true);
+    }
+    function open() {
+      customSelects.forEach((c) => c !== api && c.close());
+      list.innerHTML = "";
+      [...sel.options].forEach((o) => {
+        if (o.hidden || o.disabled) return;
+        const it = document.createElement("div");
+        it.className = "cs-opt";
+        it.setAttribute("role", "option");
+        it.tabIndex = -1;
+        it.dataset.value = o.value;
+        const on = o.value === sel.value;
+        it.setAttribute("aria-selected", String(on));
+        it.innerHTML = `<span class="cs-ico" aria-hidden="true">${iconFn(o.value)}</span><span>${esc(o.textContent)}</span>`;
+        it.addEventListener("click", (e) => { e.stopPropagation(); choose(o.value); });
+        list.appendChild(it);
+      });
+      list.hidden = false;
+      wrap.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+      const cur = list.querySelector('[aria-selected="true"]') || list.firstElementChild;
+      if (cur) { cur.scrollIntoView({ block: "nearest" }); cur.focus({ preventScroll: true }); }
+    }
+    btn.addEventListener("click", (e) => { e.stopPropagation(); list.hidden ? open() : close(true); });
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); open(); }
+    });
+    list.addEventListener("keydown", (e) => {
+      const items = [...list.children], i = items.indexOf(document.activeElement);
+      if (e.key === "ArrowDown") { e.preventDefault(); (items[i + 1] || items[0]).focus(); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); (items[i - 1] || items[items.length - 1]).focus(); }
+      else if (e.key === "Home") { e.preventDefault(); items[0].focus(); }
+      else if (e.key === "End") { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (i >= 0) choose(items[i].dataset.value); }
+      else if (e.key === "Escape" || e.key === "Tab") { close(e.key === "Escape"); }
+      e.stopPropagation();                           // the computer-keyboard piano ignores keys used in a menu
+    });
+    new MutationObserver(render).observe(sel, { attributes: true, childList: true, subtree: true, characterData: true });
+    const api = { sel, btn, render, close };
+    customSelects.push(api);
+    render();
+    return api;
+  }
+  // tap outside a list closes it
+  document.addEventListener("pointerdown", (e) => {
+    if (!e.target.closest || !e.target.closest(".cs")) customSelects.forEach((c) => c.close());
+  });
+  // values also change from code (e.g. the quiz resets the song menu), so refresh the labels regularly
+  setInterval(() => customSelects.forEach((c) => c.render()), 300);
+
+  // "Pick A Song" gently wiggles and glows until a song is chosen (not during a quiz or the Listen demo)
+  function updateSongHint() {
+    const c = customSelects.find((x) => x.sel === songSel);
+    if (c) c.btn.classList.toggle("attn", !songSel.value && !quiz && !demo && !songSel.disabled);
+  }
+  setInterval(updateSongHint, 300);
+
+  for (const s of [clefSel, modeSel, langSel, songSel]) enhanceSelect(s);
 
   nowStaff.src = `staff/${clef}/clef.svg`;
   initAudio();                                   // decode all sounds now; they start playing after the first tap

@@ -1,6 +1,6 @@
 /* Service Worker: caches every file on first visit so the app then works fully offline.
   * When you change content, bump VERSION; old caches are deleted automatically. */
-const VERSION = "toddler-music-box-1.0.6";   // bump on every frontend change (e.g. 1.0.7)
+const VERSION = "toddler-music-box-1.0.7";   // bump on every frontend change (e.g. 1.0.8)
 const PCS = ["C", "Cs", "D", "Ds", "E", "F", "Fs", "G", "Gs", "A", "As", "B"];
 const NOTES = [...PCS.map((p) => p + 3), ...PCS.map((p) => p + 4), "C5"];                // 25 notes
 const STAFF = [
@@ -21,9 +21,9 @@ const PRECACHE = [
   "icons/icon-maskable-512.png",
   "icons/apple-touch-icon.png",
   "icons/favicon-32.png",
-  "icons/praise.png",                                                                   // quiz reward picture
   ...NOTES.map((n) => `sounds/${n}.wav`),
-  "sounds/oops.wav",                                                                    // wrong-note sound
+  "sounds/oops.wav",                                                   // wrong-note sound
+  "media/silence.wav", "media/keep-awake.mp4", "media/keep-awake.webm", // iPhone sound unlock + keep screen on
   ...STAFF,
 ];
 

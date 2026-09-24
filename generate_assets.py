@@ -107,25 +107,6 @@ def write_icons() -> None:
     for name, size, circle, opaque in ICONS:
         make_icon(logo, size, circle, opaque).save(ROOT / "icons" / name, optimize=True)
     print(f"✓ {len(ICONS)} icons from assets/logo.png → static/icons/")
-    write_praise(logo)
-
-
-def write_praise(logo: Image.Image, size: int = 480) -> None:
-    """Quiz "all correct" picture: the logo on a solid cream card inside a soft beige rounded-square frame."""
-    scale = 3                                               # draw big, then shrink → smooth rounded corners
-    S, frame, radius = size * scale, 16 * scale, 72 * scale
-    card = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    d = ImageDraw.Draw(card)
-    d.rounded_rectangle((0, 0, S - 1, S - 1), radius=radius, fill=(234, 219, 200, 255))            # beige frame #EADBC8
-    d.rounded_rectangle((frame, frame, S - 1 - frame, S - 1 - frame), radius=radius - frame,
-                        fill=(255, 250, 242, 255))                                                  # cream inside #FFFAF2
-    inner = S - 2 * frame - 2 * 40 * scale                  # padding around the logo
-    w, h = logo.size
-    k = inner / max(w, h)
-    small = logo.resize((round(w * k), round(h * k)), Image.Resampling.LANCZOS)
-    card.alpha_composite(small, ((S - small.width) // 2, (S - small.height) // 2))
-    card.resize((size, size), Image.Resampling.LANCZOS).save(ROOT / "icons" / "praise.png", optimize=True)
-    print("✓ praise.png (quiz reward) → static/icons/")
 
 
 # ---------------------------------------------------------------- 3. Songs

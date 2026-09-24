@@ -27,7 +27,7 @@ LANGS = [  # (code, name shown in the menu, in its own script)
 STRINGS = {
     "en": {
         "appName": "Toddler Music Box",
-        "free": "Pick A Song", "black": "Black keys", "staff": "Staff", "now": "Current note",
+        "free": "Pick A Song", "exit": "Exit", "fullscreen": "Full screen", "black": "Black keys", "staff": "Staff", "now": "Current note",
         "language": "Language", "menu": "Menu \u2014 double-tap to open", "high": "High",
         "twinkle": "Twinkle Twinkle Little Star", "mary": "Mary Had a Little Lamb", "ode": "Ode to Joy", "jingle": "Jingle Bells", "play": "Listen", "stop": "Stop",
                 "song": "Song", "mode": "Play mode", "modeScreen": "Play on-screen keys", "modePiano": "Play a real piano", "listening": "Listening\u2026 play on your piano", "micDenied": "Microphone is off \u2014 allow it in browser settings", "great": "Great job!",
@@ -38,7 +38,7 @@ STRINGS = {
     },
     "es": {
         "appName": "Caja de M\u00fasica para Peques",
-        "free": "Elige una canci\u00f3n", "black": "Teclas negras", "staff": "Pentagrama", "now": "Nota actual",
+        "free": "Elige una canci\u00f3n", "exit": "Salir", "fullscreen": "Pantalla completa", "black": "Teclas negras", "staff": "Pentagrama", "now": "Nota actual",
         "language": "Idioma", "menu": "Men\u00fa: toca dos veces para abrir", "high": "Agudo",
         "twinkle": "Estrellita, \u00bfd\u00f3nde est\u00e1s?", "mary": "Mar\u00eda ten\u00eda un corderito", "ode": "Himno de la alegr\u00eda", "jingle": "Cascabel", "play": "Escuchar", "stop": "Parar",
                 "song": "Canci\u00f3n", "mode": "Modo de juego", "modeScreen": "Tocar las teclas en pantalla", "modePiano": "Tocar un piano de verdad", "listening": "Escuchando\u2026 toca tu piano", "micDenied": "Micr\u00f3fono desactivado \u2014 act\u00edvalo en el navegador", "great": "\u00a1Muy bien!",
@@ -49,7 +49,7 @@ STRINGS = {
     },
     "zh-Hant": {
         "appName": "\u5bf6\u5bf6\u97f3\u6a02\u76d2",
-        "free": "\u9078\u4e00\u9996\u6b4c", "black": "\u9ed1\u9375", "staff": "\u4e94\u7dda\u8b5c", "now": "\u7576\u524d\u97f3",
+        "free": "\u9078\u4e00\u9996\u6b4c", "exit": "\u9000\u51fa", "fullscreen": "\u5168\u87a2\u5e55", "black": "\u9ed1\u9375", "staff": "\u4e94\u7dda\u8b5c", "now": "\u7576\u524d\u97f3",
         "language": "\u8a9e\u8a00", "menu": "\u9078\u55ae\uff08\u9ede\u5169\u4e0b\u6253\u958b\uff09", "high": "\u9ad8\u97f3",
         "twinkle": "\u5c0f\u661f\u661f", "mary": "\u746a\u8389\u6709\u96bb\u5c0f\u7dbf\u7f8a", "ode": "\u6b61\u6a02\u980c", "jingle": "\u9234\u5152\u97ff\u53ee\u5679", "play": "\u64ad\u653e", "stop": "\u505c\u6b62",
                 "song": "\u6b4c\u66f2", "mode": "\u5f48\u594f\u65b9\u5f0f", "modeScreen": "\u96fb\u5b50\u7434\u9375\u5f48\u594f", "modePiano": "\u771f\u5be6\u92fc\u7434\u5f48\u594f", "listening": "\u8046\u807d\u4e2d\u2026\u8acb\u5f48\u4f60\u7684\u92fc\u7434", "micDenied": "\u9ea5\u514b\u98a8\u672a\u958b\u555f\uff0c\u8acb\u5728\u700f\u89bd\u5668\u8a2d\u5b9a\u4e2d\u5141\u8a31", "great": "\u592a\u68d2\u4e86\uff01",
@@ -60,7 +60,7 @@ STRINGS = {
     },
     "zh-Hans": {
         "appName": "\u5b9d\u5b9d\u97f3\u4e50\u76d2",
-        "free": "\u9009\u4e00\u9996\u6b4c", "black": "\u9ed1\u952e", "staff": "\u4e94\u7ebf\u8c31", "now": "\u5f53\u524d\u97f3",
+        "free": "\u9009\u4e00\u9996\u6b4c", "exit": "\u9000\u51fa", "fullscreen": "\u5168\u5c4f", "black": "\u9ed1\u952e", "staff": "\u4e94\u7ebf\u8c31", "now": "\u5f53\u524d\u97f3",
         "language": "\u8bed\u8a00", "menu": "\u83dc\u5355\uff08\u70b9\u4e24\u4e0b\u6253\u5f00\uff09", "high": "\u9ad8\u97f3",
         "twinkle": "\u5c0f\u661f\u661f", "mary": "\u739b\u4e3d\u6709\u53ea\u5c0f\u7ef5\u7f8a", "ode": "\u6b22\u4e50\u9882", "jingle": "\u94c3\u513f\u54cd\u53ee\u5f53", "play": "\u64ad\u653e", "stop": "\u505c\u6b62",
                 "song": "\u6b4c\u66f2", "mode": "\u5f39\u594f\u65b9\u5f0f", "modeScreen": "\u7535\u5b50\u7434\u952e\u5f39\u594f", "modePiano": "\u771f\u5b9e\u94a2\u7434\u5f39\u594f", "listening": "\u8046\u542c\u4e2d\u2026\u8bf7\u5f39\u4f60\u7684\u94a2\u7434", "micDenied": "\u9ea6\u514b\u98ce\u672a\u5f00\u542f\uff0c\u8bf7\u5728\u6d4f\u89c8\u5668\u8bbe\u7f6e\u4e2d\u5141\u8bb8", "great": "\u592a\u68d2\u4e86\uff01",
@@ -71,7 +71,7 @@ STRINGS = {
     },
     "ko": {
         "appName": "\uc544\uae30 \ubba4\uc9c1\ubc15\uc2a4",
-        "free": "\ub178\ub798 \uace0\ub974\uae30", "black": "\uac80\uc740 \uac74\ubc18", "staff": "\uc624\uc120\ubcf4", "now": "\uc9c0\uae08 \uc74c",
+        "free": "\ub178\ub798 \uace0\ub974\uae30", "exit": "\ub098\uac00\uae30", "fullscreen": "\uc804\uccb4 \ud654\uba74", "black": "\uac80\uc740 \uac74\ubc18", "staff": "\uc624\uc120\ubcf4", "now": "\uc9c0\uae08 \uc74c",
         "language": "\uc5b8\uc5b4", "menu": "\uba54\ub274 (\ub450 \ubc88 \ud0ed\ud558\uc5ec \uc5f4\uae30)", "high": "\ub192\uc740",
         "twinkle": "\ubc18\uc9dd\ubc18\uc9dd \uc791\uc740 \ubcc4", "mary": "\uba54\ub9ac\uc758 \uc5b4\ub9b0 \uc591", "ode": "\ud658\ud76c\uc758 \uc1a1\uac00", "jingle": "\uc9d5\uae00\ubca8", "play": "\ub4e3\uae30", "stop": "\uc815\uc9c0",
                 "song": "\ub178\ub798", "mode": "\uc5f0\uc8fc \ubc29\ubc95", "modeScreen": "\ud654\uba74 \uac74\ubc18\uc73c\ub85c \uc5f0\uc8fc", "modePiano": "\uc9c4\uc9dc \ud53c\uc544\ub178\ub85c \uc5f0\uc8fc", "listening": "\ub4e3\ub294 \uc911\u2026 \ud53c\uc544\ub178\ub97c \uccd0 \ubcf4\uc138\uc694", "micDenied": "\ub9c8\uc774\ud06c\uac00 \uaebc\uc838 \uc788\uc5b4\uc694 \u2014 \ube0c\ub77c\uc6b0\uc800 \uc124\uc815\uc5d0\uc11c \ud5c8\uc6a9\ud558\uc138\uc694", "great": "\uc798\ud588\uc5b4\uc694!",
@@ -82,7 +82,7 @@ STRINGS = {
     },
     "ja": {
         "appName": "\u30d9\u30d3\u30fc\u30df\u30e5\u30fc\u30b8\u30c3\u30af\u30dc\u30c3\u30af\u30b9",
-        "free": "\u3046\u305f\u3092\u3048\u3089\u3076", "black": "\u304f\u308d\u3044\u3051\u3093\u3070\u3093", "staff": "\u3054\u305b\u3093\u3075", "now": "\u3044\u307e\u306e\u304a\u3068",
+        "free": "\u3046\u305f\u3092\u3048\u3089\u3076", "exit": "\u304a\u308f\u308b", "fullscreen": "\u305c\u3093\u304c\u3081\u3093", "black": "\u304f\u308d\u3044\u3051\u3093\u3070\u3093", "staff": "\u3054\u305b\u3093\u3075", "now": "\u3044\u307e\u306e\u304a\u3068",
         "language": "\u3052\u3093\u3054", "menu": "\u30e1\u30cb\u30e5\u30fc\uff082\u304b\u3044\u30bf\u30c3\u30d7\u3067\u3072\u3089\u304f\uff09", "high": "\u305f\u304b\u3044",
         "twinkle": "\u304d\u3089\u304d\u3089\u307c\u3057", "mary": "\u30e1\u30ea\u30fc\u3055\u3093\u306e\u3072\u3064\u3058", "ode": "\u3088\u308d\u3053\u3073\u306e\u3046\u305f", "jingle": "\u30b8\u30f3\u30b0\u30eb\u30d9\u30eb", "play": "\u304d\u304f", "stop": "\u3068\u3081\u308b",
                 "song": "\u3046\u305f", "mode": "\u3072\u304d\u304b\u305f", "modeScreen": "\u304c\u3081\u3093\u306e\u3051\u3093\u3070\u3093\u3067\u3072\u304f", "modePiano": "\u307b\u3093\u3082\u306e\u306e\u30d4\u30a2\u30ce\u3067\u3072\u304f", "listening": "\u304d\u3044\u3066\u3044\u307e\u3059\u2026 \u30d4\u30a2\u30ce\u3092\u3072\u3044\u3066\u306d", "micDenied": "\u30de\u30a4\u30af\u304c\u30aa\u30d5\u3067\u3059\uff08\u30d6\u30e9\u30a6\u30b6\u306e\u305b\u3063\u3066\u3044\u3067\u304d\u3087\u304b\u3057\u3066\u304f\u3060\u3055\u3044\uff09", "great": "\u3088\u304f\u3067\u304d\u307e\u3057\u305f\uff01",
@@ -93,7 +93,7 @@ STRINGS = {
     },
     "vi": {
         "appName": "H\u1ed9p Nh\u1ea1c Cho B\u00e9",
-        "free": "Ch\u1ecdn b\u00e0i h\u00e1t", "black": "Ph\u00edm \u0111en", "staff": "Khu\u00f4ng nh\u1ea1c", "now": "N\u1ed1t hi\u1ec7n t\u1ea1i",
+        "free": "Ch\u1ecdn b\u00e0i h\u00e1t", "exit": "Tho\u00e1t", "fullscreen": "To\u00e0n m\u00e0n h\u00ecnh", "black": "Ph\u00edm \u0111en", "staff": "Khu\u00f4ng nh\u1ea1c", "now": "N\u1ed1t hi\u1ec7n t\u1ea1i",
         "language": "Ng\u00f4n ng\u1eef", "menu": "Menu \u2013 ch\u1ea1m hai l\u1ea7n \u0111\u1ec3 m\u1edf", "high": "Cao",
         "twinkle": "Ng\u00f4i sao l\u1ea5p l\u00e1nh", "mary": "Mary c\u00f3 m\u1ed9t ch\u00fa c\u1eebu non", "ode": "Kh\u00fac hoan ca", "jingle": "Jingle Bells", "play": "Nghe", "stop": "D\u1eebng",
                 "song": "B\u00e0i h\u00e1t", "mode": "C\u00e1ch ch\u01a1i", "modeScreen": "Ch\u01a1i ph\u00edm tr\u00ean m\u00e0n h\u00ecnh", "modePiano": "Ch\u01a1i \u0111\u00e0n piano th\u1eadt", "listening": "\u0110ang nghe\u2026 h\u00e3y ch\u01a1i \u0111\u00e0n nh\u00e9", "micDenied": "Micr\u00f4 \u0111ang t\u1eaft \u2014 h\u00e3y cho ph\u00e9p trong tr\u00ecnh duy\u1ec7t", "great": "Gi\u1ecfi l\u1eafm!",
@@ -104,7 +104,7 @@ STRINGS = {
     },
     "fr": {
         "appName": "Bo\u00eete \u00e0 Musique B\u00e9b\u00e9",
-        "free": "Choisis une chanson", "black": "Touches noires", "staff": "Port\u00e9e", "now": "Note actuelle",
+        "free": "Choisis une chanson", "exit": "Quitter", "fullscreen": "Plein \u00e9cran", "black": "Touches noires", "staff": "Port\u00e9e", "now": "Note actuelle",
         "language": "Langue", "menu": "Menu \u2013 touchez deux fois pour ouvrir", "high": "Aigu",
         "twinkle": "Ah ! vous dirai-je, maman", "mary": "Marie avait un petit agneau", "ode": "L'Hymne \u00e0 la joie", "jingle": "Vive le vent", "play": "\u00c9couter", "stop": "Arr\u00eater",
                 "song": "Chanson", "mode": "Mode de jeu", "modeScreen": "Jouer sur l'\u00e9cran", "modePiano": "Jouer sur un vrai piano", "listening": "\u00c0 l'\u00e9coute\u2026 joue sur ton piano", "micDenied": "Micro d\u00e9sactiv\u00e9 \u2014 autorise-le dans le navigateur", "great": "Bravo !",
@@ -115,7 +115,7 @@ STRINGS = {
     },
     "it": {
         "appName": "Carillon per Bimbi",
-        "free": "Scegli una canzone", "black": "Tasti neri", "staff": "Pentagramma", "now": "Nota attuale",
+        "free": "Scegli una canzone", "exit": "Esci", "fullscreen": "Schermo intero", "black": "Tasti neri", "staff": "Pentagramma", "now": "Nota attuale",
         "language": "Lingua", "menu": "Menu \u2013 tocca due volte per aprire", "high": "Acuto",
         "twinkle": "Brilla brilla la stellina", "mary": "Maria aveva un agnellino", "ode": "Inno alla gioia", "jingle": "Jingle Bells", "play": "Ascolta", "stop": "Ferma",
                 "song": "Canzone", "mode": "Modalit\u00e0", "modeScreen": "Suona sullo schermo", "modePiano": "Suona un pianoforte vero", "listening": "In ascolto\u2026 suona il tuo pianoforte", "micDenied": "Microfono disattivato \u2014 consentilo nel browser", "great": "Bravissimo!",
@@ -126,7 +126,7 @@ STRINGS = {
     },
     "ru": {
         "appName": "\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u0430\u044f \u0448\u043a\u0430\u0442\u0443\u043b\u043a\u0430",
-        "free": "\u0412\u044b\u0431\u0435\u0440\u0438 \u043f\u0435\u0441\u043d\u044e", "black": "\u0427\u0451\u0440\u043d\u044b\u0435 \u043a\u043b\u0430\u0432\u0438\u0448\u0438", "staff": "\u041d\u043e\u0442\u043d\u044b\u0439 \u0441\u0442\u0430\u043d", "now": "\u0422\u0435\u043a\u0443\u0449\u0430\u044f \u043d\u043e\u0442\u0430",
+        "free": "\u0412\u044b\u0431\u0435\u0440\u0438 \u043f\u0435\u0441\u043d\u044e", "exit": "\u0412\u044b\u0445\u043e\u0434", "fullscreen": "\u0412\u043e \u0432\u0435\u0441\u044c \u044d\u043a\u0440\u0430\u043d", "black": "\u0427\u0451\u0440\u043d\u044b\u0435 \u043a\u043b\u0430\u0432\u0438\u0448\u0438", "staff": "\u041d\u043e\u0442\u043d\u044b\u0439 \u0441\u0442\u0430\u043d", "now": "\u0422\u0435\u043a\u0443\u0449\u0430\u044f \u043d\u043e\u0442\u0430",
         "language": "\u042f\u0437\u044b\u043a", "menu": "\u041c\u0435\u043d\u044e \u2014 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u0434\u0432\u0430\u0436\u0434\u044b, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u043a\u0440\u044b\u0442\u044c", "high": "\u0412\u044b\u0441\u043e\u043a\u0430\u044f",
         "twinkle": "\u0422\u044b \u0441\u0432\u0435\u0442\u0438, \u0437\u0432\u0435\u0437\u0434\u0430 \u043c\u043e\u044f", "mary": "\u0423 \u041c\u044d\u0440\u0438 \u0431\u044b\u043b \u0431\u0430\u0440\u0430\u0448\u0435\u043a", "ode": "\u041e\u0434\u0430 \u043a \u0440\u0430\u0434\u043e\u0441\u0442\u0438", "jingle": "\u0411\u0443\u0431\u0435\u043d\u0447\u0438\u043a\u0438", "play": "\u0421\u043b\u0443\u0448\u0430\u0442\u044c", "stop": "\u0421\u0442\u043e\u043f",
                 "song": "\u041f\u0435\u0441\u043d\u044f", "mode": "\u041a\u0430\u043a \u0438\u0433\u0440\u0430\u0442\u044c", "modeScreen": "\u0418\u0433\u0440\u0430\u0442\u044c \u043d\u0430 \u044d\u043a\u0440\u0430\u043d\u0435", "modePiano": "\u0418\u0433\u0440\u0430\u0442\u044c \u043d\u0430 \u043d\u0430\u0441\u0442\u043e\u044f\u0449\u0435\u043c \u043f\u0438\u0430\u043d\u0438\u043d\u043e", "listening": "\u0421\u043b\u0443\u0448\u0430\u044e\u2026 \u0438\u0433\u0440\u0430\u0439 \u043d\u0430 \u043f\u0438\u0430\u043d\u0438\u043d\u043e", "micDenied": "\u041c\u0438\u043a\u0440\u043e\u0444\u043e\u043d \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d \u2014 \u0440\u0430\u0437\u0440\u0435\u0448\u0438\u0442\u0435 \u0435\u0433\u043e \u0432 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0435", "great": "\u041c\u043e\u043b\u043e\u0434\u0435\u0446!",
@@ -137,7 +137,7 @@ STRINGS = {
     },
     "de": {
         "appName": "Baby-Spieluhr",
-        "free": "W\u00e4hle ein Lied", "black": "Schwarze Tasten", "staff": "Notenlinien", "now": "Aktueller Ton",
+        "free": "W\u00e4hle ein Lied", "exit": "Beenden", "fullscreen": "Vollbild", "black": "Schwarze Tasten", "staff": "Notenlinien", "now": "Aktueller Ton",
         "language": "Sprache", "menu": "Men\u00fc \u2013 zweimal tippen zum \u00d6ffnen", "high": "Hohes",
         "twinkle": "Funkel, funkel, kleiner Stern", "mary": "Maria hat ein kleines Lamm", "ode": "Ode an die Freude", "jingle": "Jingle Bells", "play": "Anh\u00f6ren", "stop": "Stopp",
                 "song": "Lied", "mode": "Spielmodus", "modeScreen": "Auf dem Bildschirm spielen", "modePiano": "Auf echtem Klavier spielen", "listening": "Ich h\u00f6re zu\u2026 spiel auf deinem Klavier", "micDenied": "Mikrofon ist aus \u2013 bitte im Browser erlauben", "great": "Super gemacht!",
@@ -148,7 +148,7 @@ STRINGS = {
     },
     "hi": {
         "appName": "\u0936\u093f\u0936\u0941 \u0938\u0902\u0917\u0940\u0924 \u092c\u0949\u0915\u094d\u0938",
-        "free": "\u0917\u0940\u0924 \u091a\u0941\u0928\u0947\u0902", "black": "\u0915\u093e\u0932\u0940 \u0915\u0941\u0902\u091c\u093f\u092f\u093e\u0901", "staff": "\u0938\u094d\u0935\u0930\u0932\u093f\u092a\u093f", "now": "\u0935\u0930\u094d\u0924\u092e\u093e\u0928 \u0938\u094d\u0935\u0930",
+        "free": "\u0917\u0940\u0924 \u091a\u0941\u0928\u0947\u0902", "exit": "\u092c\u093e\u0939\u0930 \u0928\u093f\u0915\u0932\u0947\u0902", "fullscreen": "\u092a\u0942\u0930\u094d\u0923 \u0938\u094d\u0915\u094d\u0930\u0940\u0928", "black": "\u0915\u093e\u0932\u0940 \u0915\u0941\u0902\u091c\u093f\u092f\u093e\u0901", "staff": "\u0938\u094d\u0935\u0930\u0932\u093f\u092a\u093f", "now": "\u0935\u0930\u094d\u0924\u092e\u093e\u0928 \u0938\u094d\u0935\u0930",
         "language": "\u092d\u093e\u0937\u093e", "menu": "\u092e\u0947\u0928\u0942 \u2013 \u0916\u094b\u0932\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0926\u094b \u092c\u093e\u0930 \u091f\u0948\u092a \u0915\u0930\u0947\u0902", "high": "\u0924\u093e\u0930",
         "twinkle": "\u091a\u092e\u0915 \u091a\u092e\u0915 \u091b\u094b\u091f\u093e \u0924\u093e\u0930\u093e", "mary": "\u092e\u0948\u0930\u0940 \u0915\u093e \u091b\u094b\u091f\u093e \u092e\u0947\u092e\u0928\u093e", "ode": "\u0906\u0928\u0902\u0926 \u0915\u093e \u0917\u0940\u0924", "jingle": "\u091c\u093f\u0902\u0917\u0932 \u092c\u0947\u0932\u094d\u0938", "play": "\u0938\u0941\u0928\u0947\u0902", "stop": "\u0930\u094b\u0915\u0947\u0902",
                 "song": "\u0917\u0940\u0924", "mode": "\u092c\u091c\u093e\u0928\u0947 \u0915\u093e \u0924\u0930\u0940\u0915\u093e", "modeScreen": "\u0938\u094d\u0915\u094d\u0930\u0940\u0928 \u0915\u0940-\u092c\u094b\u0930\u094d\u0921 \u092a\u0930 \u092c\u091c\u093e\u090f\u0901", "modePiano": "\u0905\u0938\u0932\u0940 \u092a\u093f\u092f\u093e\u0928\u094b \u092a\u0930 \u092c\u091c\u093e\u090f\u0901", "listening": "\u0938\u0941\u0928 \u0930\u0939\u0947 \u0939\u0948\u0902\u2026 \u0905\u092a\u0928\u093e \u092a\u093f\u092f\u093e\u0928\u094b \u092c\u091c\u093e\u090f\u0901", "micDenied": "\u092e\u093e\u0907\u0915\u094d\u0930\u094b\u092b\u093c\u094b\u0928 \u092c\u0902\u0926 \u0939\u0948 \u2014 \u092c\u094d\u0930\u093e\u0909\u091c\u093c\u0930 \u092e\u0947\u0902 \u0905\u0928\u0941\u092e\u0924\u093f \u0926\u0947\u0902", "great": "\u092c\u0939\u0941\u0924 \u092c\u0922\u093c\u093f\u092f\u093e!",

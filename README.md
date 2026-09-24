@@ -12,7 +12,7 @@ Free, no ads, no accounts, no data collected. Works offline once it has been ope
 ## Getting started
 
 1. Open the app in a browser on a phone, tablet or computer.
-2. Tap anywhere — the first tap turns the sound on, goes fullscreen and turns the screen sideways (landscape).
+2. Tap anywhere — the first tap turns the sound on. On phones and tablets it also goes fullscreen and turns the screen sideways (landscape). On computers the app stays in the normal window, so no "Press Esc" banner covers the screen.
 3. Tap the keys and play!
 
 **Install it like an app (recommended)**
@@ -49,9 +49,10 @@ The card above the keys shows **the note on the staff → the key to press**.
 Pick a song from the **song menu**: *Twinkle Twinkle Little Star*, *Mary Had a Little Lamb*, *Ode to Joy* or *Jingle Bells*.
 All four fit the eight white keys and work in treble clef and in bass clef.
 
-- **▶ Listen** plays the song slowly first (with **Pick A Song** — free play — it plays the scale, Do up to high Do). Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap **■ Stop** at any time.
+- **Pick A Song** gently wiggles until a song is chosen. Each song has a little picture in the list. As soon as a song is picked, the app plays it slowly by itself to show the child how it goes. **▶ Listen** plays it again (with **Pick A Song** — free play — it plays the scale, Do up to high Do). Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap **■ Stop** at any time.
 - Then it's the child's turn: the next key to press bounces.
-- Only the right key plays its note and moves the song forward. The current note card then shows the answer for a moment, and a little card with the staff note and its shape flies up out of the key — to help the child remember. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
+- The shape on the current note card and the same shape on the right key bounce and glow together, so the child sees which key to press. Tapping the card plays that note.
+- Only the right key plays its note and moves the song forward. The current note card then shows the answer for a moment. Above the key, the note on the staff and its shape pop up with a little surprise — confetti, twinkling stars, hearts, ripple rings or dancing music notes, a different one each time. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
 - In free play (**Pick A Song**, nothing chosen yet) every key simply plays, with no right or wrong.
 
 ### Play mode: on-screen keys or a real piano
@@ -69,8 +70,8 @@ Switch back to **Play on-screen keys** to turn the microphone off.
 Tap **Quiz** to test reading notes in the selected clef:
 - The app tests **all 8 notes** of the selected clef, once each, in a new random order every time. The card shows only the note on the staff (the answer is a "?"), so the child has to read the staff.
 - Answer on the on-screen keys, or on a real piano when the play mode is **Play a real piano**.
-- Wrong → a soft kitten "mew?" and the correct key flashes. Right → the note plays, the card shows the answer, a note card flies out of the key, and then the next note appears.
-- All 8 done → the MyTeachers123 picture pops up. Well done!
+- Wrong → a soft kitten "mew?" and the correct key flashes. Right → the note plays, the card shows the answer with a little surprise, and then the next note appears.
+- All 8 done → see-through bubbles burst out and fill the whole screen. Tap them to pop them!
 - Five wrong answers in a row → the quiz ends gently. Try again anytime.
 
 ### Languages
@@ -79,11 +80,13 @@ The app picks your device language automatically and remembers your choice.
 
 ## Tips for parents
 
-- **The screen stays on while the child plays.** Phones and tablets normally turn the screen off after about a minute; the app keeps it on and only lets the device lock again after **30 minutes without play**. (Uses the browser's Screen Wake Lock — Chrome, Edge, Android, and Safari on iOS/iPadOS 16.4 or later.)
+- **The screen stays on, like a video player.** While the app is open, phones, tablets and computers do not dim or lock the screen (Screen Wake Lock, with a tiny silent video as a fallback for older browsers).
+- **No sound on iPhone?** The app is set up as a music player, so the ring/silent switch should not mute it. If it is still quiet, check the volume buttons and tap a key once more.
+- **Exit** (in the menus) leaves fullscreen and lets you leave the app; the same button then says **Full screen** to go back to the child-safe mode.
 
 - **Menus fold away while the child plays.** As soon as a song is being played or a quiz starts, all menus fold into one small round button, so the child looks at the keys, not the dropdowns. **Double-tap** it to open the menus (a single tap does nothing). They come back by themselves when the song or quiz is finished.
 
-The app goes fullscreen (and back again after a swipe out, on the next tap), stays in landscape, blocks zooming and the back button, and caps the volume at 70%.
+On phones and tablets the app goes fullscreen (and back again after a swipe out, on the next tap), stays in landscape, blocks zooming and the back button, and caps the volume at 70%.
 A web app can't block the phone's "home" gesture, so for full lock-down:
 
 - **iPhone / iPad — Guided Access:** Settings → Accessibility → Guided Access → On (set a passcode).
