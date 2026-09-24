@@ -167,7 +167,11 @@
   const nowKey = document.getElementById("nowKey");
   let nowNote = null;
 
-  function showNow(note, hideAnswer = false) {
+  // After a right note the card keeps showing that answer for a moment (HOLD_MS) before the next target appears.
+  const HOLD_MS = 750;
+  let holdUntil = 0, holdT = 0;
+  function showNow(note, hideAnswer = false, fromHold = false) {
+    if (!fromHold) clearTimeout(holdT);            // any direct update cancels a waiting one
     nowNote = note;
     const key = keyEls[note];
     nowEl.classList.remove("empty");
@@ -187,6 +191,39 @@
       nowKey.className = "mini-key ask";
       nowKey.innerHTML = `<span class="ask-mark">?</span>`;
     }
+  }
+
+  // Show the next target — but if the child just played a right note, wait until its answer has been seen
+  function showTarget(note, hideAnswer = false) {
+    const wait = holdUntil - performance.now();
+    if (wait > 0) {
+      clearTimeout(holdT);
+      holdT = setTimeout(() => showNow(note, hideAnswer, true), wait);
+    } else showNow(note, hideAnswer);
+  }
+
+  // Right note (songs and quiz): the card shows the answer (staff + shape) with a happy pulse,
+  // and a little card with the same staff note and shape flies up out of the key.
+  function rightNote(note) {
+    showNow(note);
+    nowEl.classList.remove("right"); void nowEl.offsetWidth; nowEl.classList.add("right");
+    holdUntil = performance.now() + HOLD_MS;
+    flyOut(note);
+  }
+  function flyOut(note) {
+    const key = keyEls[note];
+    if (!key || key.classList.contains("black")) return;
+    const fly = document.createElement("div");
+    fly.className = "fly";
+    fly.setAttribute("aria-hidden", "true");
+    fly.style.setProperty("--c", key.style.getPropertyValue("--c"));
+    fly.innerHTML = `<img src="staff/${clef}/${note}.svg" alt="" draggable="false">${key.querySelector(".shape").outerHTML}`;
+    // layout coordinates (not screen coordinates), so it also works on rotated phones
+    fly.style.left = key.offsetLeft + key.offsetWidth / 2 + "px";
+    fly.style.top = key.offsetTop + key.offsetHeight * 0.35 + "px";
+    fly.style.width = Math.min(key.offsetWidth * 1.25, 170) + "px";
+    keysEl.appendChild(fly);
+    setTimeout(() => fly.remove(), 1300);
   }
 
   /* ---------------- Keys (built for the current clef) ---------------- */
@@ -294,7 +331,8 @@
       return;
     }
     play(note);
-    bubble(el, x, y);
+    if (target) rightNote(note);                      // songs and quiz: show the answer + a flying note card
+    else bubble(el, x, y);                           // free play: the little bubble
     if (quiz) quizAnswer(note);
     else if (song) advanceSong(note);
     else showNow(note);                               // free play: show the note just played
@@ -416,6 +454,7 @@
 
   songSel.addEventListener("change", () => {
     stopDemo();
+    holdUntil = 0; clearTimeout(holdT);
     unfoldMenus();
     song = songSel.selectedOptions[0]._song || null;
     songPos = 0;
@@ -466,6 +505,7 @@
       return;
     }
     flashKey(id);
+    if (target) rightNote(id);                       // right note on the real piano: same reward
     if (quiz) quizAnswer(id);
     else if (song) advanceSong(id);
     else showNow(id);
@@ -563,7 +603,7 @@
 
   function showQuizTarget() {
     Object.values(keyEls).forEach((k) => k.classList.remove("next"));
-    showNow(quiz.notes[quiz.pos], true);
+    showTarget(quiz.notes[quiz.pos], true);
     quizProgress();
   }
 
@@ -612,6 +652,7 @@
 
   function startQuiz() {
     stopDemo();
+    holdUntil = 0; clearTimeout(holdT);              // a new quiz starts at once (no answer still on hold)
     if (song) { songSel.value = ""; song = null; updateNotes(); }
     quiz = { notes: pickQuizNotes(), pos: 0, wrong: 0 };
     keysEl.classList.add("quiz");                    // hide the staff on the keys so kids must read the card
@@ -634,9 +675,14 @@
     setPlayBtn();
     unfoldMenus();
     statusEl.textContent = "";
-    nowEl.classList.add("empty");
-    nowStaff.src = `staff/${clef}/clef.svg`;
-    nowNote = null;
+    const clearCard = () => {
+      nowEl.classList.add("empty");
+      nowStaff.src = `staff/${clef}/clef.svg`;
+      nowNote = null;
+    };
+    clearTimeout(holdT);
+    const wait = holdUntil - performance.now();     // the last right answer stays visible for a moment
+    if (wait > 0) holdT = setTimeout(clearCard, wait); else clearCard();
   }
 
   quizBtn.addEventListener("click", () => (quiz ? endQuiz() : startQuiz()));
@@ -648,30 +694,34 @@
   let demo = null;                                   // { i, timer } while playing
 
   function setPlayBtn() {
-    playBtn.disabled = !song || !!quiz;
+    playBtn.disabled = !!quiz;                       // songs: the melody · "Pick A Song" (free play): the scale
     playBtn.classList.toggle("active", !!demo);
     playBtn.textContent = demo ? `■ ${T.stop}` : `\u25B6\uFE0E ${T.play}`;
   }
   function demoStep() {
     stillPlaying();
     if (!demo) return;
-    if (demo.i >= curNotes.length) return stopDemo();
-    const note = curNotes[demo.i];
+    if (demo.i >= demo.notes.length) return stopDemo();
+    const note = demo.notes[demo.i];
     Object.values(keyEls).forEach((k) => k.classList.remove("next"));
     const el = keyEls[note];
     el.classList.add("next", "down");
     setTimeout(() => el.classList.remove("down"), 220);
     showNow(note);
     play(note);
-    statusEl.textContent = `${demo.i + 1} / ${curNotes.length}`;
-    const beats = (song.beats && song.beats[demo.i]) || 1;
+    statusEl.textContent = `${demo.i + 1} / ${demo.notes.length}`;
+    const beats = demo.beats[demo.i] || 1;
     demo.i++;
     demo.timer = setTimeout(demoStep, beats * BEAT_MS);
   }
   function startDemo() {
-    if (!song || quiz) return;
+    if (quiz) return;
     unlockAudio();
-    demo = { i: 0, timer: 0 };
+    clearTimeout(holdT);
+    // A song plays its melody; free play ("Pick A Song") plays the scale Do → high Do of the current clef
+    const notes = song ? curNotes : WHITE_SLOTS.map(noteOf);
+    const beats = song && song.beats ? song.beats : notes.map(() => 1);
+    demo = { i: 0, timer: 0, notes, beats };
     setPlayBtn();
     demoStep();
   }
@@ -681,7 +731,7 @@
     demo = null;
     setPlayBtn();
     songPos = 0;                                     // now it's the child's turn, from the first note
-    highlightNext();
+    highlightNext();                                 // (free play: clears the highlight and the counter)
   }
   playBtn.addEventListener("click", () => (demo ? stopDemo() : startDemo()));
 
@@ -723,7 +773,7 @@
     Object.values(keyEls).forEach((k) => k.classList.remove("next"));
     if (song) {
       keyEls[curNotes[songPos]].classList.add("next");
-      showNow(curNotes[songPos]);                     // play-along: show the next note to play
+      showTarget(curNotes[songPos]);                  // play-along: show the next note to play
       statusEl.textContent = `${songPos + 1} / ${curNotes.length}`;
     } else {
       statusEl.textContent = "";
@@ -814,6 +864,7 @@
   clefIcon.src = `staff/${clef}/clef.svg`;
   clefSel.addEventListener("change", () => {
     stopDemo();
+    holdUntil = 0; clearTimeout(holdT);
     clef = clefSel.value;
     appEl.dataset.clef = clef;
     try { localStorage.setItem("clef", clef); } catch (_) {}

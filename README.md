@@ -49,9 +49,9 @@ The card above the keys shows **the note on the staff → the key to press**.
 Pick a song from the **song menu**: *Twinkle Twinkle Little Star*, *Mary Had a Little Lamb*, *Ode to Joy* or *Jingle Bells*.
 All four fit the eight white keys and work in treble clef and in bass clef.
 
-- **▶ Listen** plays the song slowly first. Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap **■ Stop** at any time.
+- **▶ Listen** plays the song slowly first (with **Pick A Song** — free play — it plays the scale, Do up to high Do). Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap **■ Stop** at any time.
 - Then it's the child's turn: the next key to press bounces.
-- Only the right key plays its note and moves the song forward. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
+- Only the right key plays its note and moves the song forward. The current note card then shows the answer for a moment, and a little card with the staff note and its shape flies up out of the key — to help the child remember. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
 - In free play (**Pick A Song**, nothing chosen yet) every key simply plays, with no right or wrong.
 
 ### Play mode: on-screen keys or a real piano
@@ -69,7 +69,7 @@ Switch back to **Play on-screen keys** to turn the microphone off.
 Tap **Quiz** to test reading notes in the selected clef:
 - The app tests **all 8 notes** of the selected clef, once each, in a new random order every time. The card shows only the note on the staff (the answer is a "?"), so the child has to read the staff.
 - Answer on the on-screen keys, or on a real piano when the play mode is **Play a real piano**.
-- Wrong → a soft kitten "mew" and the correct key flashes. Right → the note plays and the next one appears.
+- Wrong → a soft kitten "mew?" and the correct key flashes. Right → the note plays, the card shows the answer, a note card flies out of the key, and then the next note appears.
 - All 8 done → the MyTeachers123 picture pops up. Well done!
 - Five wrong answers in a row → the quiz ends gently. Try again anytime.
 
