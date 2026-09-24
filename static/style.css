@@ -184,7 +184,7 @@ html, body {
 }
 .song-select { max-width: 16em; }
 .lang { margin-left: auto; max-width: 9.5em; }
-.mode-select.active { background: #E53935; border-color: #E53935; color: #fff; }
+.mode-select.active { background: var(--t-600); border-color: var(--t-600); color: #fff; }
 .piano-status { font-size: 13px; font-weight: 700; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Note heard from a real piano: the key lights up */
 .key.heard { background: color-mix(in srgb, var(--c) 22%, #fff); }
@@ -264,7 +264,7 @@ html, body {
 .dialog h2 { margin: 8px 0 6px; font-size: 20px; }
 .dialog p { margin: 0 0 16px; font-size: 15px; line-height: 1.5; }
 .dialog-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.chip.primary { background: #E53935; border-color: #E53935; color: #fff; }
+.chip.primary { background: var(--t-700); border-color: var(--t-700); color: #fff; }
 
 /* ---------- Clef menu ---------- */
 .clef-pick {
@@ -276,7 +276,7 @@ html, body {
 .clef-pick .select { border: none; padding-left: 2px; background: transparent; }
 
 /* ---------- Quiz ---------- */
-.quiz-btn.active { background: #7E57C2; border-color: #7E57C2; color: #fff; }
+.quiz-btn.active { background: var(--t-700); border-color: var(--t-700); color: #fff; }
 .key.reveal { animation: reveal 450ms ease-in-out 4; }  /* wrong answer: the correct key flashes */
 @keyframes reveal {
   0%, 100% { background: #fff; outline: 0 solid var(--c); }
@@ -355,13 +355,13 @@ html, body {
 .top .status, .top .piano-status { font-size: 14px; opacity: .85; }
 /* Keyboard users: clear focus ring on every control */
 .top .chip:focus-visible, .top .select:focus-visible, .dialog .chip:focus-visible {
-  outline: 3px solid #FFD54F; outline-offset: 2px;
+  outline: 3px solid var(--t-400); outline-offset: 2px;
 }
-.clef-pick:focus-within { outline: 3px solid #FFD54F; outline-offset: 2px; }
+.clef-pick:focus-within { outline: 3px solid var(--t-400); outline-offset: 2px; }
 .clef-pick .select:focus-visible { outline: none; }
 
 /* ---------- Padding on all four sides of both top-row areas; menus in two rows ---------- */
-.top { --pad: clamp(6px, 1.4cqw, 16px); }
+.top { --pad: clamp(5px, 1.6cqh, 16px); }
 .top .now {
   padding: var(--pad);
   background: rgba(255,255,255,.06);
@@ -507,3 +507,256 @@ html, body {
 /* Disabled clef menu (during the quiz): style the pill, not the inner select */
 .top .bar .clef-pick .select:disabled { background: transparent; border: none; color: var(--t-dis-ink); }
 .top .bar .clef-pick:has(.select:disabled) { background: var(--t-dis); border-style: dashed; }
+
+/* ---------- Current-note card: fixed sizes, so the staff never grows or shrinks ----------
+   The staff is always a square as tall as the card allows, the same in free play, songs and the quiz,
+   on every screen (including rotated phones). --staff = top-row height minus the paddings. */
+.top {
+  --top-h: clamp(110px, 40cqh, 340px);
+  height: var(--top-h);
+  --staff: calc(var(--top-h) - 18px - 4 * var(--pad));   /* 18px = top-row padding; no label any more */
+}
+.top .now { aspect-ratio: auto; width: max-content; flex: none; }
+.top .now-card { flex: none; height: auto; width: max-content; }
+.top .now-staff { flex: none; width: var(--staff); height: var(--staff); min-width: var(--staff); }
+.top .now-arrow { flex: none; width: calc(var(--staff) * .22); max-width: 40px; min-width: 16px; }
+.top .now-key-wrap { flex: none; height: var(--staff); }
+.top .mini-key, .top .mini-key.ask { flex: none; height: calc(var(--staff) * .86); width: calc(var(--staff) * .69); aspect-ratio: auto; }
+.top .mini-key.black { width: calc(var(--staff) * .47); }
+
+/* ---------- Listen button + wrong-note wiggle ---------- */
+.top .bar .play-btn.active { background: var(--t-600); border-color: var(--t-600); color: #fff; }
+.top .bar .chip:disabled {                              /* e.g. Listen in free play: 6.3:1 / 6.1:1 contrast */
+  background: var(--t-dis); color: var(--t-dis-ink); border-style: dashed; cursor: not-allowed; box-shadow: none;
+}
+.key.oops { animation: oops 400ms ease-in-out; }
+@keyframes oops {
+  0%, 100% { translate: 0 0; }
+  20% { translate: -5px 0; } 40% { translate: 5px 0; }
+  60% { translate: -3px 0; } 80% { translate: 3px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .key.oops { animation: none; } }
+
+/* ---------- Folded menus (song or quiz in progress) ---------- */
+.menu-btn { display: none; }
+#app.menu-folded .top .bar-row { display: none; }
+#app.menu-folded .top .bar {
+  flex: none; margin-left: auto; align-self: flex-start;
+  background: transparent; box-shadow: none; padding: var(--pad);
+}
+#app.menu-folded .menu-btn {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;                           /* WCAG 2.2 target size */
+  border-radius: 50%;
+  border: 2px solid var(--t-panel-line);
+  background: rgba(255, 255, 255, .06);                /* quiet on purpose: should not attract a toddler */
+  cursor: pointer; touch-action: manipulation;
+}
+#app.menu-folded .menu-btn span,
+#app.menu-folded .menu-btn span::before,
+#app.menu-folded .menu-btn span::after {               /* three soft lines (≥ 3:1 against the dark panel) */
+  display: block; width: 18px; height: 2px; border-radius: 2px;
+  background: var(--t-300); position: relative; content: "";
+}
+#app.menu-folded .menu-btn span::before { position: absolute; top: -6px; }
+#app.menu-folded .menu-btn span::after  { position: absolute; top: 6px; }
+#app.menu-folded .menu-btn:focus-visible { outline: 3px solid var(--t-400); outline-offset: 3px; }
+
+/* ---------- Quiz reward: the MyTeachers123 logo card (replaces the stars) ---------- */
+img.praise {
+  width: clamp(140px, 46cqh, 340px); height: auto; aspect-ratio: 1;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .45));
+  top: 50%;
+}
+
+/* ======================================================================
+   Healing comic style (whole site): pastel fills, chunky rounded outlines in a deeper shade
+   of the same color, and soft "sticker" shadows. Pink family for treble clef, light blue for bass.
+   The piano itself stays black and white.
+   ====================================================================== */
+#app, #app[data-clef="G"] { --t-key-shadow: #C9A9B6; --t-sticker: rgba(184, 51, 106, .45); }
+#app[data-clef="F"]       { --t-key-shadow: #A7BFCC; --t-sticker: rgba(42, 127, 176, .45); }
+
+/* Shapes on the keys and on the card: pastel fill + comic outline */
+.key .shape svg path, .mini-key .shape svg path {
+  fill: var(--c);
+  stroke: var(--cl, var(--c));
+  stroke-width: 7;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+/* White keys: soft cartoon depth in the clef color */
+.key:not(.black) { box-shadow: 0 8px 0 var(--t-key-shadow), inset 0 0 0 1px #E6DDE0; }
+.key:not(.black).down { box-shadow: 0 2px 0 var(--t-key-shadow), inset 0 0 0 1px #E6DDE0; }
+.key.next { outline-color: var(--cl, var(--c)); }
+@keyframes reveal {
+  0%, 100% { background: #fff; outline: 0 solid var(--cl, var(--c)); }
+  50%      { background: color-mix(in srgb, var(--c) 55%, #fff); outline: 6px solid var(--cl, var(--c)); }
+}
+.key.heard { background: color-mix(in srgb, var(--c) 30%, #fff); }
+.bubble { background: var(--c); border: 4px solid #fff; box-shadow: 0 0 0 3px var(--cl, var(--c)); }
+
+/* Current-note card: sticker look */
+.top .now-card {
+  border-radius: 20px;
+  box-shadow: 0 0 0 3px var(--t-300), 0 6px 0 var(--t-sticker);
+}
+.mini-key { box-shadow: 0 4px 0 var(--t-key-shadow), inset 0 0 0 2px var(--t-250); border-radius: 8px 8px 16px 16px; }
+
+/* Menus, buttons and dialog: same sticker shadow */
+.top .bar .select, .top .bar .chip, .top .bar .clef-pick { box-shadow: 0 3px 0 var(--t-sticker); }
+.top .bar .chip:disabled { box-shadow: none; }
+.dialog { box-shadow: 0 0 0 3px var(--t-300), 0 10px 0 var(--t-sticker), 0 20px 40px rgba(0,0,0,.4); }
+.dialog .chip { box-shadow: 0 3px 0 var(--t-sticker); }
+/* Celebration keeps the clef colors (no rainbow hue shift): the keys do a happy little bounce */
+.celebrate { animation: none; }
+.celebrate .key:not(.black) { animation: cheer 600ms ease-in-out 2; }
+.celebrate .key:not(.black):nth-child(2n) { animation-delay: 80ms; }
+@keyframes cheer {
+  0%, 100% { translate: 0 0; filter: none; }
+  50% { translate: 0 -10px; filter: brightness(1.04); }
+}
+@media (prefers-reduced-motion: reduce) { .celebrate .key:not(.black) { animation: none; } }
+
+/* ======================================================================
+   1.0.4 final look — "Comic" layout + "Sakura Sky" palette (chosen by the parent)
+   Comic: bold black outlines, hard offset shadows, halftone dots, a little speech bubble.
+   Sakura Sky: cherry-blossom pink (treble) / clear-sky blue (bass) + black, white, grey, beige.
+   WCAG 2.2 AA, checked with the WCAG formula:
+     pink  #7A2447/#FFF5F8 9.1 · #fff/#A93A66 6.0 · #fff/#8F2E55 7.8 · #6A2040/#FFF9FB 10.7
+     blue  #123F5C/#F1F9FD 10.4 · #fff/#1F6591 6.3 · #fff/#1A557B 8.0 · #183F57/#F7FCFF 10.8
+     outlines #111 on every background ≥ 12:1; shape outlines #C04877 / #2A78A8 ≥ 4.7:1 on white
+   ====================================================================== */
+#app, #app[data-clef="G"] {
+  --t-50:  #FFF9FB;  --t-100: #FFF5F8;  --t-200: #FDE6EE;  --t-250: #FBC8D8;
+  --t-300: #EE9DBA;  --t-400: #C04877;  --t-600: #A93A66;  --t-700: #8F2E55;
+  --t-ink: #7A2447;  --t-ink2: #6A2040; --t-title: #8F2E55; --t-on-dark: #7A2447;
+  --t-dis: #F4E7EC;  --t-dis-ink: #6B4A58;
+  --t-dot: #FBC8D8;  --t-paper: #FFF5F8;  --t-backdrop: rgba(58, 20, 36, .45);
+  --ink-line: #111;
+}
+#app[data-clef="F"] {
+  --t-50:  #F7FCFF;  --t-100: #F1F9FD;  --t-200: #DDF0FA;  --t-250: #C3E5F8;
+  --t-300: #8CC8EA;  --t-400: #2A78A8;  --t-600: #1F6591;  --t-700: #1A557B;
+  --t-ink: #123F5C;  --t-ink2: #183F57; --t-title: #1A557B; --t-on-dark: #123F5C;
+  --t-dis: #E4EEF3;  --t-dis-ink: #3F5B6E;
+  --t-dot: #C3E5F8;  --t-paper: #F1F9FD;  --t-backdrop: rgba(10, 34, 52, .45);
+}
+
+/* Page: halftone dots on soft paper (comic print) */
+html, body { background: #111; }
+#app {
+  background:
+    radial-gradient(var(--t-dot) 28%, transparent 30%) 0 0 / 22px 22px,
+    var(--t-paper);
+  transition: background-color 300ms;
+}
+/* Top row: no boxes, the comic panels stand on their own */
+#app .top .now, #app .top .bar { background: transparent; box-shadow: none; }
+
+/* Current-note card: comic panel */
+#app .top .now-card {
+  position: relative;
+  background: #fff;
+  border: 3px solid var(--ink-line);
+  border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--ink-line);
+}
+#app .top .now-arrow { background: var(--ink-line); }
+#app .mini-key, #app .top .mini-key {
+  background: #fff;
+  border: 3px solid var(--ink-line);
+  border-radius: 6px 6px 14px 14px;
+  box-shadow: 4px 4px 0 var(--ink-line);
+}
+#app .mini-key.ask .ask-mark { color: var(--t-600); }
+/* Little speech bubble on the card (decoration only) */
+.now-bubble {
+  position: absolute; top: -14px; right: -14px;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--ink-line); box-shadow: 3px 3px 0 var(--ink-line);
+  display: grid; place-items: center;
+  font: 900 20px/1 system-ui, sans-serif; color: var(--t-600);
+  pointer-events: none;
+}
+.now-bubble::after {
+  content: ""; position: absolute; left: -7px; bottom: 1px;
+  border: 7px solid transparent; border-top-color: var(--ink-line); transform: rotate(40deg);
+}
+
+/* White keys: black ink outline + hard shadow */
+#app .key:not(.black) {
+  background: #fff;
+  border: 3px solid var(--ink-line);
+  border-radius: 0 0 14px 14px;
+  box-shadow: 5px 5px 0 var(--ink-line);
+}
+#app .key:not(.black).down { box-shadow: 1px 1px 0 var(--ink-line); transform: translate(4px, 4px); }
+#app .key .shape svg path, #app .mini-key .shape svg path {
+  fill: var(--c);
+  stroke: var(--ink-line);
+  stroke-width: 7;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+/* Black keys: solid ink, a white shine stroke, shadow in the clef color */
+#app .key.black {
+  background: var(--ink-line);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 4px 4px 0 var(--t-600);
+}
+#app .key.black::after {
+  content: ""; position: absolute; left: 18%; top: 6%; width: 12%; height: 55%;
+  background: #fff; border-radius: 9px; opacity: .85; pointer-events: none;
+}
+#app .key.black.down { box-shadow: 1px 1px 0 var(--t-600); filter: none; background: #333; }
+#app .key.next { outline: 6px solid var(--t-600); outline-offset: -9px; }
+#app .key.heard { background: color-mix(in srgb, var(--c) 35%, #fff); }
+.bubble { background: var(--c); border: 3px solid #111; box-shadow: 3px 3px 0 #111; }
+
+/* Menus: comic caption pills */
+#app .top .bar .select, #app .top .bar .chip, #app .top .bar .clef-pick {
+  background: var(--t-100);
+  color: var(--t-ink);
+  border: 3px solid var(--ink-line);
+  box-shadow: 3px 3px 0 var(--ink-line);
+  font-weight: 800;
+}
+#app .top .bar .clef-pick .select { border: none; box-shadow: none; background: transparent; }
+#app .top .bar .select:hover, #app .top .bar .chip:hover, #app .top .bar .clef-pick:hover { background: var(--t-200); }
+#app .top .bar .mode-select.active, #app .top .bar .play-btn.active { background: var(--t-600); color: #fff; }
+#app .top .bar .quiz-btn.active { background: var(--t-700); color: #fff; }
+#app .top .bar .chip:disabled, #app .top .bar .select:disabled {
+  background: var(--t-dis); color: var(--t-dis-ink); border-style: dashed; box-shadow: none;
+}
+#app .top .bar .clef-pick:has(.select:disabled) { background: var(--t-dis); border-style: dashed; box-shadow: none; }
+#app .top .bar .chip:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink-line); }
+/* Status text becomes a small comic caption box (always readable on the dotted paper) */
+#app .top .status:not(:empty), #app .top .piano-status:not(:empty) {
+  color: var(--t-ink); background: #fff; opacity: 1;
+  border: 2px solid var(--ink-line); border-radius: 8px; padding: 2px 8px;
+}
+#app .top .bar .chip:focus-visible, #app .top .bar .select:focus-visible, #app .top .bar .clef-pick:focus-within {
+  outline: 3px solid var(--t-400); outline-offset: 3px;
+}
+
+/* Folded menu button (song or quiz in progress) */
+#app.menu-folded .menu-btn {
+  background: #fff; border: 3px solid var(--ink-line); box-shadow: 3px 3px 0 var(--ink-line);
+}
+#app.menu-folded .menu-btn span,
+#app.menu-folded .menu-btn span::before,
+#app.menu-folded .menu-btn span::after { background: var(--ink-line); }
+
+/* Microphone dialog: comic panel */
+#app .dialog-backdrop { background: var(--t-backdrop); backdrop-filter: none; }
+#app .dialog {
+  background: #fff; color: var(--t-ink2);
+  border: 3px solid var(--ink-line); border-radius: 20px;
+  box-shadow: 8px 8px 0 var(--ink-line);
+}
+#app .dialog .chip { border: 3px solid var(--ink-line); box-shadow: 3px 3px 0 var(--ink-line); color: var(--t-700); background: #fff; }
+#app .dialog .chip.primary { background: var(--t-700); color: #fff; }
+
+/* Quiz reward card */
+#app img.praise { filter: drop-shadow(8px 8px 0 #111); }

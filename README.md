@@ -46,27 +46,31 @@ The card above the keys shows **the note on the staff → the key to press**.
 - In a **song**, it shows the next note to play.
 
 ### Songs
-Pick a song from the **song menu**: *Twinkle Twinkle Little Star* or *Mary Had a Little Lamb*.
-The next key to press bounces. Wrong notes are never punished — the song simply waits for the right one.
-Both songs work in treble clef and in bass clef.
+Pick a song from the **song menu**: *Twinkle Twinkle Little Star*, *Mary Had a Little Lamb*, *Ode to Joy* or *Jingle Bells*.
+All four fit the eight white keys and work in treble clef and in bass clef.
+
+- **▶ Listen** plays the song slowly first. Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap **■ Stop** at any time.
+- Then it's the child's turn: the next key to press bounces.
+- Only the right key plays its note and moves the song forward. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
+- In **Free play** every key simply plays, with no right or wrong.
 
 ### Play mode: on-screen keys or a real piano
 Use the **play mode menu** (top right):
 
 | Play mode | What happens |
 |---|---|
-| 🎹 **Play on-screen keys** (default) | Tap the keys on the screen. The microphone is never used. |
-| 🎤 **Play a real piano** | Have a real piano or keyboard at home? The app listens through the microphone (on every device, including iPhone and iPad). Each correct note moves the song or the quiz forward. |
+| **Play on-screen keys** (default) | Tap the keys on the screen. The microphone is never used. |
+| **Play a real piano** | Have a real piano or keyboard at home? The app listens through the microphone (on every device, including iPhone and iPad). Each correct note moves the song or the quiz forward. |
 
 The microphone is only requested when you choose **Play a real piano**. The first time, the browser asks for permission; if it was blocked, the app shows how to turn it back on.
 Switch back to **Play on-screen keys** to turn the microphone off.
 
-### 🎯 Quiz
-Tap **🎯** to test reading notes in the selected clef:
-- The app picks **3 random notes**. The card shows only the note on the staff (the answer is a "?"), so the child has to read the staff.
+### Quiz
+Tap **Quiz** to test reading notes in the selected clef:
+- The app tests **all 8 notes** of the selected clef, once each, in a new random order every time. The card shows only the note on the staff (the answer is a "?"), so the child has to read the staff.
 - Answer on the on-screen keys, or on a real piano when the play mode is **Play a real piano**.
-- Wrong → the correct key flashes. Right → next note.
-- All 3 done → ⭐⭐⭐ Well done!
+- Wrong → a soft kitten "mew" and the correct key flashes. Right → the note plays and the next one appears.
+- All 8 done → the MyTeachers123 picture pops up. Well done!
 - Five wrong answers in a row → the quiz ends gently. Try again anytime.
 
 ### Languages
@@ -74,6 +78,8 @@ Choose from the language menu (top right): English, Spanish, Traditional Chinese
 The app picks your device language automatically and remembers your choice.
 
 ## Tips for parents
+
+- **Menus fold away while the child plays.** As soon as a song is being played or a quiz starts, all menus fold into one small round button, so the child looks at the keys, not the dropdowns. **Double-tap** it to open the menus (a single tap does nothing). They come back by themselves when the song or quiz is finished.
 
 The app goes fullscreen (and back again after a swipe out, on the next tap), stays in landscape, blocks zooming and the back button, and caps the volume at 70%.
 A web app can't block the phone's "home" gesture, so for full lock-down:

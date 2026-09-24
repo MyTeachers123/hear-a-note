@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Toddler Music Box</title>
   <meta name="description" content="A colorful piano that teaches toddlers to read treble and bass clef. Works offline, no ads, no data collected.">
-  <meta name="theme-color" content="#0B0B0C">
+  <meta name="theme-color" content="#FFF5F8">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -22,8 +22,8 @@
   <div class="top">
     <!-- "Current note" layer: staff → key to press (for learning to read music) -->
     <section id="now" class="now empty" aria-live="polite">
-      <span id="nowLabel" class="now-label"></span>
       <div class="now-card">
+        <span class="now-bubble" aria-hidden="true">♪&#xFE0E;</span>
         <img id="nowStaff" class="now-staff" alt="">
         <span class="now-arrow" aria-hidden="true"></span>
         <div class="now-key-wrap">
@@ -32,6 +32,8 @@
       </div>
     </section>
     <header class="bar">
+      <!-- While a song or quiz is being played, the menus fold into this small button (double-tap to open) -->
+      <button id="menuBtn" class="menu-btn" type="button"><span aria-hidden="true"></span></button>
       <!-- Row 1: clef, play on my piano, language -->
       <div class="bar-row">
         <span class="clef-pick">
@@ -50,6 +52,7 @@
       <!-- Row 2: everything else -->
       <div class="bar-row">
         <select id="song" class="select song-select"></select>
+        <button id="playBtn" class="chip play-btn" disabled></button>
         <button id="quizBtn" class="chip quiz-btn"></button>
         <span id="pianoStatus" class="piano-status" aria-live="polite"></span>
         <span id="status" class="status" aria-live="polite"></span>
@@ -60,12 +63,15 @@
   <main id="keys" class="keys" aria-label="Piano keys"></main>
 
   <!-- Praise shown when the quiz is all correct -->
-  <div id="praise" class="praise" hidden aria-hidden="true">⭐⭐⭐</div>
+  <img id="praise" class="praise" src="icons/praise.png" alt="" hidden aria-hidden="true" draggable="false">
 
   <!-- Microphone permission dialog (for parents) -->
   <div id="micDialog" class="dialog-backdrop" hidden>
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="micTitle">
-      <div class="dialog-icon" aria-hidden="true">🎤</div>
+      <div class="dialog-icon" aria-hidden="true">
+        <!-- microphone drawn in the clef color (no colored emoji) -->
+        <svg viewBox="0 0 48 48" width="44" height="44"><rect x="17" y="5" width="14" height="24" rx="7" fill="var(--t-250)" stroke="var(--t-600)" stroke-width="3"/><path d="M11 22a13 13 0 0 0 26 0M24 35v7M17 42h14" fill="none" stroke="var(--t-600)" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
       <h2 id="micTitle"></h2>
       <p id="micBody"></p>
       <div class="dialog-actions">

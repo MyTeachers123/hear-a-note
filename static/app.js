@@ -5,7 +5,7 @@
   * 4. Registers a Service Worker → works offline and can be "Added to Home Screen"
   * 5. 12 languages (source of truth: i18n.py in Python → static/i18n.json)
   * 6. "Current note" layer: staff notation (rendered by Python + verovio) and the key to press
-  * 8. Quiz: 3 random notes from the selected clef, answered on a real piano (microphone) or the on-screen keys
+  * 8. Quiz: all 8 notes of the selected clef, each once, in random order, answered on a real piano (microphone) or the on-screen keys
   * 7. Clef menu: treble clef (middle C to C5) / bass clef (C3 to middle C);
   *    keys, sounds, staff images and piano listening all shift by one octave
   * 9. Play-mode menu: on-screen keys (default) or a real piano — the microphone is only used for the real piano
@@ -15,14 +15,14 @@
 
   // White-key "slots": pc = pitch class, up = one octave higher (the rightmost C)
   const WHITE_SLOTS = [
-    { pc: "C", idx: 0, c: "#E53935", shape: "circle" },
-    { pc: "D", idx: 1, c: "#FB8C00", shape: "square" },
-    { pc: "E", idx: 2, c: "#F9A825", shape: "triangle" },
-    { pc: "F", idx: 3, c: "#43A047", shape: "star" },
-    { pc: "G", idx: 4, c: "#00ACC1", shape: "hexagon" },
-    { pc: "A", idx: 5, c: "#1E88E5", shape: "diamond" },
-    { pc: "B", idx: 6, c: "#8E24AA", shape: "heart" },
-    { pc: "C", idx: 0, c: "#E53935", shape: "arrow", up: 1, high: true },   // octave above: same color, up arrow
+    { pc: "C", idx: 0, shape: "circle" },
+    { pc: "D", idx: 1, shape: "square" },
+    { pc: "E", idx: 2, shape: "triangle" },
+    { pc: "F", idx: 3, shape: "star" },
+    { pc: "G", idx: 4, shape: "hexagon" },
+    { pc: "A", idx: 5, shape: "diamond" },
+    { pc: "B", idx: 6, shape: "heart" },
+    { pc: "C", idx: 0, shape: "arrow", up: 1, high: true },   // octave above: same color, up arrow
   ];
   // Black keys: between = which two white keys it sits between (positioned by JS)
   const BLACK_SLOTS = [
@@ -39,10 +39,14 @@
   let clef = "G";
   try { if (localStorage.getItem("clef") === "F") clef = "F"; } catch (_) {}
   const baseOct = () => (clef === "G" ? 4 : 3);
-  // Colors: everything pink in treble clef, everything light blue in bass clef (must match CLEF_COLOR in generate_assets.py)
-  const CLEF_COLOR = { G: "#EC407A", F: "#29B6F6" };
+  // Colors: everything pink in treble clef, everything light blue in bass clef (same families as generate_assets.py)
+  // Healing comic style: soft pastel fill + a deeper outline of the same color (outline ≥ 4.4:1 on white)
+  // "Sakura Sky" palette (chosen by the parent): cherry-blossom pink for treble, clear-sky blue for bass
+  const CLEF_COLOR = { G: "#FBC8D8", F: "#C3E5F8" };   // pastel fill
+  const CLEF_LINE  = { G: "#C04877", F: "#2A78A8" };   // deeper outline (4.7:1 / 4.8:1 on white)
   // Middle C (C4) is always pink, so the rightmost C in bass clef reminds kids "this is middle C"
   const colorOf = (note) => (note === "C4" ? CLEF_COLOR.G : CLEF_COLOR[clef]);
+  const lineOf  = (note) => (note === "C4" ? CLEF_LINE.G : CLEF_LINE[clef]);
   const noteOf = (slot) => slot.pc + (baseOct() + (slot.up || 0));
   // Middle C (C4) is always a circle; one octave up = up arrow, one octave down = down arrow
   function shapeOf(slot) {
@@ -119,13 +123,16 @@
     clefSel.setAttribute("aria-label", T.clef);
     micTitle.textContent = T.micTitle;
     micClose.textContent = T.close;
-    setMicDialog(micMode);
-    modeSel.options[0].textContent = `🎹 ${T.modeScreen}`;
-    modeSel.options[1].textContent = `🎤 ${T.modePiano}`;
+    setMicDialog();
+    modeSel.options[0].textContent = T.modeScreen;
+    modeSel.options[1].textContent = T.modePiano;
     modeSel.setAttribute("aria-label", T.mode);
-    quizBtn.textContent = quiz ? `■ ${T.quizEnd}` : `🎯 ${T.quiz}`;
+    quizBtn.textContent = quiz ? `■ ${T.quizEnd}` : T.quiz;
+    menuBtn.setAttribute("aria-label", T.menu);
+    menuBtn.title = T.menu;
+    setPlayBtn();
     if (pianoState) pianoStatus.textContent = T[pianoState] || "";
-    nowLabel.textContent = T.now;
+    nowEl.setAttribute("aria-label", T.now);          // no visible label; screen readers still hear "Current note"
     langSel.setAttribute("aria-label", T.language);
     if (nowNote) showNow(nowNote, !!quiz);
   }
@@ -147,7 +154,6 @@
 
   /* ---------------- "Current note" layer: staff + key to press ---------------- */
   const nowEl = document.getElementById("now");
-  const nowLabel = document.getElementById("nowLabel");
   const nowStaff = document.getElementById("nowStaff");
   const nowKey = document.getElementById("nowKey");
   let nowNote = null;
@@ -166,6 +172,7 @@
     nowKey.className = "mini-key" + (key.classList.contains("black") ? " black" : "");
     nowKey.dataset.shape = key.dataset.shape || "";
     nowKey.style.setProperty("--c", key.style.getPropertyValue("--c"));
+    nowKey.style.setProperty("--cl", key.style.getPropertyValue("--cl"));
     nowKey.innerHTML = key.classList.contains("black") ? "" : key.querySelector(".shape").outerHTML;
     if (hideAnswer) {                               // quiz: hide the answer (which key to press)
       nowKey.className = "mini-key ask";
@@ -185,6 +192,7 @@
       const shape = shapeOf(k);
       b.dataset.shape = shape;
       b.style.setProperty("--c", colorOf(note));
+      b.style.setProperty("--cl", lineOf(note));
       // Only a big, simple shape on each key — easy for toddlers to see
       b.innerHTML = `<span class="shape" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="${SHAPES_SVG[shape]}"/></svg></span>`;
       b._info = k;
@@ -199,6 +207,7 @@
       b.className = "key black";
       b.dataset.note = note;
       b.style.setProperty("--c", CLEF_COLOR[clef]);
+      b.style.setProperty("--cl", CLEF_LINE[clef]);
       b._info = k;
       keysEl.appendChild(b);
       keyEls[note] = b;
@@ -261,10 +270,20 @@
     if (note && keyEls[note]) keyEls[note].classList.remove("down");
   });
 
+  // Free play: every key sounds. Songs and quiz: only the right key plays its note and moves on;
+  // a wrong key plays a soft kitten "mew" instead (and in the quiz the right key flashes).
   function press(el, x, y) {
     const note = el.dataset.note;
     el.classList.add("down");
     setTimeout(() => el.classList.remove("down"), 180);
+    if (demo) { play(note); bubble(el, x, y); return; }   // while the song is being played to the child: just sound
+    const target = quiz ? quiz.notes[quiz.pos] : song ? curNotes[songPos] : null;
+    if (target && note !== target) {
+      playOops();
+      wobble(el);
+      if (quiz) quizAnswer(note);
+      return;
+    }
     play(note);
     bubble(el, x, y);
     if (quiz) quizAnswer(note);
@@ -276,6 +295,7 @@
     const d = document.createElement("div");
     d.className = "bubble";
     d.style.setProperty("--c", el.style.getPropertyValue("--c"));
+    d.style.setProperty("--cl", el.style.getPropertyValue("--cl"));
     d.style.left = x + "px";
     d.style.top = y + "px";
     document.body.appendChild(d);
@@ -297,7 +317,7 @@
     master.gain.value = MAX_VOLUME;
     master.connect(comp).connect(ctx.destination);
 
-    await Promise.all(ALL_NOTES.map(async (note) => {
+    await Promise.all([...ALL_NOTES, "oops"].map(async (note) => {
       try {
         const res = await fetch(`sounds/${note}.wav`);
         const data = await res.arrayBuffer();
@@ -321,6 +341,29 @@
     } else {
       fallbackTone(note);                            // fallback if the sound file did not load
     }
+  }
+
+  // Soft, low kitten "mew" for a wrong note (songs and quiz only). It always glides and never holds a
+  // piano pitch (see generate_assets.py). Many wrong taps in a row play it at most once every 0.7 s,
+  // and never two at once, so it stays calm instead of noisy.
+  // The microphone ignores the next moment, so the speaker's own sound is never mistaken for the piano.
+  let micQuietUntil = 0, oopsSrc = null, oopsAt = 0;
+  function playOops() {
+    micQuietUntil = performance.now() + 600;
+    if (!ctx || !buffers.oops) return;
+    if (ctx.state === "suspended") ctx.resume();
+    const now = performance.now();
+    if (now - oopsAt < 700) return;                  // fast repeated wrong taps: calm, never stacked
+    oopsAt = now;
+    try { oopsSrc && oopsSrc.stop(); } catch (_) {}  // only one mew at a time
+    oopsSrc = ctx.createBufferSource();
+    oopsSrc.buffer = buffers.oops;
+    oopsSrc.connect(master);
+    oopsSrc.start();
+  }
+  function wobble(el) {                              // wrong key gives a little wiggle (no red, no scolding)
+    el.classList.remove("oops"); void el.offsetWidth; el.classList.add("oops");
+    setTimeout(() => el.classList.remove("oops"), 420);
   }
 
   function fallbackTone(note) {
@@ -363,21 +406,26 @@
   }
 
   songSel.addEventListener("change", () => {
+    stopDemo();
+    unfoldMenus();
     song = songSel.selectedOptions[0]._song || null;
     songPos = 0;
     updateNotes();
     highlightNext();
+    setPlayBtn();
     if (listening) pianoStatus.textContent = T[pianoState] || "";
   });
 
   function advanceSong(note) {
-    if (note !== curNotes[songPos]) return;          // wrong notes are not punished, we just don't advance
+    if (note !== curNotes[songPos]) return;          // only the right note moves the song forward
     songPos++;
+    if (songPos < curNotes.length) foldMenus();     // the child is playing → menus fold away
+    else unfoldMenus();
     if (songPos >= curNotes.length) {              // end of song
       keysEl.classList.add("celebrate");
       setTimeout(() => keysEl.classList.remove("celebrate"), 1200);
       songPos = 0;
-      if (listening) pianoStatus.textContent = `🎉 ${T.great}`;   // finished on a real piano → "Great job" (keeps listening)
+      if (listening) pianoStatus.textContent = T.great;   // finished on a real piano → "Great job" (keeps listening)
     }
     highlightNext();
   }
@@ -395,32 +443,39 @@
   }
 
   function onPianoNote(num) {
+    if (demo || performance.now() < micQuietUntil) return;   // ignore our own speaker (demo / "mew")
     const target = quiz ? quiz.notes[quiz.pos] : song ? curNotes[songPos] : null;
     // The mic is sometimes off by an octave → compare pitch class only (Do/Re/Mi…) and map to the current clef's octave
     const pc = PC[num % 12];
     const id = target && target.slice(0, -1) === pc ? target : pc + baseOct();
     if (!keyEls[id]) return;                         // ignore notes outside the current set of keys
+    if (target && id !== target) {                   // wrong note on the real piano → soft "mew", no progress
+      playOops();
+      wobble(keyEls[id]);
+      if (quiz) quizAnswer(id);
+      return;
+    }
     flashKey(id);
     if (quiz) quizAnswer(id);
     else if (song) advanceSong(id);
     else showNow(id);
   }
 
-  // Microphone permission dialog: "ask" = not allowed yet (button: Allow) | "blocked" = blocked (how-to + Try again)
+  // Microphone: choosing "real piano" leaves fullscreen and asks the browser directly (its own
+  // Allow / Block prompt). Our dialog only appears if the microphone was blocked earlier.
   const micDialog = document.getElementById("micDialog");
   const micTitle = document.getElementById("micTitle");
   const micBody = document.getElementById("micBody");
   const micOk = document.getElementById("micOk");
   const micClose = document.getElementById("micClose");
-  let micMode = "ask";
+  let micPending = false;                          // while the browser prompt is open, do not re-enter fullscreen
 
-  function setMicDialog(mode) {
-    micMode = mode;
-    if (!T.micBody) return;
-    micBody.textContent = mode === "blocked" ? T.micBlocked : T.micBody;
-    micOk.textContent = mode === "blocked" ? T.retry : `🎤 ${T.micAllow}`;
+  function setMicDialog() {
+    if (!T.micBlocked) return;
+    micBody.textContent = T.micBlocked;
+    micOk.textContent = T.retry;
   }
-  function openMicDialog(mode) { setMicDialog(mode); micDialog.hidden = false; }
+  function openMicDialog() { setMicDialog(); micDialog.hidden = false; }
   function closeMicDialog() { micDialog.hidden = true; }
 
   function beginListening(state) {
@@ -430,22 +485,28 @@
     if (song && !quiz) { songPos = 0; highlightNext(); }     // start from the first note
   }
 
-  async function tryMic() {
-    try {
-      await PianoInput.startMic(onPianoNote);       // the browser shows its own permission prompt
-      closeMicDialog();
-      beginListening("listening");
-    } catch (_) {
-      openMicDialog("blocked");                    // denied → show parents how to enable it
-    }
+  // Browsers hide or auto-dismiss permission prompts in fullscreen, so leave fullscreen first
+  async function leaveFullscreen() {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!fsElement() || !exit) return;
+    try { await exit.call(document); } catch (_) {}
+    await new Promise((r) => setTimeout(r, 200));  // let the browser finish the transition
   }
 
-  async function startPiano() {
-    // Check mic permission: granted → start; otherwise show our explanation dialog first
-    const perm = await PianoInput.micPermission();
-    if (perm === "granted") return tryMic();
-    openMicDialog(perm === "denied" ? "blocked" : "ask");
+  async function tryMic() {
+    micPending = true;
+    closeMicDialog();
+    await leaveFullscreen();
+    try {
+      await PianoInput.startMic(onPianoNote);       // the browser shows its own Allow / Block prompt
+      beginListening("listening");
+    } catch (_) {
+      openMicDialog();                             // blocked before → show how to turn it back on
+    }
+    micPending = false;
   }
+
+  function startPiano() { return tryMic(); }
 
   micOk.addEventListener("click", tryMic);
   // Closing the dialog without a working microphone → back to the on-screen keys
@@ -470,16 +531,16 @@
   });
 
   /* ---------------- Quiz ---------------- */
-  // Pick 3 random white-key notes for the current clef; wrong → the correct key flashes; right → next note;
-  // all 3 done → praise; 5 wrong in a row → end gently
-  const QUIZ_LEN = 3, MAX_WRONG = 5;
+  // Every quiz tests all 8 white-key notes of the current clef exactly once, in a new random order;
+  // wrong → the correct key flashes; right → next note; all 8 done → praise; 5 wrong in a row → end gently
+  const QUIZ_LEN = WHITE_SLOTS.length, MAX_WRONG = 5;
   const quizBtn = document.getElementById("quizBtn");
   const praiseEl = document.getElementById("praise");
   let quiz = null;
 
   function pickQuizNotes() {
-    const pool = WHITE_SLOTS.map(noteOf);
-    for (let i = pool.length - 1; i > 0; i--) {     // shuffle
+    const pool = WHITE_SLOTS.map(noteOf);           // all 8 notes
+    for (let i = pool.length - 1; i > 0; i--) {     // Fisher–Yates shuffle
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
@@ -512,6 +573,7 @@
       clearTimeout(revealKey.t);
       keyEls[target].classList.remove("reveal");
       if (quiz.pos >= QUIZ_LEN) return finishQuiz(true);
+      foldMenus();                                   // the child keeps playing → menus stay out of the way
       showQuizTarget();
     } else {
       quiz.wrong++;
@@ -533,19 +595,22 @@
       setTimeout(() => keysEl.classList.remove("celebrate"), 1200);
       praise();
     }
-    const msg = success ? `🎉 ${T.quizPraise}` : T.quizTryLater;
+    const msg = success ? T.quizPraise : T.quizTryLater;
     endQuiz();
     pianoStatus.textContent = msg;
   }
 
   function startQuiz() {
+    stopDemo();
     if (song) { songSel.value = ""; song = null; updateNotes(); }
     quiz = { notes: pickQuizNotes(), pos: 0, wrong: 0 };
     keysEl.classList.add("quiz");                    // hide the staff on the keys so kids must read the card
     songSel.disabled = clefSel.disabled = true;
     quizBtn.classList.add("active");
     quizBtn.textContent = `■ ${T.quizEnd}`;
+    setPlayBtn();
     showQuizTarget();
+    foldMenus(true);
   }
 
   function endQuiz() {
@@ -555,7 +620,9 @@
     keysEl.classList.remove("quiz");
     songSel.disabled = clefSel.disabled = false;
     quizBtn.classList.remove("active");
-    quizBtn.textContent = `🎯 ${T.quiz}`;
+    quizBtn.textContent = T.quiz;
+    setPlayBtn();
+    unfoldMenus();
     statusEl.textContent = "";
     nowEl.classList.add("empty");
     nowStaff.src = `staff/${clef}/clef.svg`;
@@ -563,6 +630,83 @@
   }
 
   quizBtn.addEventListener("click", () => (quiz ? endQuiz() : startQuiz()));
+
+  /* ---------------- Listen: the app plays the song slowly, showing every note ---------------- */
+  // Each note: the key bounces + lights up, the card shows its staff note and shape, and it sounds.
+  const BEAT_MS = 850;                               // slow (about 70 beats per minute) so toddlers can follow
+  const playBtn = document.getElementById("playBtn");
+  let demo = null;                                   // { i, timer } while playing
+
+  function setPlayBtn() {
+    playBtn.disabled = !song || !!quiz;
+    playBtn.classList.toggle("active", !!demo);
+    playBtn.textContent = demo ? `■ ${T.stop}` : `\u25B6\uFE0E ${T.play}`;
+  }
+  function demoStep() {
+    if (!demo) return;
+    if (demo.i >= curNotes.length) return stopDemo();
+    const note = curNotes[demo.i];
+    Object.values(keyEls).forEach((k) => k.classList.remove("next"));
+    const el = keyEls[note];
+    el.classList.add("next", "down");
+    setTimeout(() => el.classList.remove("down"), 220);
+    showNow(note);
+    play(note);
+    statusEl.textContent = `${demo.i + 1} / ${curNotes.length}`;
+    const beats = (song.beats && song.beats[demo.i]) || 1;
+    demo.i++;
+    demo.timer = setTimeout(demoStep, beats * BEAT_MS);
+  }
+  function startDemo() {
+    if (!song || quiz) return;
+    unlockAudio();
+    demo = { i: 0, timer: 0 };
+    setPlayBtn();
+    demoStep();
+  }
+  function stopDemo() {
+    if (!demo) return;
+    clearTimeout(demo.timer);
+    demo = null;
+    setPlayBtn();
+    songPos = 0;                                     // now it's the child's turn, from the first note
+    highlightNext();
+  }
+  playBtn.addEventListener("click", () => (demo ? stopDemo() : startDemo()));
+
+  /* ---------------- Menus fold away while the child plays ---------------- */
+  // As soon as a song is being played (first right note) or a quiz starts, the menus fold into one small
+  // button so the child looks at the keys, not the dropdowns. A single tap does nothing — it takes a
+  // double-tap (a grown-up gesture) to open them. They come back by themselves when the song or quiz ends.
+  const menuBtn = document.getElementById("menuBtn");
+  const barEl = document.querySelector(".top .bar");
+  let menuKeepOpenUntil = 0, menuLastTap = 0;
+  function foldMenus(force) {
+    if (!force && performance.now() < menuKeepOpenUntil) return;   // a grown-up is using the menus right now
+    document.getElementById("app").classList.add("menu-folded");
+  }
+  function unfoldMenus() {
+    document.getElementById("app").classList.remove("menu-folded");
+  }
+  function openMenusByGrownUp() {
+    unfoldMenus();
+    menuKeepOpenUntil = performance.now() + 8000;   // stays open while being used; folds again later
+  }
+  menuBtn.addEventListener("pointerup", (e) => {
+    e.preventDefault();
+    const now = performance.now();
+    if (now - menuLastTap < 450) { menuLastTap = 0; openMenusByGrownUp(); }
+    else menuLastTap = now;
+  });
+  menuBtn.addEventListener("keydown", (e) => {    // keyboard users (accessibility): Enter / Space opens directly
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openMenusByGrownUp(); }
+  });
+  for (const type of ["pointerdown", "change", "keydown"]) {
+    barEl.addEventListener(type, (e) => {
+      // only after a grown-up double-tapped them open: keep them open while they are being used
+      if (e.target !== menuBtn && performance.now() < menuKeepOpenUntil) menuKeepOpenUntil = performance.now() + 8000;
+    });
+  }
 
   function highlightNext() {
     Object.values(keyEls).forEach((k) => k.classList.remove("next"));
@@ -606,7 +750,9 @@
     unlockAudio();                                       // must run inside a user gesture (iOS / Chrome)
     if (!started) { started = true; trapBack(); lockLandscape(); }
     // Opening a dropdown should not be interrupted; fullscreen then starts on the next tap elsewhere
-    if (!(e.target.closest && e.target.closest("select"))) enterFullscreen();
+    // (and not while the microphone prompt is open or the microphone dialog is showing)
+    const t = e.target.closest ? e.target : document.body;
+    if (!micPending && micDialog.hidden && !t.closest("select")) enterFullscreen();
   }
   // Capture phase: runs before the key's own handler, so the very first tap on a key also plays it.
   // Browsers allow fullscreen on different events (mouse: pointerdown; touch: pointerup), so listen to both.
@@ -631,6 +777,7 @@
   clefSel.value = clef;
   clefIcon.src = `staff/${clef}/clef.svg`;
   clefSel.addEventListener("change", () => {
+    stopDemo();
     clef = clefSel.value;
     appEl.dataset.clef = clef;
     try { localStorage.setItem("clef", clef); } catch (_) {}

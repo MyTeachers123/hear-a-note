@@ -13,7 +13,7 @@ import wave
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 import i18n
 
@@ -107,29 +107,108 @@ def write_icons() -> None:
     for name, size, circle, opaque in ICONS:
         make_icon(logo, size, circle, opaque).save(ROOT / "icons" / name, optimize=True)
     print(f"✓ {len(ICONS)} icons from assets/logo.png → static/icons/")
+    write_praise(logo)
+
+
+def write_praise(logo: Image.Image, size: int = 480) -> None:
+    """Quiz "all correct" picture: the logo on a solid cream card inside a soft beige rounded-square frame."""
+    scale = 3                                               # draw big, then shrink → smooth rounded corners
+    S, frame, radius = size * scale, 16 * scale, 72 * scale
+    card = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(card)
+    d.rounded_rectangle((0, 0, S - 1, S - 1), radius=radius, fill=(234, 219, 200, 255))            # beige frame #EADBC8
+    d.rounded_rectangle((frame, frame, S - 1 - frame, S - 1 - frame), radius=radius - frame,
+                        fill=(255, 250, 242, 255))                                                  # cream inside #FFFAF2
+    inner = S - 2 * frame - 2 * 40 * scale                  # padding around the logo
+    w, h = logo.size
+    k = inner / max(w, h)
+    small = logo.resize((round(w * k), round(h * k)), Image.Resampling.LANCZOS)
+    card.alpha_composite(small, ((S - small.width) // 2, (S - small.height) // 2))
+    card.resize((size, size), Image.Resampling.LANCZOS).save(ROOT / "icons" / "praise.png", optimize=True)
+    print("✓ praise.png (quiz reward) → static/icons/")
 
 
 # ---------------------------------------------------------------- 3. Songs
+def song(sid: str, notes: str, beats: str) -> dict:
+    """notes and beats are space-separated; one beat = one quarter note. Every note must be a white key C4–C5."""
+    n, b = notes.split(), [float(x) for x in beats.split()]
+    assert len(n) == len(b), (sid, len(n), len(b))
+    assert all(x in WHITE for x in n), sid                 # stays inside the 8 white keys
+    return {"id": sid, "title": sid, "notes": n, "beats": b}   # title = i18n key
+
+
+# Public-domain tunes that fit the 8 white keys (C4–C5). Written for treble clef; the app moves them
+# down one octave for bass clef. "beats" drives the slow "Play" demo.
 SONGS = [
-    {
-        "id": "twinkle",
-        "title": "twinkle",   # i18n key
-        "notes": "C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4 "
-                 "G4 G4 F4 F4 E4 E4 D4 G4 G4 F4 F4 E4 E4 D4 "
-                 "C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4".split(),
-    },
-    {
-        "id": "mary",
-        "title": "mary",
-        "notes": "E4 D4 C4 D4 E4 E4 E4 D4 D4 D4 E4 G4 G4 "
-                 "E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4".split(),
-    },
+    song("twinkle",                                    # Twinkle Twinkle Little Star (traditional)
+         "C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4 "
+         "G4 G4 F4 F4 E4 E4 D4 G4 G4 F4 F4 E4 E4 D4 "
+         "C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4",
+         "1 1 1 1 1 1 2 1 1 1 1 1 1 2 "
+         "1 1 1 1 1 1 2 1 1 1 1 1 1 2 "
+         "1 1 1 1 1 1 2 1 1 1 1 1 1 2"),
+    song("mary",                                       # Mary Had a Little Lamb (traditional)
+         "E4 D4 C4 D4 E4 E4 E4 D4 D4 D4 E4 G4 G4 "
+         "E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4",
+         "1 1 1 1 1 1 2 1 1 2 1 1 2 "
+         "1 1 1 1 1 1 1 1 1 1 1 1 4"),
+    song("ode",                                        # Ode to Joy (Beethoven, Symphony No. 9, 1824)
+         "E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4 D4 D4 "
+         "E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4 C4 C4",
+         "1 1 1 1 1 1 1 1 1 1 1 1 1.5 0.5 2 "
+         "1 1 1 1 1 1 1 1 1 1 1 1 1.5 0.5 2"),
+    song("jingle",                                     # Jingle Bells chorus (James Lord Pierpont, 1857)
+         "E4 E4 E4 E4 E4 E4 E4 G4 C4 D4 E4 "
+         "F4 F4 F4 F4 F4 E4 E4 E4 E4 E4 D4 D4 E4 D4 G4 "
+         "E4 E4 E4 E4 E4 E4 E4 G4 C4 D4 E4 "
+         "F4 F4 F4 F4 F4 E4 E4 E4 E4 G4 G4 F4 D4 C4",
+         "1 1 2 1 1 2 1 1 1.5 0.5 4 "
+         "1 1 1.5 0.5 1 1 1 0.5 0.5 1 1 1 1 2 2 "
+         "1 1 2 1 1 2 1 1 1.5 0.5 4 "
+         "1 1 1 1 1 1 1 0.5 0.5 1 1 1 1 4"),
 ]
 
 
+# ---------------------------------------------------------------- 1b. Wrong-note sound: a soft kitten "mew"
+def _lowpass(x: np.ndarray, fc: float) -> np.ndarray:
+    """One-pole low-pass filter: takes off any sharp edge."""
+    a = np.exp(-2 * np.pi * fc / SAMPLE_RATE)
+    y = np.empty_like(x)
+    acc = 0.0
+    for i, v in enumerate(x):
+        acc = (1 - a) * v + a * acc
+        y[i] = acc
+    return y
+
+
+def synth_oops() -> np.ndarray:
+    """Wrong-note sound (sounds/oops.wav): a soft, low, "questioning" kitten mew — "mew?".
+    Chosen by the parent from 10 versions (#6).
+      * pitch 430 Hz → dips to 380 Hz → rises to 610 Hz at the end, like asking "is this one?"
+      * it glides the whole time, so it never sounds like a piano note
+      * only a few gentle overtones + a 1.8 kHz low-pass: round, never shrill (sound centre ~530 Hz)
+      * short (0.36 s) and quiet (32 % volume); app.js never stacks two mews"""
+    dur = 0.36
+    n = int(SAMPLE_RATE * dur)
+    t = np.arange(n) / SAMPLE_RATE
+    x = t / dur
+    # Smooth pitch curve through (0, 430 Hz), (0.45, 380 Hz), (1, 610 Hz), interpolated on a log scale
+    f0 = np.exp(np.interp(x, [0, 0.45, 1], np.log([430, 380, 610])))
+    k = max(3, n // 60)
+    f0 = np.convolve(np.pad(f0, k, mode="edge"), np.ones(2 * k + 1) / (2 * k + 1), "valid")
+    f0 *= 1 + 0.006 * np.sin(2 * np.pi * 6 * t)                # tiny purr-like wobble
+    phase = 2 * np.pi * np.cumsum(f0) / SAMPLE_RATE
+    bright = 0.3 * np.sin(np.pi * np.clip(x * 1.4, 0, 1))     # "ee" a little brighter in the middle
+    tone = (np.sin(phase) + 0.55 * bright * np.sin(2 * phase)
+            + 0.25 * bright * np.sin(3 * phase) + 0.08 * bright * np.sin(4 * phase))
+    env = np.minimum(t / 0.035, 1) * np.sin(np.pi * np.clip(x, 0, 1)) ** 0.6   # soft start and end
+    out = _lowpass(tone * env, 1800)
+    return out / np.max(np.abs(out)) * 0.32
+
+
 # ---------------------------------------------------------------- 5. Staff notation
-# Colors: everything pink in treble clef, light blue in bass clef (must match CLEF_COLOR in app.js)
-CLEF_COLOR = {"G": "#EC407A", "F": "#29B6F6"}
+# Colors: everything pink in treble clef, light blue in bass clef (same families as CLEF_LINE in app.js)
+CLEF_COLOR = {"G": "#C04877", "F": "#2A78A8"}   # "Sakura Sky" outline colors for the note heads (4.7:1 / 4.8:1 on white)
 # Notes drawn for each clef: treble C4–C5, bass C3–C4 (middle C appears in both)
 CLEF_NOTES = {
     "G": ["C4", "Cs4", "D4", "Ds4", "E4", "F4", "Fs4", "G4", "Gs4", "A4", "As4", "B4", "C5"],
@@ -186,7 +265,8 @@ def main() -> None:
 
     for name, freq in NOTES.items():
         write_wav(ROOT / "sounds" / f"{name}.wav", synth_piano(freq))
-    print(f"✓ {len(NOTES)} sound files → static/sounds/")
+    write_wav(ROOT / "sounds" / "oops.wav", synth_oops())
+    print(f"✓ {len(NOTES)} sound files + oops.wav → static/sounds/")
 
     write_icons()
 
