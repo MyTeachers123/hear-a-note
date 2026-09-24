@@ -30,7 +30,7 @@ Opened from the home-screen icon, it runs fullscreen and works without internet.
 - **Middle C** is always a **circle**. The C one octave higher is an **up arrow ↑**; the C one octave lower is a **down arrow ↓**.
 
 ### Treble clef and bass clef
-Use the **clef menu** (top left) to switch:
+Use the **clef menu** (top right) to switch. The whole screen changes color too — pink for treble clef, light blue for bass clef:
 
 | | Treble clef | Bass clef |
 |---|---|---|

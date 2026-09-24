@@ -411,3 +411,99 @@ html, body {
   stroke-linejoin: round;
 }
 .mini-key .shape { width: 66%; }
+
+/* Long status messages (e.g. "All correct!") wrap instead of being cut off */
+.top .bar .piano-status { white-space: normal; line-height: 1.25; max-width: 16em; }
+
+/* ======================================================================
+   Clef themes — "healing" soft colors that follow the clef menu:
+     treble clef (data-clef="G") = pink family · bass clef (data-clef="F") = light-blue family
+   Applies to the whole layout except the piano keys (keys stay white/black like a real piano).
+   Every text/background pair meets WCAG 2.2 AA (normal text >= 4.5:1), checked with the WCAG formula:
+     pink: #6D2146/#FFF0F5 9.7 · #fff/#C2185B 5.9 · #fff/#AD1457 7.0 · #5A2340/#FFF7FA 11.4 · #FFD1E3 on panel 12.2
+     blue: #0D3B5C/#EAF6FD 10.6 · #fff/#0277BD 4.8 · #fff/#01579B 7.4 · #173F5A/#F5FBFF 10.6 · #BFE8FF on panel 12.4
+   Borders and focus rings are >= 3:1 against the dark panels.
+   ====================================================================== */
+#app, #app[data-clef="G"] {
+  --t-50:  #FFF7FA;  --t-100: #FFF0F5;  --t-200: #FFE3EE;  --t-250: #F8BBD0;
+  --t-300: #F48FB1;  --t-400: #FF9EC4;  --t-600: #C2185B;  --t-700: #AD1457;
+  --t-ink: #6D2146;  --t-ink2: #5A2340; --t-title: #880E4F; --t-on-dark: #FFD1E3;
+  --t-dis: #F3E6EB;  --t-dis-ink: #6B4A58;
+  --t-glow: #2A131D;                         /* top of the page gradient */
+  --t-panel: rgba(236, 64, 122, .14);        /* the two top panels */
+  --t-panel-line: rgba(244, 143, 177, .35);
+  --t-backdrop: rgba(28, 8, 18, .62);
+}
+#app[data-clef="F"] {
+  --t-50:  #F5FBFF;  --t-100: #EAF6FD;  --t-200: #D6EEFB;  --t-250: #B3E5FC;
+  --t-300: #81D4FA;  --t-400: #7FD0FF;  --t-600: #0277BD;  --t-700: #01579B;
+  --t-ink: #0D3B5C;  --t-ink2: #173F5A; --t-title: #01579B; --t-on-dark: #BFE8FF;
+  --t-dis: #E3EEF4;  --t-dis-ink: #3F5B6E;
+  --t-glow: #0F1E27;
+  --t-panel: rgba(41, 182, 246, .14);
+  --t-panel-line: rgba(129, 212, 250, .35);
+  --t-backdrop: rgba(6, 18, 28, .62);
+}
+
+/* Whole layout follows the clef (the black piano look stays) */
+#app { background: linear-gradient(var(--t-glow), var(--bg) 34%); transition: background 400ms; }
+.top .now, .top .bar {
+  background: var(--t-panel);
+  box-shadow: inset 0 0 0 1px var(--t-panel-line);
+  transition: background-color 400ms, box-shadow 400ms;
+}
+.top .now-label { color: var(--t-on-dark); opacity: 1; }
+.top .now-card { box-shadow: 0 0 0 3px var(--t-250), 0 6px 18px rgba(0,0,0,.35); }
+.top .now-arrow { background: var(--t-600); opacity: 1; }
+.mini-key.ask .ask-mark { color: var(--t-600); }
+
+/* Menus and buttons in the right-hand panel */
+.top .bar .select,
+.top .bar .chip,
+.top .bar .clef-pick {
+  background: var(--t-100);
+  color: var(--t-ink);
+  border: 2px solid var(--t-300);
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 2px 0 rgba(0,0,0,.25);
+  transition: background-color 120ms, border-color 120ms;
+}
+.top .bar .clef-pick .select { background: transparent; border: none; box-shadow: none; }
+.top .bar .select:hover, .top .bar .chip:hover, .top .bar .clef-pick:hover { background: var(--t-200); }
+.top .bar .select option { background: #fff; color: var(--t-ink); }
+.top .bar .mode-select.active { background: var(--t-600); border-color: var(--t-600); color: #fff; }
+.top .bar .quiz-btn.active { background: var(--t-700); border-color: var(--t-700); color: #fff; }
+.top .bar .select:disabled { opacity: 1; background: var(--t-dis); color: var(--t-dis-ink); border-style: dashed; cursor: not-allowed; }   /* 6.9:1 */
+.top .status, .top .piano-status { color: var(--t-on-dark); opacity: 1; font-weight: 700; }
+.top .bar .chip:focus-visible, .top .bar .select:focus-visible, .top .bar .clef-pick:focus-within {
+  outline: 3px solid var(--t-400); outline-offset: 3px;
+}
+.top .bar .clef-pick .select:focus-visible { outline: none; }
+
+/* Microphone dialog */
+.dialog-backdrop { background: var(--t-backdrop); backdrop-filter: blur(2px); }
+.dialog {
+  background: var(--t-50);
+  color: var(--t-ink2);
+  border: 2px solid var(--t-250);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
+}
+.dialog h2 { color: var(--t-title); font-size: 22px; line-height: 1.3; }
+.dialog p { color: var(--t-ink2); font-size: 16px; line-height: 1.6; }
+.dialog .chip {
+  min-height: 44px; min-width: 44px;
+  padding: 8px 20px;
+  font-size: 16px; font-weight: 700;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--t-700);
+  border: 2px solid var(--t-700);
+}
+.dialog .chip.primary { background: var(--t-700); border-color: var(--t-700); color: #fff; }
+.dialog .chip:hover { filter: brightness(.96); }
+.dialog .chip:focus-visible { outline: 3px solid var(--t-600); outline-offset: 3px; }
+/* Disabled clef menu (during the quiz): style the pill, not the inner select */
+.top .bar .clef-pick .select:disabled { background: transparent; border: none; color: var(--t-dis-ink); }
+.top .bar .clef-pick:has(.select:disabled) { background: var(--t-dis); border-style: dashed; }

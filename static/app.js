@@ -626,10 +626,13 @@
   /* ---------------- Clef menu: treble / bass ---------------- */
   const clefSel = document.getElementById("clef");
   const clefIcon = document.getElementById("clefIcon");
+  const appEl = document.getElementById("app");
+  appEl.dataset.clef = clef;                       // whole layout: pink theme (treble) / light blue (bass)
   clefSel.value = clef;
   clefIcon.src = `staff/${clef}/clef.svg`;
   clefSel.addEventListener("change", () => {
     clef = clefSel.value;
+    appEl.dataset.clef = clef;
     try { localStorage.setItem("clef", clef); } catch (_) {}
     clefIcon.src = `staff/${clef}/clef.svg`;
     buildKeys();                                     // rebuild the keys for this clef's octave
