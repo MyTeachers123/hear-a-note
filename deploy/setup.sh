@@ -37,7 +37,9 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt -q
 .venv/bin/python generate_assets.py
 
-echo "==> 4/6 啟動 Python 後端 (systemd)"
+echo "==> 4/6 啟動 Python 後端 (systemd，低權限帳號 toddler)"
+id toddler &>/dev/null || sudo useradd --system --no-create-home --shell /usr/sbin/nologin toddler
+sudo chmod -R go-w "$APP_DIR"
 sed "s|__APP_DIR__|$APP_DIR|g" deploy/toddler-music-box.service \
   | sudo tee /etc/systemd/system/toddler-music-box.service > /dev/null
 sudo systemctl daemon-reload
@@ -46,6 +48,7 @@ sudo systemctl restart toddler-music-box
 
 echo "==> 5/6 設定 Nginx（模式：$SSL_MODE）"
 sudo mkdir -p /etc/nginx/snippets
+sudo cp deploy/security-headers.conf /etc/nginx/snippets/toddler-music-box-security.conf
 sed "s|__APP_DIR__|$APP_DIR|g" deploy/app-locations.conf \
   | sudo tee /etc/nginx/snippets/toddler-music-box-app.conf > /dev/null
 if [ "$SSL_MODE" = "cloudflare" ]; then
@@ -82,3 +85,4 @@ echo
 echo "完成！檢查："
 curl -s http://127.0.0.1:8000/api/health && echo
 echo "打開 https://$DOMAIN"
+echo "建議接著執行安全強化：bash $APP_DIR/deploy/harden.sh"

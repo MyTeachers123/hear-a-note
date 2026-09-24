@@ -1,6 +1,6 @@
 """
 generate_assets.py — 用 Python 產生 PWA 需要的所有素材
-  1. static/sounds/*.wav  : 用 numpy 合成的 8 個鋼琴音 (C4 ~ C5)
+  1. static/sounds/*.wav  : 用 numpy 合成的 13 個鋼琴音 (C4 ~ C5，含 5 個黑鍵)
   2. static/icons/*.png   : App 圖示 (192 / 512 / maskable)，不需要 Pillow
   3. static/songs.json    : 兒歌旋律資料 (公領域曲目)
 
@@ -18,11 +18,16 @@ ROOT = Path(__file__).parent / "static"
 SAMPLE_RATE = 22050      # 幼兒 App 不需要 44.1kHz，檔案小一半
 DURATION = 1.6           # 每個音 1.6 秒
 
-# 白鍵 C 大調一個八度 + 高音 C（幼兒最友善：沒有黑鍵）
-NOTES = {
+# 白鍵：C 大調一個八度 + 高音 C
+WHITE = {
     "C4": 261.63, "D4": 293.66, "E4": 329.63, "F4": 349.23,
     "G4": 392.00, "A4": 440.00, "B4": 493.88, "C5": 523.25,
 }
+# 黑鍵（升記號）。檔名用 s 代替 #，因為 # 在網址裡有特殊意義：C#4 → Cs4
+BLACK = {
+    "Cs4": 277.18, "Ds4": 311.13, "Fs4": 369.99, "Gs4": 415.30, "As4": 466.16,
+}
+NOTES = {**WHITE, **BLACK}
 
 
 # ---------------------------------------------------------------- 1. 聲音
@@ -75,7 +80,7 @@ def make_icon(size: int, maskable: bool = False) -> np.ndarray:
     img = np.zeros((size, size, 3), dtype=np.uint8)
     img[:] = (255, 248, 231)                              # 奶油色背景
     colors = [(239, 83, 80), (255, 167, 38), (255, 213, 79), (102, 187, 106),
-              (38, 198, 218), (66, 165, 245), (171, 71, 188), (236, 64, 122)]
+              (38, 198, 218), (66, 165, 245), (171, 71, 188), (239, 83, 80)]
     pad = int(size * (0.22 if maskable else 0.12))        # maskable 要留安全區
     top, bottom = pad + int(size * 0.08), size - pad - int(size * 0.08)
     key_w = (size - 2 * pad) / 8
@@ -104,7 +109,7 @@ SONGS = [
     {
         "id": "scale",
         "title": "音階 Do Re Mi",
-        "notes": list(NOTES) + list(reversed(NOTES)),
+        "notes": list(WHITE) + list(reversed(WHITE)),
     },
 ]
 
@@ -123,7 +128,7 @@ def main() -> None:
     print("✓ 3 個圖示 → static/icons/")
 
     (ROOT / "songs.json").write_text(
-        json.dumps({"notes": list(NOTES), "songs": SONGS}, ensure_ascii=False, indent=2),
+        json.dumps({"notes": list(WHITE), "black": list(BLACK), "songs": SONGS}, ensure_ascii=False, indent=2),
         encoding="utf-8")
     print(f"✓ {len(SONGS)} 首兒歌 → static/songs.json")
 

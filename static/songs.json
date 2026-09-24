@@ -9,6 +9,13 @@
     "B4",
     "C5"
   ],
+  "black": [
+    "Cs4",
+    "Ds4",
+    "Fs4",
+    "Gs4",
+    "As4"
+  ],
   "songs": [
     {
       "id": "twinkle",

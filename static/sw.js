@@ -1,7 +1,7 @@
 /* Service Worker：第一次開啟時把所有檔案存進快取，之後完全離線可用。
  * 更新內容時，把 VERSION 加 1，舊快取會被自動清掉。 */
-const VERSION = "toddler-music-box-v1";
-const NOTES = ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"];
+const VERSION = "toddler-music-box-v4";
+const NOTES = ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "Cs4", "Ds4", "Fs4", "Gs4", "As4"];
 const PRECACHE = [
   "./",
   "index.html",

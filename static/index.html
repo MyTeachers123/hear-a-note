@@ -11,25 +11,30 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- #app：直立的手機會把整個畫面轉 90 度，變成橫向顯示 -->
+<div id="app">
   <!-- 開始畫面：瀏覽器規定要先有一次點擊才能發出聲音 -->
   <div id="start" class="overlay">
     <button id="startBtn" class="start-btn" aria-label="開始彈琴">
       <span class="play-icon" aria-hidden="true"></span>
     </button>
-    <p class="start-hint">點一下開始 · Tap to play</p>
+    <p class="start-hint" id="startHint">點一下開始 · Tap to play</p>
   </div>
 
   <header class="bar">
     <div class="songs" id="songs" role="group" aria-label="選歌">
       <button class="chip active" data-song="">自由彈 Free</button>
     </div>
+    <button id="blackToggle" class="chip toggle" aria-pressed="true">♯ 黑鍵</button>
     <span id="status" class="status" aria-live="polite"></span>
   </header>
 
   <main id="keys" class="keys" aria-label="琴鍵"></main>
+</div>
 
   <script src="app.js"></script>
 </body>

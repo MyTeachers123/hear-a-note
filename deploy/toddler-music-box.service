@@ -1,14 +1,40 @@
 # systemd 服務：開機自動啟動 Python 後端，當掉會自動重啟
+# 安全：用專屬的低權限帳號 toddler 執行，整個檔案系統對它都是「唯讀」
 [Unit]
 Description=Toddler Music Box API (FastAPI + uvicorn)
 After=network.target
 
 [Service]
-User=ubuntu
+User=toddler
+Group=toddler
 WorkingDirectory=__APP_DIR__
-ExecStart=__APP_DIR__/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 2
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=__APP_DIR__/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 2 --no-server-header
 Restart=always
 RestartSec=3
+
+# ---- 沙盒（只讀不能寫）----
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+UMask=0077
 
 [Install]
 WantedBy=multi-user.target
