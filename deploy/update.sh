@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# After updating the code, run on EC2: bash /opt/toddler-music-box/deploy/update.sh
+# After pushing new code to GitHub, run on EC2: bash /opt/toddler-music-box/deploy/update.sh
 set -euo pipefail
 cd /opt/toddler-music-box
-git pull
+# The server never edits code, so always match GitHub exactly.
+# (generate_assets.py re-creates sounds/staff/icons below; verovio SVGs differ slightly on every run,
+#  which would otherwise make "git pull" refuse to update.)
+git fetch origin
+git reset --hard origin/main
 .venv/bin/pip install -r requirements.txt -q
 .venv/bin/python generate_assets.py
 id toddler &>/dev/null || sudo useradd --system --no-create-home --shell /usr/sbin/nologin toddler
