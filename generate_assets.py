@@ -1,7 +1,7 @@
 """
 generate_assets.py — generates every asset the PWA needs, with Python
     1. static/sounds/*.wav  : 25 piano notes synthesized with numpy (C3 to C5, including black keys)
-    2. static/icons/*.png   : app icons (192 / 512 / maskable), no Pillow needed
+    2. static/icons/*.png   : app icons made from assets/logo.png with Pillow (circle-safe)
     3. static/songs.json    : nursery song melodies (public-domain tunes)
     4. static/i18n.json     : UI text in 12 languages (source: i18n.py)
     5. static/staff/*.svg   : staff notation image for every note (engraved with verovio)
@@ -9,12 +9,11 @@ generate_assets.py — generates every asset the PWA needs, with Python
 Run: python generate_assets.py
 """
 import json
-import struct
 import wave
-import zlib
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 import i18n
 
@@ -65,36 +64,49 @@ def write_wav(path: Path, data: np.ndarray) -> None:
 
 
 # ---------------------------------------------------------------- 2. Icons
-def write_png(path: Path, rgb: np.ndarray) -> None:
-    """Writes a PNG by hand with the standard-library zlib (lesson: a PNG is just a header + compressed pixels)"""
-    h, w, _ = rgb.shape
-    raw = b"".join(b"\x00" + rgb[y].astype(np.uint8).tobytes() for y in range(h))
-
-    def chunk(tag: bytes, body: bytes) -> bytes:
-        return (struct.pack(">I", len(body)) + tag + body
-                + struct.pack(">I", zlib.crc32(tag + body) & 0xFFFFFFFF))
-
-    png = (b"\x89PNG\r\n\x1a\n"
-           + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
-           + chunk(b"IDAT", zlib.compress(raw, 9))
-           + chunk(b"IEND", b""))
-    path.write_bytes(png)
+# Every icon is made from the transparent logo in assets/logo.png.
+# Launchers often crop icons to a circle, so the logo is always scaled down until its whole
+# bounding box (corners included) fits inside the circle — nothing of the logo is ever cut off.
+LOGO = Path(__file__).parent / "assets" / "logo.png"
+ICON_BG = (255, 255, 255, 255)   # background for icons that must be opaque (maskable, Apple)
 
 
-def make_icon(size: int, maskable: bool = False) -> np.ndarray:
-    """Draws an icon with 8 colored piano keys"""
-    img = np.zeros((size, size, 3), dtype=np.uint8)
-    img[:] = (255, 248, 231)                              # cream background
-    colors = [(239, 83, 80), (255, 167, 38), (255, 213, 79), (102, 187, 106),
-              (38, 198, 218), (66, 165, 245), (171, 71, 188), (239, 83, 80)]
-    pad = int(size * (0.22 if maskable else 0.12))        # maskable icons need a safe zone
-    top, bottom = pad + int(size * 0.08), size - pad - int(size * 0.08)
-    key_w = (size - 2 * pad) / 8
-    for i, c in enumerate(colors):
-        x0 = int(pad + i * key_w + key_w * 0.08)
-        x1 = int(pad + (i + 1) * key_w - key_w * 0.08)
-        img[top:bottom, x0:x1] = c
-    return img
+def load_logo() -> Image.Image:
+    """Loads the logo and trims the transparent border around it"""
+    logo = Image.open(LOGO).convert("RGBA")
+    return logo.crop(logo.getchannel("A").getbbox())
+
+
+def make_icon(logo: Image.Image, size: int, circle: float, opaque: bool) -> Image.Image:
+    """Centers the logo on a square canvas so its bounding box fits in a circle.
+
+    circle = diameter of the circle as a fraction of the icon size
+             (0.80 = maskable safe zone, 0.94 = a plain round frame with a small margin)
+    """
+    w, h = logo.size
+    d = circle * size                      # circle diameter in pixels
+    scale = d / (w * w + h * h) ** 0.5     # the box diagonal must fit the diameter
+    lw, lh = max(1, round(w * scale)), max(1, round(h * scale))
+    canvas = Image.new("RGBA", (size, size), ICON_BG if opaque else (0, 0, 0, 0))
+    small = logo.resize((lw, lh), Image.Resampling.LANCZOS)
+    canvas.alpha_composite(small, ((size - lw) // 2, (size - lh) // 2))
+    return canvas.convert("RGB") if opaque else canvas
+
+
+ICONS = [   # file name, size, circle, opaque
+    ("icon-192.png",          192, 0.94, False),   # manifest "any"
+    ("icon-512.png",          512, 0.94, False),   # manifest "any"
+    ("icon-maskable-512.png", 512, 0.80, True),    # manifest "maskable" (Android adaptive icons)
+    ("apple-touch-icon.png",  180, 0.80, True),    # iPhone / iPad home screen (no transparency)
+    ("favicon-32.png",         32, 0.98, False),   # browser tab
+]
+
+
+def write_icons() -> None:
+    logo = load_logo()
+    for name, size, circle, opaque in ICONS:
+        make_icon(logo, size, circle, opaque).save(ROOT / "icons" / name, optimize=True)
+    print(f"✓ {len(ICONS)} icons from assets/logo.png → static/icons/")
 
 
 # ---------------------------------------------------------------- 3. Songs
@@ -176,10 +188,7 @@ def main() -> None:
         write_wav(ROOT / "sounds" / f"{name}.wav", synth_piano(freq))
     print(f"✓ {len(NOTES)} sound files → static/sounds/")
 
-    write_png(ROOT / "icons" / "icon-192.png", make_icon(192))
-    write_png(ROOT / "icons" / "icon-512.png", make_icon(512))
-    write_png(ROOT / "icons" / "icon-maskable-512.png", make_icon(512, maskable=True))
-    print("✓ 3 icons → static/icons/")
+    write_icons()
 
     (ROOT / "songs.json").write_text(
         json.dumps({"notes": list(WHITE), "black": list(BLACK), "songs": SONGS}, ensure_ascii=False, indent=2),
@@ -188,7 +197,7 @@ def main() -> None:
 
     i18n.check()
     (ROOT / "i18n.json").write_text(
-        json.dumps({"langs": i18n.LANGS, "strings": i18n.STRINGS}, ensure_ascii=False, indent=1),
+        json.dumps({"langs": i18n.LANGS, "strings": i18n.STRINGS}, ensure_ascii=True, indent=1),
         encoding="utf-8")
     print(f"✓ {len(i18n.LANGS)} languages → static/i18n.json")
 
