@@ -234,7 +234,7 @@
   }
 
   /* ---------------- Right-note reward (chosen by the parent: #1, #2, #4, #5, #10, at random) ---------------- */
-  // Above the key that was played: the note on the staff (transparent background) + its shape, with one of
+  // Above the key that was played: only the note on the staff (transparent background), with one of
   // five little effects around it: confetti, twinkling stars, hearts, ripple rings or orbiting music notes.
   // Colors: Sakura Sky pink + blue, beige, black, white only. It never blocks the keys (pointer-events: none).
   const RW_COLORS = ["#FBC8D8", "#C04877", "#C3E5F8", "#2A78A8", "#EADBC8", "#FFFFFF"];
@@ -263,9 +263,8 @@
     const box = document.createElement("div");
     box.className = "reward rw-" + kind;
     box.setAttribute("aria-hidden", "true");
-    const shape = key.classList.contains("black") ? "" : key.querySelector(".shape").outerHTML;
-    box.style.setProperty("--c", key.style.getPropertyValue("--c"));
-    box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/${note}.svg" alt="" draggable="false">${shape}</div>`;
+    // only the note on a see-through staff + the see-through effect (no shape, no white background)
+    box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/${note}.svg" alt="" draggable="false"></div>`;
     const w = Math.min(Math.max(key.offsetWidth * 2.1, 150), 300);
     box.style.width = w + "px";
     // layout coordinates (not screen coordinates), so it also works on rotated phones
@@ -308,7 +307,7 @@
       party.appendChild(b);
     }
     app.appendChild(party);
-    party._t = setTimeout(endBubbleParty, 30000);             // they drift away by themselves after 30 s
+    party._t = setTimeout(endBubbleParty, 3000);              // they disappear by themselves after 3 s
   }
   function popBubble(b) {
     if (b.classList.contains("popped")) return;
@@ -865,7 +864,19 @@
     songPos = 0;                                     // now it's the child's turn, from the first note
     highlightNext();                                 // (free play: clears the highlight and the counter)
   }
-  playBtn.addEventListener("click", () => (demo ? stopDemo() : startDemo()));
+  // While a song (or the scale) is playing by itself, ANY tap on the page stops it at once.
+  // Capture phase, so it runs before everything else; the tap itself still does its normal job
+  // (a key still sounds), except on the Play/Stop button, which must not start the song again.
+  let demoTapStop = false;                           // true from the stopping tap until its click is over
+  document.addEventListener("pointerdown", () => {
+    demoTapStop = !!demo;
+    if (demo) stopDemo();
+  }, true);
+  document.addEventListener("click", () => { demoTapStop = false; });
+  playBtn.addEventListener("click", () => {
+    if (demoTapStop) return;                         // this same tap already stopped the song
+    demo ? stopDemo() : startDemo();
+  });
 
   /* ---------------- Menus fold away while the child plays ---------------- */
   // As soon as a song is being played (first right note) or a quiz starts, the menus fold into one small
@@ -1087,8 +1098,9 @@
 
   function enhanceSelect(sel) {
     const kind = sel.id, iconFn = iconOf[kind] || (() => "");
+    const iconOnly = kind === "clef";                // the clef menu shows only the treble / bass clef pictures
     const wrap = document.createElement("span");
-    wrap.className = "cs cs-" + kind;
+    wrap.className = "cs cs-" + kind + (iconOnly ? " cs-icononly" : "");
     const pick = sel.parentNode.classList.contains("clef-pick") ? sel.parentNode : null;
     if (pick) {                                      // the clef menu: its picture now lives inside the button
       pick.parentNode.insertBefore(wrap, pick);
@@ -1120,7 +1132,8 @@
       const key = [sel.selectedIndex, o ? o.textContent : "", sel.disabled, sel.getAttribute("aria-label"), sel.className].join("|");
       if (key === shown) return;
       shown = key;
-      btn.innerHTML = `<span class="cs-ico" aria-hidden="true">${iconFn(o ? o.value : "")}</span><span class="cs-label">${esc(o ? o.textContent : "")}</span>`;
+      btn.innerHTML = `<span class="cs-ico" aria-hidden="true">${iconFn(o ? o.value : "")}</span>` +
+        (iconOnly ? "" : `<span class="cs-label">${esc(o ? o.textContent : "")}</span>`);
       btn.disabled = sel.disabled;
       btn.classList.toggle("active", sel.classList.contains("active"));
       btn.setAttribute("aria-label", `${sel.getAttribute("aria-label") || ""}: ${o ? o.textContent : ""}`);
@@ -1152,7 +1165,8 @@
         it.dataset.value = o.value;
         const on = o.value === sel.value;
         it.setAttribute("aria-selected", String(on));
-        it.innerHTML = `<span class="cs-ico" aria-hidden="true">${iconFn(o.value)}</span><span>${esc(o.textContent)}</span>`;
+        it.innerHTML = `<span class="cs-ico" aria-hidden="true">${iconFn(o.value)}</span>` + (iconOnly ? "" : `<span>${esc(o.textContent)}</span>`);
+        if (iconOnly) it.setAttribute("aria-label", o.textContent);   // no words shown; screen readers still hear the name
         it.addEventListener("click", (e) => { e.stopPropagation(); choose(o.value); });
         list.appendChild(it);
       });
