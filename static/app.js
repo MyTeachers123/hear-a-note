@@ -134,6 +134,11 @@
     if (pianoState) pianoStatus.textContent = T[pianoState] || "";
     nowEl.setAttribute("aria-label", T.now);          // no visible label; screen readers still hear "Current note"
     langSel.setAttribute("aria-label", T.language);
+    // The closed language menu always shows the word "Language" in the current language
+    // (not the language name); in the open list the current language has a check mark.
+    langSel.options[0].textContent = T.language;
+    for (const o of langSel.options) if (o.value) o.textContent = (o.value === lang ? "\u2713 " : "") + o._label;
+    langSel.value = "";
     if (nowNote) showNow(nowNote, !!quiz);
   }
 
@@ -141,12 +146,16 @@
     const r = await fetch("i18n.json");
     I18N = await r.json();
     const codes = I18N.langs.map(([c]) => c);
-    for (const [code, label] of I18N.langs) langSel.add(new Option(label, code));
+    const title = new Option("", "");                   // shows "Language" (translated) when the menu is closed
+    title.hidden = true;
+    title.disabled = true;
+    langSel.add(title);
+    for (const [code, label] of I18N.langs) { const o = new Option(label, code); o._label = label; langSel.add(o); }
     lang = pickLang(codes);
-    langSel.value = lang;
     applyLang();
   }
   langSel.addEventListener("change", () => {
+    if (!langSel.value) return;
     lang = langSel.value;
     try { localStorage.setItem("lang", lang); } catch (_) {}
     applyLang();
@@ -443,6 +452,7 @@
   }
 
   function onPianoNote(num) {
+    stillPlaying();
     if (demo || performance.now() < micQuietUntil) return;   // ignore our own speaker (demo / "mew")
     const target = quiz ? quiz.notes[quiz.pos] : song ? curNotes[songPos] : null;
     // The mic is sometimes off by an octave → compare pitch class only (Do/Re/Mi…) and map to the current clef's octave
@@ -643,6 +653,7 @@
     playBtn.textContent = demo ? `■ ${T.stop}` : `\u25B6\uFE0E ${T.play}`;
   }
   function demoStep() {
+    stillPlaying();
     if (!demo) return;
     if (demo.i >= curNotes.length) return stopDemo();
     const note = curNotes[demo.i];
@@ -746,7 +757,32 @@
   }
 
   let started = false;
+  /* ---------------- Keep the screen awake (up to 30 minutes without play) ---------------- */
+  // Phones and tablets usually turn the screen off after about 1 minute. While the child plays, the app holds a
+  // Screen Wake Lock; after 30 minutes with no taps, keys or piano notes it lets go, so the device's normal
+  // auto-lock takes over again. The next tap brings the wake lock back.
+  const IDLE_LIMIT_MS = 30 * 60 * 1000;
+  let wakeLock = null, lastPlay = 0;
+  async function holdScreen() {
+    if (!("wakeLock" in navigator) || wakeLock || document.visibilityState !== "visible") return;
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", () => { wakeLock = null; });
+    } catch (_) { wakeLock = null; }                 // e.g. low battery mode: the device decides
+  }
+  function stillPlaying() {
+    lastPlay = Date.now();
+    holdScreen();
+  }
+  setInterval(() => {
+    if (wakeLock && Date.now() - lastPlay > IDLE_LIMIT_MS) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  }, 30 * 1000);
+  document.addEventListener("visibilitychange", () => {   // the browser drops the lock when the app is hidden
+    if (document.visibilityState === "visible" && Date.now() - lastPlay < IDLE_LIMIT_MS) holdScreen();
+  });
+
   function onAnyTap(e) {
+    stillPlaying();
     unlockAudio();                                       // must run inside a user gesture (iOS / Chrome)
     if (!started) { started = true; trapBack(); lockLandscape(); }
     // Opening a dropdown should not be interrupted; fullscreen then starts on the next tap elsewhere

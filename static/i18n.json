@@ -52,7 +52,7 @@
  "strings": {
   "en": {
    "appName": "Toddler Music Box",
-   "free": "Free play",
+   "free": "Pick A Song",
    "black": "Black keys",
    "staff": "Staff",
    "now": "Current note",
@@ -95,7 +95,7 @@
   },
   "es": {
    "appName": "Caja de M\u00fasica para Peques",
-   "free": "Libre",
+   "free": "Elige una canci\u00f3n",
    "black": "Teclas negras",
    "staff": "Pentagrama",
    "now": "Nota actual",
@@ -138,7 +138,7 @@
   },
   "zh-Hant": {
    "appName": "\u5bf6\u5bf6\u97f3\u6a02\u76d2",
-   "free": "\u81ea\u7531\u5f48",
+   "free": "\u9078\u4e00\u9996\u6b4c",
    "black": "\u9ed1\u9375",
    "staff": "\u4e94\u7dda\u8b5c",
    "now": "\u7576\u524d\u97f3",
@@ -181,7 +181,7 @@
   },
   "zh-Hans": {
    "appName": "\u5b9d\u5b9d\u97f3\u4e50\u76d2",
-   "free": "\u81ea\u7531\u5f39",
+   "free": "\u9009\u4e00\u9996\u6b4c",
    "black": "\u9ed1\u952e",
    "staff": "\u4e94\u7ebf\u8c31",
    "now": "\u5f53\u524d\u97f3",
@@ -224,7 +224,7 @@
   },
   "ko": {
    "appName": "\uc544\uae30 \ubba4\uc9c1\ubc15\uc2a4",
-   "free": "\uc790\uc720 \uc5f0\uc8fc",
+   "free": "\ub178\ub798 \uace0\ub974\uae30",
    "black": "\uac80\uc740 \uac74\ubc18",
    "staff": "\uc624\uc120\ubcf4",
    "now": "\uc9c0\uae08 \uc74c",
@@ -267,7 +267,7 @@
   },
   "ja": {
    "appName": "\u30d9\u30d3\u30fc\u30df\u30e5\u30fc\u30b8\u30c3\u30af\u30dc\u30c3\u30af\u30b9",
-   "free": "\u3058\u3086\u3046\u306b\u3072\u304f",
+   "free": "\u3046\u305f\u3092\u3048\u3089\u3076",
    "black": "\u304f\u308d\u3044\u3051\u3093\u3070\u3093",
    "staff": "\u3054\u305b\u3093\u3075",
    "now": "\u3044\u307e\u306e\u304a\u3068",
@@ -310,7 +310,7 @@
   },
   "vi": {
    "appName": "H\u1ed9p Nh\u1ea1c Cho B\u00e9",
-   "free": "Ch\u01a1i t\u1ef1 do",
+   "free": "Ch\u1ecdn b\u00e0i h\u00e1t",
    "black": "Ph\u00edm \u0111en",
    "staff": "Khu\u00f4ng nh\u1ea1c",
    "now": "N\u1ed1t hi\u1ec7n t\u1ea1i",
@@ -353,7 +353,7 @@
   },
   "fr": {
    "appName": "Bo\u00eete \u00e0 Musique B\u00e9b\u00e9",
-   "free": "Jeu libre",
+   "free": "Choisis une chanson",
    "black": "Touches noires",
    "staff": "Port\u00e9e",
    "now": "Note actuelle",
@@ -396,7 +396,7 @@
   },
   "it": {
    "appName": "Carillon per Bimbi",
-   "free": "Suona libero",
+   "free": "Scegli una canzone",
    "black": "Tasti neri",
    "staff": "Pentagramma",
    "now": "Nota attuale",
@@ -439,7 +439,7 @@
   },
   "ru": {
    "appName": "\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u0430\u044f \u0448\u043a\u0430\u0442\u0443\u043b\u043a\u0430",
-   "free": "\u0421\u0432\u043e\u0431\u043e\u0434\u043d\u0430\u044f \u0438\u0433\u0440\u0430",
+   "free": "\u0412\u044b\u0431\u0435\u0440\u0438 \u043f\u0435\u0441\u043d\u044e",
    "black": "\u0427\u0451\u0440\u043d\u044b\u0435 \u043a\u043b\u0430\u0432\u0438\u0448\u0438",
    "staff": "\u041d\u043e\u0442\u043d\u044b\u0439 \u0441\u0442\u0430\u043d",
    "now": "\u0422\u0435\u043a\u0443\u0449\u0430\u044f \u043d\u043e\u0442\u0430",
@@ -482,7 +482,7 @@
   },
   "de": {
    "appName": "Baby-Spieluhr",
-   "free": "Freies Spiel",
+   "free": "W\u00e4hle ein Lied",
    "black": "Schwarze Tasten",
    "staff": "Notenlinien",
    "now": "Aktueller Ton",
@@ -525,7 +525,7 @@
   },
   "hi": {
    "appName": "\u0936\u093f\u0936\u0941 \u0938\u0902\u0917\u0940\u0924 \u092c\u0949\u0915\u094d\u0938",
-   "free": "\u092e\u0941\u0915\u094d\u0924 \u0935\u093e\u0926\u0928",
+   "free": "\u0917\u0940\u0924 \u091a\u0941\u0928\u0947\u0902",
    "black": "\u0915\u093e\u0932\u0940 \u0915\u0941\u0902\u091c\u093f\u092f\u093e\u0901",
    "staff": "\u0938\u094d\u0935\u0930\u0932\u093f\u092a\u093f",
    "now": "\u0935\u0930\u094d\u0924\u092e\u093e\u0928 \u0938\u094d\u0935\u0930",

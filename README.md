@@ -42,7 +42,7 @@ The keys, the sounds and the pictures all change together.
 
 ### "Current note" card
 The card above the keys shows **the note on the staff → the key to press**.
-- In **Free play**, it shows the note you just played.
+- In free play (the song menu shows **Pick A Song**), it shows the note you just played.
 - In a **song**, it shows the next note to play.
 
 ### Songs
@@ -52,7 +52,7 @@ All four fit the eight white keys and work in treble clef and in bass clef.
 - **▶ Listen** plays the song slowly first. Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap **■ Stop** at any time.
 - Then it's the child's turn: the next key to press bounces.
 - Only the right key plays its note and moves the song forward. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
-- In **Free play** every key simply plays, with no right or wrong.
+- In free play (**Pick A Song**, nothing chosen yet) every key simply plays, with no right or wrong.
 
 ### Play mode: on-screen keys or a real piano
 Use the **play mode menu** (top right):
@@ -74,10 +74,12 @@ Tap **Quiz** to test reading notes in the selected clef:
 - Five wrong answers in a row → the quiz ends gently. Try again anytime.
 
 ### Languages
-Choose from the language menu (top right): English, Spanish, Traditional Chinese, Simplified Chinese, Korean, Japanese, Vietnamese, French, Italian, Russian, German and Hindi.
+Choose from the **Language** menu (top right — it always shows the word "Language" in the current language, and the list marks the current one with ✓): English, Spanish, Traditional Chinese, Simplified Chinese, Korean, Japanese, Vietnamese, French, Italian, Russian, German and Hindi.
 The app picks your device language automatically and remembers your choice.
 
 ## Tips for parents
+
+- **The screen stays on while the child plays.** Phones and tablets normally turn the screen off after about a minute; the app keeps it on and only lets the device lock again after **30 minutes without play**. (Uses the browser's Screen Wake Lock — Chrome, Edge, Android, and Safari on iOS/iPadOS 16.4 or later.)
 
 - **Menus fold away while the child plays.** As soon as a song is being played or a quiz starts, all menus fold into one small round button, so the child looks at the keys, not the dropdowns. **Double-tap** it to open the menus (a single tap does nothing). They come back by themselves when the song or quiz is finished.
 
