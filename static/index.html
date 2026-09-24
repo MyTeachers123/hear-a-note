@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Toddler Music Box 寶寶音樂盒</title>
+  <meta name="description" content="給幼兒的彩色鋼琴，可離線使用，無廣告、不收集資料。">
+  <meta name="theme-color" content="#FFF8E7">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 開始畫面：瀏覽器規定要先有一次點擊才能發出聲音 -->
+  <div id="start" class="overlay">
+    <button id="startBtn" class="start-btn" aria-label="開始彈琴">
+      <span class="play-icon" aria-hidden="true"></span>
+    </button>
+    <p class="start-hint">點一下開始 · Tap to play</p>
+  </div>
+
+  <header class="bar">
+    <div class="songs" id="songs" role="group" aria-label="選歌">
+      <button class="chip active" data-song="">自由彈 Free</button>
+    </div>
+    <span id="status" class="status" aria-live="polite"></span>
+  </header>
+
+  <main id="keys" class="keys" aria-label="琴鍵"></main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+:root {
+  --bg: #FFF8E7;
+  --ink: #4A3F35;
+  --chip: #FFFFFF;
+  --chip-active: #4A3F35;
+  --gap: clamp(4px, 1.2vw, 12px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", sans-serif;
+  /* 防止幼兒誤觸：不能選取文字、不能長按選單、不能縮放 */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ---------- 上方選歌列（給家長用，字小、放角落） ---------- */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px var(--gap);
+}
+.songs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.chip {
+  border: 2px solid var(--ink);
+  background: var(--chip);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.chip.active { background: var(--chip-active); color: var(--bg); }
+.status { margin-left: auto; font-size: 13px; opacity: .7; white-space: nowrap; }
+
+/* ---------- 琴鍵 ---------- */
+.keys {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--gap);
+  padding: 0 var(--gap) var(--gap);
+}
+.key {
+  position: relative;
+  border: none;
+  border-radius: clamp(12px, 3vw, 28px);
+  background: var(--c);
+  box-shadow: 0 8px 0 var(--shade);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 16px;
+  color: #fff;
+  font-weight: 800;
+  font-size: clamp(16px, 4vw, 34px);
+  text-shadow: 0 2px 0 rgba(0,0,0,.18);
+  transition: transform 60ms ease-out, box-shadow 60ms ease-out, filter 60ms;
+  cursor: pointer;
+  min-width: 0;
+}
+.key .shape {
+  width: 46%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.85);
+  margin-bottom: auto;
+  margin-top: 18%;
+}
+.key[data-shape="circle"] .shape   { border-radius: 50%; }
+.key[data-shape="square"] .shape   { border-radius: 14%; }
+.key[data-shape="triangle"] .shape { clip-path: polygon(50% 6%, 96% 92%, 4% 92%); }
+.key[data-shape="star"] .shape     { clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+.key[data-shape="hexagon"] .shape  { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
+.key[data-shape="diamond"] .shape  { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.key[data-shape="moon"] .shape     { border-radius: 50%; box-shadow: inset -18px -4px 0 0 var(--c); background: rgba(255,255,255,.85); }
+.key[data-shape="flower"] .shape   { border-radius: 50% 0; }
+
+.key.down {
+  transform: translateY(8px) scale(.98);
+  box-shadow: 0 0 0 var(--shade);
+  filter: brightness(1.12);
+}
+
+/* 跟唱模式：下一個要按的鍵會跳動發光 */
+.key.next {
+  animation: hop 700ms ease-in-out infinite;
+  outline: 6px solid #fff;
+  outline-offset: -6px;
+}
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* 按下時飄出的音符泡泡 */
+.bubble {
+  position: fixed;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--c);
+  border: 4px solid #fff;
+  pointer-events: none;
+  animation: float 900ms ease-out forwards;
+}
+@keyframes float {
+  from { transform: translate(-50%, -50%) scale(.6); opacity: 1; }
+  to   { transform: translate(-50%, -260%) scale(1.2); opacity: 0; }
+}
+
+/* 完成一首歌的慶祝 */
+.celebrate { animation: party 1.2s ease-in-out; }
+@keyframes party {
+  0%, 100% { filter: none; }
+  25% { filter: hue-rotate(60deg); }
+  50% { filter: hue-rotate(180deg); }
+  75% { filter: hue-rotate(300deg); }
+}
+
+/* ---------- 開始畫面 ---------- */
+.overlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px; z-index: 10;
+}
+.overlay.hidden { display: none; }
+.start-btn {
+  width: min(48vw, 48vh); aspect-ratio: 1;
+  border-radius: 50%; border: none;
+  background: #66BB6A;
+  box-shadow: 0 12px 0 #43A047;
+  cursor: pointer;
+  animation: hop 1.2s ease-in-out infinite;
+  display: grid; place-items: center;
+}
+.play-icon {
+  width: 40%; aspect-ratio: 1; background: #fff;
+  clip-path: polygon(25% 10%, 90% 50%, 25% 90%);
+}
+.start-hint { font-size: 20px; font-weight: 700; margin: 0; }
+
+/* 直向手機：琴鍵改成 2 排 */
+@media (orientation: portrait) and (max-width: 600px) {
+  .keys { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key.next, .start-btn { animation: none; }
+}
