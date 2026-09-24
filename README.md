@@ -15,7 +15,9 @@ toddler-music-box/
 ├── deploy/
 │   ├── setup.sh            # EC2 一鍵安裝（Nginx + Python + HTTPS）
 │   ├── update.sh           # 更新程式用
-│   ├── nginx.conf          # Nginx 設定
+│   ├── app-locations.conf  # Nginx 共用設定（靜態檔、/api、快取）
+│   ├── nginx-cloudflare.conf  # HTTPS 模式：Cloudflare Origin 憑證（預設）
+│   ├── nginx.conf          # HTTPS 模式：Let's Encrypt
 │   └── toddler-music-box.service   # systemd：開機自動啟動後端
 └── static/                 # 前端（PWA）
     ├── index.html  style.css  app.js
@@ -25,7 +27,7 @@ toddler-music-box/
 ```
 
 ```
-使用者 ──HTTPS──> Nginx (EC2) ──┬── 靜態檔 static/（網頁、音檔、圖示）
+使用者 ──HTTPS──> Cloudflare ──> Nginx (EC2) ──┬── 靜態檔 static/（網頁、音檔、圖示）
                                 └── /api/* ──> uvicorn + FastAPI (127.0.0.1:8000)
 ```
 
@@ -38,15 +40,25 @@ uvicorn app:app --reload --port 8000
 ```
 打開 http://localhost:8000
 
-## 部署到 AWS EC2
+## 部署到 AWS EC2（Cloudflare SSL）
 
-1. 開 EC2（Ubuntu 24.04），安全群組開 22 / 80 / 443。
-2. 綁定 Elastic IP，在網域 DNS 加 A 記錄：`kids` → Elastic IP。
-3. 連線到 EC2 後執行：
+```
+使用者 ──HTTPS──> Cloudflare（橘色雲朵）──HTTPS(Origin 憑證)──> EC2 Nginx ──> uvicorn
+```
+
+1. 開 EC2（Ubuntu 26.04 LTS），安全群組開 22 / 80 / 443，綁定 Elastic IP。
+2. Cloudflare DNS：A 記錄 `kids` → Elastic IP，**Proxied（橘色雲朵）**。
+3. Cloudflare → SSL/TLS → Origin Server → Create Certificate，把憑證和私鑰存到 EC2：
+   `/etc/ssl/cloudflare/origin.pem`、`/etc/ssl/cloudflare/origin.key`
+4. Cloudflare → SSL/TLS → Overview → 加密模式選 **Full (strict)**。
+5. 在 EC2 執行：
    ```bash
    curl -fsSL https://raw.githubusercontent.com/MyTeachers123/toddler-music-box/main/deploy/setup.sh | bash
    ```
-4. 之後更新：`bash /opt/toddler-music-box/deploy/update.sh`
+6. 之後更新：`bash /opt/toddler-music-box/deploy/update.sh`，前端有改動時到 Cloudflare 清除快取（Caching → Purge Everything）。
+
+不用 Cloudflare Proxy 時（灰色雲朵），改用 Let's Encrypt：
+`curl -fsSL .../setup.sh | SSL_MODE=letsencrypt bash`
 
 ## 功能
 
