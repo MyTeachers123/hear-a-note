@@ -95,6 +95,13 @@ A web app can't block the phone's "home" gesture, so for full lock-down:
 - **Android — App pinning:** Settings → Security → App pinning → On.
   Open the app, go to Recent apps, tap the app icon → **Pin**.
 
+## For parents and teachers: information pages
+
+Read what the app is, how it helps children aged 2 to 5, and how piano and music teachers can use it:
+[English](https://kids.myteachers123.com/learn/en/) · [Español](https://kids.myteachers123.com/learn/es/) · [Traditional Chinese](https://kids.myteachers123.com/learn/zh-hant/) · [Simplified Chinese](https://kids.myteachers123.com/learn/zh-hans/) · [Korean](https://kids.myteachers123.com/learn/ko/) · [Japanese](https://kids.myteachers123.com/learn/ja/) · [Vietnamese](https://kids.myteachers123.com/learn/vi/) · [Français](https://kids.myteachers123.com/learn/fr/) · [Italiano](https://kids.myteachers123.com/learn/it/) · [Russian](https://kids.myteachers123.com/learn/ru/) · [Deutsch](https://kids.myteachers123.com/learn/de/) · [Hindi](https://kids.myteachers123.com/learn/hi/)
+
+A link like `https://kids.myteachers123.com/?lang=ja` opens the app in that language.
+
 ## Privacy
 
 - No accounts, no personal data, no ads, no tracking.
@@ -109,6 +116,7 @@ uvicorn app:app --reload --port 8000
 ```
 
 Then open http://localhost:8000. All UI text is in `i18n.py` (12 languages).
+The information pages, `sitemap.xml`, `robots.txt` and `llms.txt` are built from `seo_i18n.py` with `python seo_pages.py`.
 
 ## License
 

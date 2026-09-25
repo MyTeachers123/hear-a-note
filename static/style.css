@@ -952,3 +952,8 @@ html, body { background: #111; }
 /* Confetti around the shape on the current note card (no staff note there) */
 .now-key-wrap, .mini-key { position: relative; }       /* position references for the card confetti */
 .reward.rw-card { z-index: 5; }
+
+/* Shown only when JavaScript is off (and read by crawlers that do not run JavaScript) */
+.noscript { position: relative; z-index: 100; max-width: 720px; margin: 24px auto; padding: 16px 20px; background: #fff;
+  color: #1d1d1f; border: 3px solid #111; border-radius: 16px; font: 16px/1.6 system-ui, sans-serif; }
+.noscript a { color: #2A78A8; }

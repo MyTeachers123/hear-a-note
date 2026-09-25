@@ -95,6 +95,11 @@
   }
 
   function pickLang(list) {
+    // A link such as /?lang=ja (from the information pages) picks the language first
+    try {
+      const q = new URLSearchParams(location.search).get("lang");
+      if (q && list.includes(q)) return q;
+    } catch (_) {}
     let saved = null;
     try { saved = localStorage.getItem("lang"); } catch (_) {}
     if (saved && list.includes(saved)) return saved;

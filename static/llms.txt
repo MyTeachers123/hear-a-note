@@ -1,0 +1,83 @@
+# Toddler Music Box
+
+> Free piano and music-reading game for toddlers aged 2-5. Kids match shapes and colors to learn treble and bass clef notes. No ads, no sign-up, works offline.
+
+Toddler Music Box is a free web app that introduces children aged 2 to 5 to the piano and to reading music. Every white key shows one big shape and color, and the note card above the keys shows the same note on a real staff. By matching the staff note to the shape and the key, children connect what they see, hear and play - long before they can read words.
+
+## Key facts
+
+- Age: 2 to 5 years (toddlers and preschoolers)
+- Price: Free. No ads and no in-app purchases
+- Account and privacy: No sign-up. No personal data collected
+- Devices: Any modern browser on iPhone, iPad, Android, Chromebook, Windows and Mac. Can be added to the home screen
+- Offline: Works offline after the first visit
+- What children learn: Treble clef and Bass clef: one octave from Do to high Do, with black keys
+- Songs: Twinkle Twinkle Little Star, Mary Had a Little Lamb, Ode to Joy, Jingle Bells
+- Ways to play: Free play, play-along songs, a note-reading Challenge, and real-piano mode (listens through the microphone)
+- Languages: English, Spanish, Traditional Chinese, Simplified Chinese, Korean, Japanese, Vietnamese, French, Italian, Russian, German, Hindi
+
+## For parents of 2-5 year olds
+
+- Made for little hands: fullscreen, big keys and no words on the keys - only shapes and colors toddlers already know.
+- Listen first, then play: pick a song and the app plays it slowly while each key lights up; then your child plays along.
+- Gentle feedback: a right note brings soft confetti, a wrong note is a quiet kitten "mew" - never scolding.
+- Safe by design: no ads, nothing for children to tap by accident, a volume limit for little ears, and menus that fold away while your child plays.
+- Grows with your child: when they are ready, the Challenge asks them to read all 8 notes of a clef on their own.
+
+## For piano teachers and music teachers
+
+Use Toddler Music Box as a warm-up for your youngest students, as a first look at the staff, or as five minutes of home practice between lessons.
+
+- Introduce the treble and bass clef visually, before students can read: staff note -> shape -> key.
+- Real-piano mode listens to an acoustic or digital piano through the device microphone, so students answer on the instrument.
+- The Challenge tests all 8 notes of a clef in random order - a quick, playful note-reading check.
+- No accounts and no data collection, so it is easy to recommend to families.
+- 12 interface languages help multilingual families practice at home.
+
+## FAQ
+
+### What age is Toddler Music Box for?
+
+It is designed for children aged 2 to 5. The keys use shapes and colors instead of letters, so children do not need to read.
+
+### Is it really free?
+
+Yes. It is free to use, with no ads, no in-app purchases and no sign-up.
+
+### Does it collect data about my child?
+
+No personal data is collected. Settings such as the language are saved only on your device. In real-piano mode the microphone sound is analyzed on the device to recognize notes and is not uploaded.
+
+### Do we need a real piano?
+
+No. Children play the keys on the screen. If you have a piano or keyboard at home, real-piano mode lets them play on it instead.
+
+### Which devices does it work on?
+
+Any modern web browser on phones, tablets and computers, including iPhone, iPad and Android. You can add it to the home screen and use it offline.
+
+### Can it help my child learn to read music?
+
+It is a playful first step: children see each note on a real treble or bass clef staff and connect it with a shape, a color, a key and a sound.
+
+### How can piano teachers use it?
+
+As a warm-up, as a first introduction to the staff and clefs, or as short home practice. Real-piano mode lets students answer on the instrument.
+
+## Links
+
+- [Open the app (free)](https://kids.myteachers123.com/)
+- [Information page in English](https://kids.myteachers123.com/learn/en/)
+- [Information page in Spanish](https://kids.myteachers123.com/learn/es/)
+- [Information page in Traditional Chinese](https://kids.myteachers123.com/learn/zh-hant/)
+- [Information page in Simplified Chinese](https://kids.myteachers123.com/learn/zh-hans/)
+- [Information page in Korean](https://kids.myteachers123.com/learn/ko/)
+- [Information page in Japanese](https://kids.myteachers123.com/learn/ja/)
+- [Information page in Vietnamese](https://kids.myteachers123.com/learn/vi/)
+- [Information page in French](https://kids.myteachers123.com/learn/fr/)
+- [Information page in Italian](https://kids.myteachers123.com/learn/it/)
+- [Information page in Russian](https://kids.myteachers123.com/learn/ru/)
+- [Information page in German](https://kids.myteachers123.com/learn/de/)
+- [Information page in Hindi](https://kids.myteachers123.com/learn/hi/)
+- [Source code (MIT)](https://github.com/MyTeachers123/toddler-music-box)
+- [Publisher: MyTeachers123.com](https://myteachers123.com/) - a multilingual platform that helps parents find family daycare for infants and toddlers
