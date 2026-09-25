@@ -236,7 +236,7 @@
   }
 
   /* ---------------- Right-note reward: the note on a clef-free staff + a soft confetti burst ---------------- */
-  // 1.2 x the key's shape, centered, 10 px from the key's bottom (never over the black keys); plays to the end, about 3 s,
+  // 1.2 x the key's shape, centered, its bottom 65 % of its height above the key's bottom (never over the black keys); plays to the end, about 3 s,
   // even when the next note is already sounding (each reward is its own layer). pointer-events: none.
   // Colors: Sakura Sky pink + blue, beige, white only.
   const RW_MS = 3200;
@@ -258,20 +258,20 @@
     box.setAttribute("aria-hidden", "true");
     // only the note on a see-through staff + the see-through effect (no shape, no white background)
     box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/plain/${note}.svg" alt="" draggable="false"></div>`;
-    // The staff note is 1.2 x the key's shape, centered on the key, 10 px above the key's bottom edge,
+    // The staff note is 1.2 x the key's shape, centered on the key, its bottom 65 % of its own height above the key's bottom edge,
     // and never over the black keys (it shrinks if there is not enough room below them).
     // Layout coordinates (offsetLeft/Top, not screen coordinates), so it also works on rotated phones.
     const shapeEl = key.querySelector(".shape");
     const black = keysEl.querySelector(".key.black");
     const keyBottom = key.offsetTop + key.offsetHeight;
-    const PAD_BOTTOM = 10;
     let img, cx, cy;
     if (shapeEl && !key.classList.contains("black")) {
       const blackBottom = black ? black.offsetTop + black.offsetHeight : key.offsetTop;
-      const room = keyBottom - PAD_BOTTOM - blackBottom - 4;       // white part of the key below the black keys
+      const room = (keyBottom - blackBottom - 4) / 1.65;           // white part below the black keys (incl. the 65 % gap)
       img = Math.min(shapeEl.offsetWidth * 1.2, room);
       cx = key.offsetLeft + key.offsetWidth / 2;
-      cy = keyBottom - PAD_BOTTOM - img / 2;
+      cy = keyBottom - img * 0.65 - img / 2;                        // its bottom is 65 % of its own height above the key's bottom
+      cy = Math.max(cy, blackBottom + 4 + img / 2);                 // but never onto the black keys
     } else {                                                        // (a black key: centered on it)
       img = key.offsetWidth * 1.5;
       cx = key.offsetLeft + key.offsetWidth / 2;
@@ -290,6 +290,31 @@
     });
     keysEl.appendChild(box);
     setTimeout(() => box.remove(), RW_MS + 300);         // removed only after its own animation ends
+    cardReward(img / (shapeEl ? shapeEl.offsetWidth || 1 : 1));
+  }
+  // The same confetti also bursts around the shape on the current note card (no staff note there).
+  // Same scale relative to the shape as on the key, so both look alike.
+  function cardReward(scale) {
+    const shape = nowKey.querySelector(".shape");
+    if (!shape) return;
+    const box = document.createElement("div");
+    box.className = "reward rw-confetti rw-card";
+    box.setAttribute("aria-hidden", "true");
+    box.innerHTML = '<div class="rw-layer"></div>';
+    box.style.width = (shape.offsetWidth * Math.max(scale, 1)) / 0.62 + "px";
+    const L = box.firstChild;
+    confetti((vars) => {
+      const d = document.createElement("div");
+      d.className = "rw-p";
+      for (const k in vars) d.style.setProperty(k, vars[k]);
+      L.appendChild(d);
+    });
+    // lives in the card's key frame (not inside the mini key), so it keeps playing when the next note shows
+    const wrap = nowKey.parentNode;
+    box.style.left = nowKey.offsetLeft + shape.offsetLeft + shape.offsetWidth / 2 + "px";
+    box.style.top = nowKey.offsetTop + shape.offsetTop + shape.offsetHeight / 2 + "px";
+    wrap.appendChild(box);
+    setTimeout(() => box.remove(), RW_MS + 300);
   }
 
   /* ---------------- Quiz finished: a burst of see-through bubbles that the child can pop ---------------- */
@@ -830,7 +855,7 @@
 
   /* ---------------- Listen: the app plays the song slowly, showing every note ---------------- */
   // Each note: the key bounces + lights up, the card shows its staff note and shape, and it sounds.
-  const BEAT_MS = 540;                               // lively but a little calmer (about 110 beats per minute)
+  const BEAT_MS = 900;                               // calm and easy to follow (about 67 beats per minute)
   const playBtn = document.getElementById("playBtn");
   let demo = null;                                   // { i, timer } while playing
 
