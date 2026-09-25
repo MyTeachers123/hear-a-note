@@ -1,11 +1,13 @@
 /* Service Worker: caches every file on first visit so the app then works fully offline.
   * When you change content, bump VERSION; old caches are deleted automatically. */
-const VERSION = "toddler-music-box-1.0.9";   // bump on every frontend change (e.g. 1.0.8)
+const VERSION = "toddler-music-box-1.0.10";  // bump on every frontend change (e.g. 1.0.11)
 const PCS = ["C", "Cs", "D", "Ds", "E", "F", "Fs", "G", "Gs", "A", "As", "B"];
 const NOTES = [...PCS.map((p) => p + 3), ...PCS.map((p) => p + 4), "C5"];                // 25 notes
 const STAFF = [
   ...[...PCS.map((p) => p + 4), "C5", "clef"].map((n) => `staff/G/${n}.svg`),         // treble clef
   ...[...PCS.map((p) => p + 3), "C4", "clef"].map((n) => `staff/F/${n}.svg`),         // bass clef
+  ...[...PCS.map((p) => p + 4), "C5"].map((n) => `staff/G/plain/${n}.svg`),           // reward: no clef
+  ...[...PCS.map((p) => p + 3), "C4"].map((n) => `staff/F/plain/${n}.svg`),
 ];
 const PRECACHE = [
   "./",

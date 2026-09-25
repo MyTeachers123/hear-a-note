@@ -233,52 +233,44 @@
     reward(note);
   }
 
-  /* ---------------- Right-note reward (chosen by the parent: #1, #2, #4, #5, #10, at random) ---------------- */
-  // Above the key that was played: only the note on the staff (transparent background), with one of
-  // five little effects around it: confetti, twinkling stars, hearts, ripple rings or orbiting music notes.
-  // Colors: Sakura Sky pink + blue, beige, black, white only. It never blocks the keys (pointer-events: none).
+  /* ---------------- Right-note reward: the note on a clef-free staff + a soft confetti burst ---------------- */
+  // 2 x the key's shape, centered, 10 px from the key's bottom (never over the black keys); plays to the end, about 3 s,
+  // even when the next note is already sounding (each reward is its own layer). pointer-events: none.
+  // Colors: Sakura Sky pink + blue, beige, white only.
+  const RW_MS = 3200;
   const RW_COLORS = ["#FBC8D8", "#C04877", "#C3E5F8", "#2A78A8", "#EADBC8", "#FFFFFF"];
-  const RW_STAR = '<svg viewBox="-50 -50 100 100"><path d="M0-46C6-10 10-6 46 0 10 6 6 10 0 46-6 10-10 6-46 0-10-6-6-10 0-46Z"/></svg>';
-  const RW_HEART = '<svg viewBox="-6 -6 112 112"><path d="M50 88 C22 68 6 52 6 33 C6 18 17 8 30 8 C39 8 46 13 50 21 C54 13 61 8 70 8 C83 8 94 18 94 33 C94 52 78 68 50 88 Z"/></svg>';
-  const RW_NOTE = '<svg viewBox="0 0 40 40"><path d="M15 30V8l18-4v20" fill="none" stroke="#111" stroke-width="3"/><ellipse cx="10.5" cy="30.5" rx="6" ry="4.6"/><ellipse cx="28.5" cy="25.5" rx="6" ry="4.6"/></svg>';
-  const rw = (i, s) => { const x = Math.sin(i * 999 + s * 77 + Math.random()) * 10000; return x - Math.floor(x); };
-  const RW_BUILD = {
-    confetti(L, add) { for (let i = 0; i < 22; i++) { const a = rw(i, 1) * Math.PI * 2, r = 18 + rw(i, 2) * 26;
-      add("", { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r * .8 - 10 + "cqw", "--r": (rw(i, 3) * 720 - 360) + "deg", "--d": rw(i, 4) * .12 + "s", "--c": RW_COLORS[i % 5] }); } },
-    sparkle(L, add) { for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2, r = 36 + rw(i, 2) * 8;
-      add(RW_STAR, { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r * .75 + "cqw", "--d": (i % 5) * .08 + "s", "--c": RW_COLORS[[0, 2, 4, 1, 3][i % 5]] }); } },
-    hearts(L, add) { for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + (rw(i, 1) - .5) * 2.6, r = 30 + rw(i, 2) * 16;
-      add(RW_HEART, { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r + "cqw", "--r": (rw(i, 3) * 60 - 30) + "deg", "--s": (7 + rw(i, 4) * 6) + "cqw", "--d": rw(i, 5) * .3 + "s", "--c": RW_COLORS[[0, 2, 1, 0, 2, 3][i % 6]] }); } },
-    ripple(L, add) { [0, .3, .6].forEach((d, i) => add("", { "--d": d + "s", "--c": RW_COLORS[[0, 2, 1][i]] })); },
-    orbit(L, add) { for (let i = 0; i < 6; i++) add(RW_NOTE, { "--a": (i * 60) + "deg", "--d": (i * .04) + "s", "--c": RW_COLORS[[0, 2, 1, 3, 0, 2][i]] }); },
-  };
-  const RW_KINDS = Object.keys(RW_BUILD);
-  let lastKind = "";
+  function confetti(add) {
+    for (let i = 0; i < 18; i++) {
+      const a = -Math.PI / 2 + (Math.random() - .5) * 2.4;          // mostly upwards, like a little fountain
+      const r = 26 + Math.random() * 22;
+      add({ "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r * .9 + "cqw",
+            "--fall": 34 + Math.random() * 20 + "cqw", "--r": (Math.random() * 540 - 270) + "deg",
+            "--d": Math.random() * .15 + "s", "--c": RW_COLORS[i % 6] });
+    }
+  }
   function reward(note) {
     const key = keyEls[note];
     if (!key) return;
-    let kind = RW_KINDS[Math.floor(Math.random() * RW_KINDS.length)];
-    if (kind === lastKind) kind = RW_KINDS[(RW_KINDS.indexOf(kind) + 1) % RW_KINDS.length];   // never twice in a row
-    lastKind = kind;
     const box = document.createElement("div");
-    box.className = "reward rw-" + kind;
+    box.className = "reward rw-confetti";
     box.setAttribute("aria-hidden", "true");
     // only the note on a see-through staff + the see-through effect (no shape, no white background)
-    box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/${note}.svg" alt="" draggable="false"></div>`;
-    // The staff note is 1.5 x the key's shape, floats on top of that shape, and stays below the black keys.
+    box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/plain/${note}.svg" alt="" draggable="false"></div>`;
+    // The staff note is 2 x the key's shape, centered on the key, 10 px above the key's bottom edge,
+    // and never over the black keys (it shrinks if there is not enough room below them).
     // Layout coordinates (offsetLeft/Top, not screen coordinates), so it also works on rotated phones.
     const shapeEl = key.querySelector(".shape");
     const black = keysEl.querySelector(".key.black");
     const keyBottom = key.offsetTop + key.offsetHeight;
+    const PAD_BOTTOM = 10;
     let img, cx, cy;
     if (shapeEl && !key.classList.contains("black")) {
       const blackBottom = black ? black.offsetTop + black.offsetHeight : key.offsetTop;
-      const room = keyBottom - blackBottom;                        // white part of the key below the black keys
-      img = Math.min(shapeEl.offsetWidth * 1.5, room * 0.86);
-      cx = key.offsetLeft + shapeEl.offsetLeft + shapeEl.offsetWidth / 2;
-      cy = key.offsetTop + shapeEl.offsetTop + shapeEl.offsetHeight / 2;
-      cy = Math.min(Math.max(cy, blackBottom + img * 0.56), keyBottom - img * 0.52);
-    } else {                                                        // (a black key: just above it)
+      const room = keyBottom - PAD_BOTTOM - blackBottom - 4;       // white part of the key below the black keys
+      img = Math.min(shapeEl.offsetWidth * 2, room);
+      cx = key.offsetLeft + key.offsetWidth / 2;
+      cy = keyBottom - PAD_BOTTOM - img / 2;
+    } else {                                                        // (a black key: centered on it)
       img = key.offsetWidth * 1.5;
       cx = key.offsetLeft + key.offsetWidth / 2;
       cy = key.offsetTop + key.offsetHeight * 0.5;
@@ -288,15 +280,14 @@
     box.style.left = cx + "px";
     box.style.top = cy + "px";
     const L = box.querySelector(".rw-layer");
-    RW_BUILD[kind](L, (html, vars) => {
+    confetti((vars) => {
       const d = document.createElement("div");
       d.className = "rw-p";
       for (const k in vars) d.style.setProperty(k, vars[k]);
-      d.innerHTML = html;
       L.appendChild(d);
     });
     keysEl.appendChild(box);
-    setTimeout(() => box.remove(), 2100);
+    setTimeout(() => box.remove(), RW_MS + 300);         // removed only after its own animation ends
   }
 
   /* ---------------- Quiz finished: a burst of see-through bubbles that the child can pop ---------------- */
@@ -834,7 +825,7 @@
 
   /* ---------------- Listen: the app plays the song slowly, showing every note ---------------- */
   // Each note: the key bounces + lights up, the card shows its staff note and shape, and it sounds.
-  const BEAT_MS = 850;                               // slow (about 70 beats per minute) so toddlers can follow
+  const BEAT_MS = 460;                               // lively and fun (about 130 beats per minute)
   const playBtn = document.getElementById("playBtn");
   let demo = null;                                   // { i, timer } while playing
 

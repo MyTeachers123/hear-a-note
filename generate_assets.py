@@ -9,6 +9,7 @@ generate_assets.py — generates every asset the PWA needs, with Python
 Run: python generate_assets.py
 """
 import json
+import re
 import wave
 from pathlib import Path
 
@@ -216,6 +217,25 @@ def staff_mei(note, clef_name: str) -> str:
 </layer></staff></measure></section></score></mdiv></body></music></mei>"""
 
 
+def plain_staff(svg: str) -> str:
+    """Same staff picture without the clef, as a square cropped around the note (used by the right-note reward).
+    Works on the verovio SVG text: drop the clef group, fit the five staff lines to the window, square view box
+    that still holds the ledger-line notes (treble C4 below, bass C4 above)."""
+    svg = re.sub(r'<g[^>]*class="clef"[^>]*>.*?</g>', "", svg, count=1, flags=re.S)
+    layer = svg[svg.find('class="layer"'):]
+    xs = [int(x) for x in re.findall(r'translate\((\d+), \d+\)', layer)] or [825]
+    ORIGIN, SIZE, HEAD = 100, 1440, 300                    # page margin (x and y 100/200), window size, notehead
+    mid = (min(xs) + max(xs) + HEAD) / 2                    # center of the note (+ its sharp), staff coordinates
+    x0 = int(mid - SIZE / 2)
+    ys = [int(y) for y in re.findall(r'M0 (\d+) L\d+ \1" stroke-width="13"', svg)] or [240, 960]
+    top = int(200 + (min(ys) + max(ys)) / 2 - SIZE / 2)     # the five lines sit in the middle of the square
+    svg = re.sub(r'M0 (\d+) L(\d+) \1" stroke-width="13"',
+                 lambda m: f'M{x0} {m.group(1)} L{x0 + SIZE} {m.group(1)}" stroke-width="13"', svg)
+    svg = re.sub(r'<svg viewBox="0 0 \d+ \d+"', '<svg viewBox="0 0 144 144"', svg, count=1)
+    return re.sub(r'(class="definition-scale"[^>]*viewBox=")0 0 \d+ \d+"',
+                  lambda m: f'{m.group(1)}{x0 + ORIGIN} {top} {SIZE} {SIZE}"', svg, count=1)
+
+
 def write_staff() -> None:
     try:
         import verovio
@@ -235,8 +255,13 @@ def write_staff() -> None:
         folder.mkdir(parents=True, exist_ok=True)
         for n in [None] + notes:                          # None = clef-only image (used as the menu icon)
             tk.loadData(staff_mei(n, clef_name))
-            (folder / f"{n or 'clef'}.svg").write_text(tk.renderToSVG(1), encoding="utf-8")
+            svg = tk.renderToSVG(1)
+            (folder / f"{n or 'clef'}.svg").write_text(svg, encoding="utf-8")
             total += 1
+            if n:                                         # plain/<note>.svg: no clef, for the reward
+                (folder / "plain").mkdir(exist_ok=True)
+                (folder / "plain" / f"{n}.svg").write_text(plain_staff(svg), encoding="utf-8")
+                total += 1
     print(f"✓ {total} staff images (treble staff/G, bass staff/F) → static/staff/")
 
 

@@ -875,7 +875,7 @@ html, body { background: #111; }
 .bar-row > .cs-lang { min-width: 7.2em; flex-shrink: .5; }
 .bar-row > .cs-mode { flex-shrink: 1.4; }
 
-/* ---------- Right-note reward: transparent staff note + shape + one of 5 effects (random) ---------- */
+/* ---------- Right-note reward: clef-free staff note + soft confetti (about 3 s) ---------- */
 .reward {
   position: absolute; z-index: 9; pointer-events: none; aspect-ratio: 1;
   transform: translate(-50%, -50%); container-type: inline-size;
@@ -884,46 +884,25 @@ html, body { background: #111; }
 .rw-answer {
   position: absolute; left: 50%; top: 50%; width: 62%; translate: -50% -50%;
   display: flex; flex-direction: column; align-items: center; gap: 2%; z-index: 2;
-  animation: rw-in 1.9s cubic-bezier(.2, 1.6, .4, 1) both;
+  animation: rw-in 3.2s cubic-bezier(.33, 0, .25, 1) both;
 }
 .rw-answer img { width: 100%; aspect-ratio: 1; object-fit: contain; display: block; }   /* see-through, no white */
-@keyframes rw-in {
-  0% { scale: .4; opacity: 0; } 18% { scale: 1.05; opacity: 1; } 28% { scale: 1; }
-  80% { opacity: 1; } 100% { opacity: 0; scale: .95; }       /* stays in place: never drifts up onto the black keys */
+@keyframes rw-in {                                    /* smooth: grows in, rests, fades out; never moves */
+  0% { scale: .7; opacity: 0; } 14% { scale: 1; opacity: 1; }
+  78% { scale: 1; opacity: 1; } 100% { scale: .97; opacity: 0; }
 }
 .rw-p { position: absolute; left: 50%; top: 50%; pointer-events: none; }
 .rw-p svg { width: 100%; height: 100%; display: block; overflow: visible; }
-/* 1 confetti */
-.rw-confetti .rw-p { width: 3cqw; height: 5cqw; background: var(--c); border: .5cqw solid #111; border-radius: .6cqw;
-  animation: rw-conf 1.8s cubic-bezier(.2, .7, .4, 1) var(--d) both; }
+/* confetti: a gentle fountain that floats up, then drifts down while it spins and fades */
+.rw-confetti .rw-p { width: 3.2cqw; height: 5.2cqw; background: var(--c); border-radius: .8cqw;
+  box-shadow: 0 0 0 .35cqw rgba(255, 255, 255, .7);
+  animation: rw-conf 3s cubic-bezier(.25, .6, .35, 1) var(--d) both; will-change: transform, opacity; }
 @keyframes rw-conf {
-  0% { transform: translate(-50%, -50%) rotate(0) scale(.3); opacity: 0; } 12% { opacity: 1; }
-  55% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)) scale(1); }
-  100% { transform: translate(calc(-50% + var(--dx) * 1.1), calc(-50% + var(--dy) + 28cqw)) rotate(calc(var(--r) * 2)); opacity: 0; } }
-/* 2 twinkling stars */
-.rw-sparkle .rw-p { width: 8cqw; height: 8cqw; animation: rw-spk 1.4s ease-in-out var(--d) both; }
-.rw-sparkle .rw-p path { fill: var(--c); stroke: #111; stroke-width: 5; stroke-linejoin: round; }
-@keyframes rw-spk {
-  0%, 100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0) rotate(0); }
-  45% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15) rotate(45deg); }
-  70% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.8) rotate(70deg); } }
-/* 4 hearts */
-.rw-hearts .rw-p { width: var(--s); height: var(--s); animation: rw-hrt 1.8s cubic-bezier(.2, .8, .4, 1) var(--d) both; }
-.rw-hearts .rw-p path { fill: var(--c); stroke: #111; stroke-width: 6; stroke-linejoin: round; }
-@keyframes rw-hrt { 0% { transform: translate(-50%, -50%) scale(.2); opacity: 0; } 15% { opacity: 1; }
-  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--r)); opacity: 0; } }
-/* 5 ripple rings */
-.rw-ripple .rw-p { width: 46cqw; height: 46cqw; border-radius: 50%; border: 1.4cqw solid var(--c);
-  box-shadow: 0 0 0 .5cqw #fff; animation: rw-rip 1.7s ease-out var(--d) both; }
-@keyframes rw-rip { 0% { transform: translate(-50%, -50%) scale(.3); opacity: .95; } 100% { transform: translate(-50%, -50%) scale(2.1); opacity: 0; } }
-/* 10 orbiting music notes */
-.rw-orbit .rw-p { width: 10cqw; height: 10cqw; animation: rw-orb 1.9s ease-in-out var(--d) both; }
-.rw-orbit .rw-p ellipse { fill: var(--c); stroke: #111; stroke-width: 3; }
-@keyframes rw-orb {
-  0% { transform: translate(-50%, -50%) rotate(var(--a)) translateX(0) rotate(calc(-1 * var(--a))) scale(0); }
-  20% { transform: translate(-50%, -50%) rotate(var(--a)) translateX(34cqw) rotate(calc(-1 * var(--a))) scale(1); }
-  70% { transform: translate(-50%, -50%) rotate(calc(var(--a) + 200deg)) translateX(34cqw) rotate(calc(-1 * var(--a) - 200deg)) scale(1); }
-  100% { transform: translate(-50%, -50%) rotate(calc(var(--a) + 250deg)) translateX(62cqw) rotate(calc(-1 * var(--a) - 250deg)) scale(.6); opacity: 0; } }
+  0% { transform: translate(-50%, -50%) rotate(0) scale(.4); opacity: 0; }
+  10% { opacity: 1; }
+  35% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--r) * .4)) scale(1); }
+  75% { opacity: .9; }
+  100% { transform: translate(calc(-50% + var(--dx) * 1.25), calc(-50% + var(--dy) + var(--fall))) rotate(var(--r)) scale(.9); opacity: 0; } }
 
 /* ---------- Quiz finished: see-through bubbles burst out and fill the screen; tap to pop ---------- */
 .bubble-party { position: absolute; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
