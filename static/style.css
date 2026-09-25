@@ -859,12 +859,11 @@ html, body { background: #111; }
 
 /* The note to press: card shape and key shape bounce + blink together */
 #app .key.next { animation: none; }
-.cue { animation: cue 4s ease-in-out infinite; transform-origin: 50% 100%; }   /* "jelly": squash and spring back, every 4 s */
+.cue { animation: cue 4s ease-in-out infinite; transform-origin: 50% 100%; }   /* "sway": rocks gently left and right, every 4 s */
 @keyframes cue {
-  0%, 60%, 100% { transform: scale(1, 1); }
-  15% { transform: scale(1.18, .82); }
-  30% { transform: scale(.88, 1.14); }
-  45% { transform: scale(1.05, .96); }
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
 }
 .ask-mark.cue { display: inline-block; }
 @media (prefers-reduced-motion: reduce) {
