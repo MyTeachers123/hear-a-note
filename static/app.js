@@ -236,7 +236,7 @@
   }
 
   /* ---------------- Right-note reward: the note on a clef-free staff + a soft confetti burst ---------------- */
-  // 1.2 x the key's shape, centered, its bottom 65 % of its height above the key's bottom (never over the black keys); plays to the end, about 3 s,
+  // 1.2 x the key's shape, centered, its bottom 50 % of its height above the key's bottom (never over the black keys); plays to the end, about 3 s,
   // even when the next note is already sounding (each reward is its own layer). pointer-events: none.
   // Colors: Sakura Sky pink + blue, beige, white only.
   const RW_MS = 3200;
@@ -258,7 +258,7 @@
     box.setAttribute("aria-hidden", "true");
     // only the note on a see-through staff + the see-through effect (no shape, no white background)
     box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/plain/${note}.svg" alt="" draggable="false"></div>`;
-    // The staff note is 1.2 x the key's shape, centered on the key, its bottom 65 % of its own height above the key's bottom edge,
+    // The staff note is 1.2 x the key's shape, centered on the key, its bottom 50 % of its own height above the key's bottom edge,
     // and never over the black keys (it shrinks if there is not enough room below them).
     // Layout coordinates (offsetLeft/Top, not screen coordinates), so it also works on rotated phones.
     const shapeEl = key.querySelector(".shape");
@@ -267,10 +267,10 @@
     let img, cx, cy;
     if (shapeEl && !key.classList.contains("black")) {
       const blackBottom = black ? black.offsetTop + black.offsetHeight : key.offsetTop;
-      const room = (keyBottom - blackBottom - 4) / 1.65;           // white part below the black keys (incl. the 65 % gap)
+      const room = (keyBottom - blackBottom - 4) / 1.5;            // white part below the black keys (incl. the 50 % gap)
       img = Math.min(shapeEl.offsetWidth * 1.2, room);
       cx = key.offsetLeft + key.offsetWidth / 2;
-      cy = keyBottom - img * 0.65 - img / 2;                        // its bottom is 65 % of its own height above the key's bottom
+      cy = keyBottom - img * 0.5 - img / 2;                         // its bottom is 50 % of its own height above the key's bottom
       cy = Math.max(cy, blackBottom + 4 + img / 2);                 // but never onto the black keys
     } else {                                                        // (a black key: centered on it)
       img = key.offsetWidth * 1.5;

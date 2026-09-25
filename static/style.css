@@ -859,16 +859,16 @@ html, body { background: #111; }
 
 /* The note to press: card shape and key shape bounce + blink together */
 #app .key.next { animation: none; }
-.cue { animation: cue 3.6s ease-in-out infinite; transform-origin: 50% 80%; }   /* slow, gentle blink */
+.cue { animation: cue 4s ease-in-out infinite; transform-origin: 50% 100%; }   /* "jelly": squash and spring back, every 4 s */
 @keyframes cue {
-  0%, 100% { transform: translateY(0) scale(1); filter: none; }
-  25% { transform: translateY(-14%) scale(1.12); filter: brightness(1.08) drop-shadow(0 0 6px var(--t-400)); }
-  50% { transform: translateY(0) scale(.96); filter: none; }
-  70% { transform: translateY(-6%) scale(1.05); filter: brightness(1.05) drop-shadow(0 0 4px var(--t-400)); }
+  0%, 60%, 100% { transform: scale(1, 1); }
+  15% { transform: scale(1.18, .82); }
+  30% { transform: scale(.88, 1.14); }
+  45% { transform: scale(1.05, .96); }
 }
 .ask-mark.cue { display: inline-block; }
 @media (prefers-reduced-motion: reduce) {
-  .cue { animation: cue-soft 3.6s ease-in-out infinite; }
+  .cue { animation: cue-soft 4s ease-in-out infinite; }
   @keyframes cue-soft { 50% { filter: drop-shadow(0 0 6px var(--t-400)); } }
 }
 #app .top .now-card { cursor: pointer; }

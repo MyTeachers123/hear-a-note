@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>v1.0.14 選擇頁</title>
+<style>
+:root {
+  --bg: #FFF3F7; --dot: #FBD3E0; --ink: #1d1d1f; --muted: #5b5b61;
+  --pink: #FBC8D8; --pink-line: #C04877; --pink-glow: #FF9EC4; --blue: #C3E5F8; --blue-dark: #2A78A8;
+  --beige: #EADBC8; --card: #fff; --line: #111;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif; color: var(--ink);
+  background: var(--bg) radial-gradient(var(--dot) 2px, transparent 2.5px) 0 0 / 18px 18px; --dur: 4s; }
+header { padding: 24px 16px 8px; max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 24px; margin: 0 0 6px; }
+header p { margin: 0; color: var(--muted); line-height: 1.6; }
+section { max-width: 1100px; margin: 0 auto; padding: 16px; }
+h2 { font-size: 20px; margin: 18px 0 6px; }
+.hint { color: var(--muted); margin: 0 0 14px; line-height: 1.6; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.card { background: var(--card); border: 3px solid var(--line); border-radius: 16px; box-shadow: 5px 5px 0 var(--line); overflow: hidden; }
+.card.chosen { outline: 5px solid var(--pink-line); outline-offset: 3px; }
+.card-body { padding: 10px 12px 14px; }
+.card h3 { font-size: 17px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.card p { margin: 0 0 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--pink); border: 2px solid var(--line); font-size: 14px; flex: none; }
+.pick { width: 100%; min-height: 44px; font: inherit; font-size: 16px; font-weight: 700; border: 3px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; box-shadow: 3px 3px 0 var(--line); }
+.pick:hover { background: #FFE3EE; }
+.card.chosen .pick { background: var(--pink-line); color: #fff; }
+.pick:focus-visible, .dur button:focus-visible { outline: 3px solid var(--blue-dark); outline-offset: 2px; }
+
+/* ---------- position: one white key like the app ---------- */
+.keystage { background: #f6f1ec; display: grid; place-items: center; padding: 14px 0; border-bottom: 3px solid var(--line); }
+.wkey { position: relative; width: 146px; height: 418px; background: linear-gradient(#fff 85%, #f1f1f1); border: 3px solid var(--line);
+  border-radius: 0 0 16px 16px; box-shadow: 5px 5px 0 var(--line); }
+.bk { position: absolute; top: -3px; width: 44px; height: 230px; background: #111; border-radius: 0 0 8px 8px; box-shadow: 0 3px 0 var(--pink-line); }
+.bk.l { left: -25px; } .bk.r { right: -25px; }
+.kshape { position: absolute; left: 50%; width: 78px; height: 78px; top: calc(81% - 39px); translate: -50% 0; overflow: visible; }
+.kshape path, .s path { fill: var(--pink); stroke: var(--pink); stroke-width: 6; stroke-linejoin: round; }
+.rw { position: absolute; left: 50%; width: 94px; height: 94px; bottom: calc(94px * var(--gap)); translate: -50% 0; }
+.rw img { position: relative; width: 100%; height: 100%; display: block; animation: rw-in 3.2s cubic-bezier(.33, 0, .25, 1) infinite; z-index: 2; }
+@keyframes rw-in { 0% { scale: .7; opacity: 0; } 14% { scale: 1; opacity: 1; } 78% { scale: 1; opacity: 1; } 100% { scale: .97; opacity: 0; } }
+.conf { position: absolute; left: 50%; top: 50%; width: 152px; aspect-ratio: 1; translate: -50% -50%; container-type: inline-size; pointer-events: none; }
+.conf i { position: absolute; left: 50%; top: 50%; width: 3.2cqw; height: 5.2cqw; background: var(--c); border-radius: .8cqw;
+  box-shadow: 0 0 0 .35cqw rgba(255,255,255,.7); animation: conf 3s cubic-bezier(.25,.6,.35,1) var(--d) both; }
+@keyframes conf {
+  0% { transform: translate(-50%, -50%) rotate(0) scale(.4); opacity: 0; } 10% { opacity: 1; }
+  35% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--r) * .4)) scale(1); }
+  75% { opacity: .9; }
+  100% { transform: translate(calc(-50% + var(--dx) * 1.25), calc(-50% + var(--dy) + var(--fall))) rotate(var(--r)) scale(.9); opacity: 0; } }
+.gapline { position: absolute; left: 50%; bottom: 0; width: 0; height: calc(94px * var(--gap)); border-left: 2px dashed var(--blue-dark); }
+.gaptag { position: absolute; right: 6px; bottom: 4px; font-size: 13px; color: var(--blue-dark); }
+
+/* ---------- blink: card shape + key shape together ---------- */
+.dur { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+.dur button { min-width: 88px; min-height: 44px; font: inherit; font-size: 16px; font-weight: 700; border: 3px solid var(--line); border-radius: 22px; background: #fff; cursor: pointer; box-shadow: 3px 3px 0 var(--line); }
+.dur button[aria-pressed="true"] { background: var(--pink-line); color: #fff; }
+.animstage { display: flex; align-items: center; justify-content: center; gap: 12px; height: 150px; background: #f6f1ec; border-bottom: 3px solid var(--line); }
+.minicard { width: 84px; height: 100px; background: #fff; border: 3px solid var(--line); border-radius: 12px; box-shadow: 3px 3px 0 var(--line); display: grid; place-items: center; }
+.minikey { width: 64px; height: 124px; background: #fff; border: 3px solid var(--line); border-radius: 0 0 10px 10px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; box-shadow: 3px 3px 0 var(--line); }
+.arrow { font-size: 22px; font-weight: 700; }
+.s { width: 50px; height: 50px; overflow: visible; transform-origin: 50% 80%; animation-duration: var(--dur); animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+.minikey .s { width: 44px; height: 44px; }
+.a-bounce { animation-name: a-bounce; }
+@keyframes a-bounce { 0%,100% { transform: translateY(0) scale(1); filter: none; } 25% { transform: translateY(-14%) scale(1.12); filter: brightness(1.08) drop-shadow(0 0 6px var(--pink-glow)); } 50% { transform: none; } 70% { transform: translateY(-6%) scale(1.05); filter: drop-shadow(0 0 4px var(--pink-glow)); } }
+.a-breathe { animation-name: a-breathe; transform-origin: 50% 50%; }
+@keyframes a-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.16); filter: drop-shadow(0 0 6px var(--pink-glow)); } }
+.a-float { animation-name: a-float; }
+@keyframes a-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18%); } }
+.a-sway { animation-name: a-sway; transform-origin: 50% 100%; }
+@keyframes a-sway { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+.a-heart { animation-name: a-heart; transform-origin: 50% 50%; }
+@keyframes a-heart { 0%,40%,100% { transform: scale(1); } 8% { transform: scale(1.15); } 16% { transform: scale(1); } 24% { transform: scale(1.12); filter: drop-shadow(0 0 5px var(--pink-glow)); } }
+.a-jelly { animation-name: a-jelly; transform-origin: 50% 100%; }
+@keyframes a-jelly { 0%,60%,100% { transform: scale(1, 1); } 15% { transform: scale(1.18, .82); } 30% { transform: scale(.88, 1.14); } 45% { transform: scale(1.05, .96); } }
+.a-glow { animation-name: a-glow; }
+@keyframes a-glow { 0%,100% { filter: drop-shadow(0 0 0 transparent); } 50% { filter: drop-shadow(0 0 10px var(--pink-glow)) drop-shadow(0 0 4px var(--pink-line)) brightness(1.05); } }
+.a-spin { animation-name: a-spin; transform-origin: 50% 55%; }
+@keyframes a-spin { 0% { transform: rotate(0); } 50%,100% { transform: rotate(360deg); } }
+.a-hop { animation-name: a-hop; transform-origin: 50% 100%; }
+@keyframes a-hop { 0%,70%,100% { transform: translateY(0) scale(1,1); } 10% { transform: scale(1.1,.88); } 30% { transform: translateY(-24%) scale(.95,1.08); } 48% { transform: translateY(0) scale(1.12,.9); } 58% { transform: scale(1,1); } }
+.a-fade { animation-name: a-fade; }
+@keyframes a-fade { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .s { animation-name: a-fade !important; } }
+
+/* ---------- result ---------- */
+.result { position: sticky; bottom: 0; background: #fff; border-top: 3px solid var(--line); padding: 12px 16px; }
+.result .in { max-width: 1100px; margin: 0 auto; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.result output { font-size: 16px; font-weight: 700; flex: 1 1 260px; }
+.result button { min-height: 44px; padding: 0 18px; font: inherit; font-size: 16px; font-weight: 700; border: 3px solid var(--line); border-radius: 12px; background: var(--pink); cursor: pointer; }
+@media (max-width: 520px) { .grid { grid-template-columns: 1fr 1fr; } .keystage { padding: 10px 0; } .wkey { transform: scale(.8); margin: -40px 0; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>v1.0.14 選擇頁</h1>
+  <p>這頁只給你挑選用，不會上傳到 GitHub。選好兩項後，按最下面的「複製我的選擇」，貼回對話給我。</p>
+</header>
+
+<section aria-labelledby="h-pos">
+  <h2 id="h-pos">一、獎勵圖位置（在琴鍵上居中）</h2>
+  <p class="hint">和網站一樣大小的琴鍵（電腦版）。藍色虛線 = 圖片底部到琴鍵底線的距離。彩紙會一直重播。</p>
+  <div class="grid">
+<article class="card pos-card" data-kind="pos" data-id="20">
+  <div class="keystage"><div class="wkey" style="--gap:0.2">
+    <i class="bk l"></i><i class="bk r"></i>
+    <svg class="kshape" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg>
+    <div class="rw"><div class="conf"></div><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTQ0IDE0NCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBvdmVyZmxvdz0idmlzaWJsZSIgaWQ9Iml0dWJpdDMiPgogICA8ZGVzYz5FbmdyYXZlZCBieSBWZXJvdmlvIDYuMy4wLTQyNWRkN2I8L2Rlc2M+CiAgIDxkZWZzPgogICAgICA8ZyBpZD0iRTA1MC1pdHViaXQzIj4KICAgICAgICAgPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgxLC0xKSIgZD0iTTQ0MSAtMjQ1Yy0yMyAtNCAtNDggLTYgLTc2IC02Yy01OSAwIC0xMDIgNyAtMTMwIDIwYy04OCA0MiAtMTUwIDkzIC0xODcgMTU0Yy0yNiA0NCAtNDMgMTAzIC00OCAxNzZjMCA2IC0xIDEzIC0xIDE5YzAgNTQgMTUgMTExIDQ1IDE3MGMyOSA1NyA2NSAxMDYgMTEwIDE0OHM5NiA4NSAxNTMgMTI3Yy0zIDE2IC04IDQ2IC0xMyA5MmMtNCA0MyAtNSA3MyAtNSA4OWMwIDExNyAxNiAxNzIgNjkgMjU3YzM0IDU0IDY0IDgyIDg5IDgyIGMyMSAwIDQzIC0zMCA2OSAtOTJzMzkgLTExNSA0MSAtMTU5di0xNWMwIC0xMDkgLTIxIC0xNjIgLTY3IC0yNDFjLTEzIC0yMCAtNjMgLTkwIC05OCAtMTE4Yy0xMyAtOSAtMjUgLTE5IC0zNyAtMjlsMzEgLTE4MWM4IDEgMTggMiAyOCAyYzU4IDAgMTAyIC0xMiAxMzMgLTM1YzU5IC00MyA5MiAtMTA0IDk4IC0xODRjMSAtNyAxIC0xNSAxIC0yMmMwIC0xMjMgLTg3IC0yMDkgLTE4MSAtMjQ4YzggLTU3IDE3IC0xMTAgMjUgLTE2MiBjNSAtMzEgNiAtNTggNiAtODBjMCAtMzAgLTUgLTUzIC0xNCAtNzBjLTM1IC02NCAtODggLTk5IC0xNTggLTEwM2MtNSAwIC0xMSAtMSAtMTYgLTFjLTM3IDAgLTcyIDEwIC0xMDggMjdjLTUwIDI0IC03NyA1OSAtODAgMTA1djExYzAgMjkgNyA1NSAyMCA3NmMxOCAyOCA0NSA0MiA3OSA0NGg2YzQ5IDAgOTMgLTQyIDk3IC04N3YtOWMwIC01MSAtMzQgLTg2IC0xMDUgLTEwNmMxNyAtMjQgNTEgLTM2IDEwMiAtMzZjNjIgMCAxMTYgNDMgMTQwIDg1IGM5IDE2IDEzIDQxIDEzIDc0YzAgMjAgLTEgNDIgLTUgNjdjLTggNTMgLTE4IDEwNiAtMjYgMTU5ek00NjEgOTM5Yy05NSAwIC0xMzUgLTE3NSAtMTM1IC0yODZjMCAtMjQgMiAtNDggNSAtNzFjNTAgMzkgOTIgODIgMTI3IDEyOGM0MCA1MyA2MCAxMDAgNjAgMTQwdjhjLTQgNTMgLTIyIDgxIC01NSA4MWgtMnpNNDA2IDExOWw1NCAtMzI2YzczIDI1IDExMCA3OCAxMTAgMTYxYzAgNyAwIDE1IC0xIDIzYy03IDk1IC01NyAxNDIgLTE1MSAxNDJoLTEyIHpNMzgyIDExN2MtNzIgLTIgLTEyOCAtNDcgLTEyOCAtMTIwdi03YzIgLTQ2IDQzIC05OSA3NSAtMTE1Yy0zIC0yIC03IC01IC0xMCAtMTBjLTcwIDMzIC0xMTYgODggLTEyMyAxNzJ2MTFjMCA2OCA0NCAxMjYgODggMTU5YzIzIDE3IDQ5IDI5IDc4IDM2bC0yOSAxNzBjLTIxIC0xMyAtNTIgLTM3IC05MiAtNzNjLTUwIC00NCAtODYgLTg0IC0xMDkgLTExOWMtNDUgLTY5IC02NyAtMTMwIC02NyAtMTgydi0xM2M1IC02OCAzNSAtMTI3IDkzIC0xNzYgczEyNSAtNzMgMjAzIC03M2MyNSAwIDUwIDMgNzUgOWMtMTkgMTExIC0zNiAyMjEgLTU0IDMzMXoiIC8+CiAgICAgIDwvZz4KICAgICAgPGcgaWQ9IkUwQTItaXR1Yml0MyI+CiAgICAgICAgIDxwYXRoIHRyYW5zZm9ybT0ic2NhbGUoMSwtMSkiIGQ9Ik0xOTggMTMzYzEwMiAwIDIwNyAtNDUgMjA3IC0xMzNjMCAtOTIgLTExOCAtMTMzIC0yMjcgLTEzM2MtMTAxIDAgLTE3OCA0NiAtMTc4IDEzM2MwIDg4IDkzIDEzMyAxOTggMTMzek0yOTMgLTIxYzAgMTQgLTMgMjkgLTggNDRjLTcgMjAgLTE4IDM4IC0zMyA1NGMtMjAgMjEgLTQzIDMxIC02OCAzMWwtMjAgLTJjLTE1IC01IC0yNyAtMTQgLTM2IC0yOGMtNCAtOSAtNiAtMTcgLTggLTI0cy0zIC0xNiAtMyAtMjdjMCAtMTUgMyAtMzQgOSAtNTcgczE4IC00MSAzNCAtNTVjMTUgLTE1IDM2IC0yMyA2MiAtMjNjNCAwIDEwIDEgMTggMmMxOSA1IDMyIDE1IDQwIDMwczEzIDM0IDEzIDU1eiIgLz4KICAgICAgPC9nPgogICA8L2RlZnM+CiAgIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+I2l0dWJpdDMgZy5lbmRpbmcsICNpdHViaXQzIGcuZmluZywgI2l0dWJpdDMgZy5yZWgsICNpdHViaXQzIGcudGVtcG8ge2ZvbnQtd2VpZ2h0OmJvbGQ7fSNpdHViaXQzIGcuZGlyLCAjaXR1Yml0MyBnLmR5bmFtLCAjaXR1Yml0MyBnLm1OdW0ge2ZvbnQtc3R5bGU6aXRhbGljO30jaXR1Yml0MyBnLmxhYmVsIHtmb250LXdlaWdodDpub3JtYWw7fSNpdHViaXQzIGVsbGlwc2UsICNpdHViaXQzIHBhdGgsICNpdHViaXQzIHBvbHlnb24sICNpdHViaXQzIHBvbHlsaW5lLCAjaXR1Yml0MyByZWN0IHtzdHJva2U6Y3VycmVudENvbG9yfSNpdHViaXQzIGcuY3Vyc29yIHtmaWxsOmRvZGdlcmJsdWU7IGNvbG9yOmRvZGdlcmJsdWU7fSNpdHViaXQzIGcuY3Vyc29yLmNob3JkIHtmaWxsOmxpbWVncmVlbjsgY29sb3I6bGltZWdyZWVuO308L3N0eWxlPgogICA8c3ZnIGNsYXNzPSJkZWZpbml0aW9uLXNjYWxlIiBjb2xvcj0iYmxhY2siIGZvbnQtZmFtaWx5PSJUaW1lcywgc2VyaWYiIHZpZXdCb3g9IjM1NSA4MCAxNDQwIDE0NDAiPgogICAgICA8ZyBjbGFzcz0icGFnZS1tYXJnaW4iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCwgMjAwKSI+CiAgICAgICAgIDxnIGlkPSJqa29kMzllIiBjbGFzcz0ibWRpdiBwYWdlTWlsZXN0b25lIiAvPgogICAgICAgICA8ZyBpZD0ia2p1cHNjdSIgY2xhc3M9InNjb3JlIHBhZ2VNaWxlc3RvbmUiIC8+CiAgICAgICAgIDxnIGlkPSJoaXBlcGNtIiBjbGFzcz0ic3lzdGVtIj4KICAgICAgICAgICAgPGcgaWQ9IngxNnUzYWU0IiBjbGFzcz0ic2VjdGlvbiBzeXN0ZW1NaWxlc3RvbmUiIC8+CiAgICAgICAgICAgIDxnIGlkPSJ5cjV2d2lpIiBjbGFzcz0ibWVhc3VyZSI+CiAgICAgICAgICAgICAgIDxnIGlkPSJoMXludnVtdSIgY2xhc3M9InN0YWZmIj4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSAyNDAgTDE2OTUgMjQwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDQyMCBMMTY5NSA0MjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yNTUgNjAwIEwxNjk1IDYwMCIgc3Ryb2tlLXdpZHRoPSIxMyIgLz4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSA3ODAgTDE2OTUgNzgwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDk2MCBMMTY5NSA5NjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICA8ZyBpZD0iZjF4d2J6aHIiIGNsYXNzPSJrZXlTaWciIC8+CiAgICAgICAgICAgICAgICAgIDxnIGlkPSJpMXNkbHhhMCIgY2xhc3M9ImxheWVyIj4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImpmdWN1amQiIGNsYXNzPSJub3RlIiBjb2xvcj0iI0MwNDg3NyIgZmlsbD0iI0MwNDg3NyI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGNsYXNzPSJub3RlaGVhZCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgaHJlZj0iI0UwQTItaXR1Yml0MyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODI1LCA5NjApIHNjYWxlKDAuNzIsIDAuNzIpIiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImsxdW16MHg1IiBjbGFzcz0ic3BhY2UiIC8+CiAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICA8ZyBpZD0iZzFvbDJudmoiIGNsYXNzPSJiYXJMaW5lIiAvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxnIGlkPSJzMWV4M3lhdiIgY2xhc3M9InN5c3RlbU1pbGVzdG9uZUVuZCB4MTZ1M2FlNCIgLz4KICAgICAgICAgPC9nPgogICAgICAgICA8ZyBpZD0idDFhMm5wY2YiIGNsYXNzPSJwYWdlTWlsZXN0b25lRW5kIGtqdXBzY3UiIC8+CiAgICAgICAgIDxnIGlkPSJ1eDY2dmF3IiBjbGFzcz0icGFnZU1pbGVzdG9uZUVuZCBqa29kMzllIiAvPgogICAgICA8L2c+CiAgIDwvc3ZnPgo8L3N2Zz4K" alt=""></div>
+    <i class="gapline"></i><b class="gaptag">20%</b>
+  </div></div>
+  <div class="card-body"><h3><span class="num">1</span>底部離琴鍵底 20%</h3>
+  <p>圖片底部到琴鍵底線的距離 = 圖片高度的 20%。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card pos-card" data-kind="pos" data-id="30">
+  <div class="keystage"><div class="wkey" style="--gap:0.3">
+    <i class="bk l"></i><i class="bk r"></i>
+    <svg class="kshape" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg>
+    <div class="rw"><div class="conf"></div><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTQ0IDE0NCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBvdmVyZmxvdz0idmlzaWJsZSIgaWQ9Iml0dWJpdDMiPgogICA8ZGVzYz5FbmdyYXZlZCBieSBWZXJvdmlvIDYuMy4wLTQyNWRkN2I8L2Rlc2M+CiAgIDxkZWZzPgogICAgICA8ZyBpZD0iRTA1MC1pdHViaXQzIj4KICAgICAgICAgPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgxLC0xKSIgZD0iTTQ0MSAtMjQ1Yy0yMyAtNCAtNDggLTYgLTc2IC02Yy01OSAwIC0xMDIgNyAtMTMwIDIwYy04OCA0MiAtMTUwIDkzIC0xODcgMTU0Yy0yNiA0NCAtNDMgMTAzIC00OCAxNzZjMCA2IC0xIDEzIC0xIDE5YzAgNTQgMTUgMTExIDQ1IDE3MGMyOSA1NyA2NSAxMDYgMTEwIDE0OHM5NiA4NSAxNTMgMTI3Yy0zIDE2IC04IDQ2IC0xMyA5MmMtNCA0MyAtNSA3MyAtNSA4OWMwIDExNyAxNiAxNzIgNjkgMjU3YzM0IDU0IDY0IDgyIDg5IDgyIGMyMSAwIDQzIC0zMCA2OSAtOTJzMzkgLTExNSA0MSAtMTU5di0xNWMwIC0xMDkgLTIxIC0xNjIgLTY3IC0yNDFjLTEzIC0yMCAtNjMgLTkwIC05OCAtMTE4Yy0xMyAtOSAtMjUgLTE5IC0zNyAtMjlsMzEgLTE4MWM4IDEgMTggMiAyOCAyYzU4IDAgMTAyIC0xMiAxMzMgLTM1YzU5IC00MyA5MiAtMTA0IDk4IC0xODRjMSAtNyAxIC0xNSAxIC0yMmMwIC0xMjMgLTg3IC0yMDkgLTE4MSAtMjQ4YzggLTU3IDE3IC0xMTAgMjUgLTE2MiBjNSAtMzEgNiAtNTggNiAtODBjMCAtMzAgLTUgLTUzIC0xNCAtNzBjLTM1IC02NCAtODggLTk5IC0xNTggLTEwM2MtNSAwIC0xMSAtMSAtMTYgLTFjLTM3IDAgLTcyIDEwIC0xMDggMjdjLTUwIDI0IC03NyA1OSAtODAgMTA1djExYzAgMjkgNyA1NSAyMCA3NmMxOCAyOCA0NSA0MiA3OSA0NGg2YzQ5IDAgOTMgLTQyIDk3IC04N3YtOWMwIC01MSAtMzQgLTg2IC0xMDUgLTEwNmMxNyAtMjQgNTEgLTM2IDEwMiAtMzZjNjIgMCAxMTYgNDMgMTQwIDg1IGM5IDE2IDEzIDQxIDEzIDc0YzAgMjAgLTEgNDIgLTUgNjdjLTggNTMgLTE4IDEwNiAtMjYgMTU5ek00NjEgOTM5Yy05NSAwIC0xMzUgLTE3NSAtMTM1IC0yODZjMCAtMjQgMiAtNDggNSAtNzFjNTAgMzkgOTIgODIgMTI3IDEyOGM0MCA1MyA2MCAxMDAgNjAgMTQwdjhjLTQgNTMgLTIyIDgxIC01NSA4MWgtMnpNNDA2IDExOWw1NCAtMzI2YzczIDI1IDExMCA3OCAxMTAgMTYxYzAgNyAwIDE1IC0xIDIzYy03IDk1IC01NyAxNDIgLTE1MSAxNDJoLTEyIHpNMzgyIDExN2MtNzIgLTIgLTEyOCAtNDcgLTEyOCAtMTIwdi03YzIgLTQ2IDQzIC05OSA3NSAtMTE1Yy0zIC0yIC03IC01IC0xMCAtMTBjLTcwIDMzIC0xMTYgODggLTEyMyAxNzJ2MTFjMCA2OCA0NCAxMjYgODggMTU5YzIzIDE3IDQ5IDI5IDc4IDM2bC0yOSAxNzBjLTIxIC0xMyAtNTIgLTM3IC05MiAtNzNjLTUwIC00NCAtODYgLTg0IC0xMDkgLTExOWMtNDUgLTY5IC02NyAtMTMwIC02NyAtMTgydi0xM2M1IC02OCAzNSAtMTI3IDkzIC0xNzYgczEyNSAtNzMgMjAzIC03M2MyNSAwIDUwIDMgNzUgOWMtMTkgMTExIC0zNiAyMjEgLTU0IDMzMXoiIC8+CiAgICAgIDwvZz4KICAgICAgPGcgaWQ9IkUwQTItaXR1Yml0MyI+CiAgICAgICAgIDxwYXRoIHRyYW5zZm9ybT0ic2NhbGUoMSwtMSkiIGQ9Ik0xOTggMTMzYzEwMiAwIDIwNyAtNDUgMjA3IC0xMzNjMCAtOTIgLTExOCAtMTMzIC0yMjcgLTEzM2MtMTAxIDAgLTE3OCA0NiAtMTc4IDEzM2MwIDg4IDkzIDEzMyAxOTggMTMzek0yOTMgLTIxYzAgMTQgLTMgMjkgLTggNDRjLTcgMjAgLTE4IDM4IC0zMyA1NGMtMjAgMjEgLTQzIDMxIC02OCAzMWwtMjAgLTJjLTE1IC01IC0yNyAtMTQgLTM2IC0yOGMtNCAtOSAtNiAtMTcgLTggLTI0cy0zIC0xNiAtMyAtMjdjMCAtMTUgMyAtMzQgOSAtNTcgczE4IC00MSAzNCAtNTVjMTUgLTE1IDM2IC0yMyA2MiAtMjNjNCAwIDEwIDEgMTggMmMxOSA1IDMyIDE1IDQwIDMwczEzIDM0IDEzIDU1eiIgLz4KICAgICAgPC9nPgogICA8L2RlZnM+CiAgIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+I2l0dWJpdDMgZy5lbmRpbmcsICNpdHViaXQzIGcuZmluZywgI2l0dWJpdDMgZy5yZWgsICNpdHViaXQzIGcudGVtcG8ge2ZvbnQtd2VpZ2h0OmJvbGQ7fSNpdHViaXQzIGcuZGlyLCAjaXR1Yml0MyBnLmR5bmFtLCAjaXR1Yml0MyBnLm1OdW0ge2ZvbnQtc3R5bGU6aXRhbGljO30jaXR1Yml0MyBnLmxhYmVsIHtmb250LXdlaWdodDpub3JtYWw7fSNpdHViaXQzIGVsbGlwc2UsICNpdHViaXQzIHBhdGgsICNpdHViaXQzIHBvbHlnb24sICNpdHViaXQzIHBvbHlsaW5lLCAjaXR1Yml0MyByZWN0IHtzdHJva2U6Y3VycmVudENvbG9yfSNpdHViaXQzIGcuY3Vyc29yIHtmaWxsOmRvZGdlcmJsdWU7IGNvbG9yOmRvZGdlcmJsdWU7fSNpdHViaXQzIGcuY3Vyc29yLmNob3JkIHtmaWxsOmxpbWVncmVlbjsgY29sb3I6bGltZWdyZWVuO308L3N0eWxlPgogICA8c3ZnIGNsYXNzPSJkZWZpbml0aW9uLXNjYWxlIiBjb2xvcj0iYmxhY2siIGZvbnQtZmFtaWx5PSJUaW1lcywgc2VyaWYiIHZpZXdCb3g9IjM1NSA4MCAxNDQwIDE0NDAiPgogICAgICA8ZyBjbGFzcz0icGFnZS1tYXJnaW4iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCwgMjAwKSI+CiAgICAgICAgIDxnIGlkPSJqa29kMzllIiBjbGFzcz0ibWRpdiBwYWdlTWlsZXN0b25lIiAvPgogICAgICAgICA8ZyBpZD0ia2p1cHNjdSIgY2xhc3M9InNjb3JlIHBhZ2VNaWxlc3RvbmUiIC8+CiAgICAgICAgIDxnIGlkPSJoaXBlcGNtIiBjbGFzcz0ic3lzdGVtIj4KICAgICAgICAgICAgPGcgaWQ9IngxNnUzYWU0IiBjbGFzcz0ic2VjdGlvbiBzeXN0ZW1NaWxlc3RvbmUiIC8+CiAgICAgICAgICAgIDxnIGlkPSJ5cjV2d2lpIiBjbGFzcz0ibWVhc3VyZSI+CiAgICAgICAgICAgICAgIDxnIGlkPSJoMXludnVtdSIgY2xhc3M9InN0YWZmIj4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSAyNDAgTDE2OTUgMjQwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDQyMCBMMTY5NSA0MjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yNTUgNjAwIEwxNjk1IDYwMCIgc3Ryb2tlLXdpZHRoPSIxMyIgLz4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSA3ODAgTDE2OTUgNzgwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDk2MCBMMTY5NSA5NjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICA8ZyBpZD0iZjF4d2J6aHIiIGNsYXNzPSJrZXlTaWciIC8+CiAgICAgICAgICAgICAgICAgIDxnIGlkPSJpMXNkbHhhMCIgY2xhc3M9ImxheWVyIj4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImpmdWN1amQiIGNsYXNzPSJub3RlIiBjb2xvcj0iI0MwNDg3NyIgZmlsbD0iI0MwNDg3NyI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGNsYXNzPSJub3RlaGVhZCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgaHJlZj0iI0UwQTItaXR1Yml0MyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODI1LCA5NjApIHNjYWxlKDAuNzIsIDAuNzIpIiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImsxdW16MHg1IiBjbGFzcz0ic3BhY2UiIC8+CiAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICA8ZyBpZD0iZzFvbDJudmoiIGNsYXNzPSJiYXJMaW5lIiAvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxnIGlkPSJzMWV4M3lhdiIgY2xhc3M9InN5c3RlbU1pbGVzdG9uZUVuZCB4MTZ1M2FlNCIgLz4KICAgICAgICAgPC9nPgogICAgICAgICA8ZyBpZD0idDFhMm5wY2YiIGNsYXNzPSJwYWdlTWlsZXN0b25lRW5kIGtqdXBzY3UiIC8+CiAgICAgICAgIDxnIGlkPSJ1eDY2dmF3IiBjbGFzcz0icGFnZU1pbGVzdG9uZUVuZCBqa29kMzllIiAvPgogICAgICA8L2c+CiAgIDwvc3ZnPgo8L3N2Zz4K" alt=""></div>
+    <i class="gapline"></i><b class="gaptag">30%</b>
+  </div></div>
+  <div class="card-body"><h3><span class="num">2</span>底部離琴鍵底 30%</h3>
+  <p>圖片底部到琴鍵底線的距離 = 圖片高度的 30%。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card pos-card" data-kind="pos" data-id="40">
+  <div class="keystage"><div class="wkey" style="--gap:0.4">
+    <i class="bk l"></i><i class="bk r"></i>
+    <svg class="kshape" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg>
+    <div class="rw"><div class="conf"></div><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTQ0IDE0NCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBvdmVyZmxvdz0idmlzaWJsZSIgaWQ9Iml0dWJpdDMiPgogICA8ZGVzYz5FbmdyYXZlZCBieSBWZXJvdmlvIDYuMy4wLTQyNWRkN2I8L2Rlc2M+CiAgIDxkZWZzPgogICAgICA8ZyBpZD0iRTA1MC1pdHViaXQzIj4KICAgICAgICAgPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgxLC0xKSIgZD0iTTQ0MSAtMjQ1Yy0yMyAtNCAtNDggLTYgLTc2IC02Yy01OSAwIC0xMDIgNyAtMTMwIDIwYy04OCA0MiAtMTUwIDkzIC0xODcgMTU0Yy0yNiA0NCAtNDMgMTAzIC00OCAxNzZjMCA2IC0xIDEzIC0xIDE5YzAgNTQgMTUgMTExIDQ1IDE3MGMyOSA1NyA2NSAxMDYgMTEwIDE0OHM5NiA4NSAxNTMgMTI3Yy0zIDE2IC04IDQ2IC0xMyA5MmMtNCA0MyAtNSA3MyAtNSA4OWMwIDExNyAxNiAxNzIgNjkgMjU3YzM0IDU0IDY0IDgyIDg5IDgyIGMyMSAwIDQzIC0zMCA2OSAtOTJzMzkgLTExNSA0MSAtMTU5di0xNWMwIC0xMDkgLTIxIC0xNjIgLTY3IC0yNDFjLTEzIC0yMCAtNjMgLTkwIC05OCAtMTE4Yy0xMyAtOSAtMjUgLTE5IC0zNyAtMjlsMzEgLTE4MWM4IDEgMTggMiAyOCAyYzU4IDAgMTAyIC0xMiAxMzMgLTM1YzU5IC00MyA5MiAtMTA0IDk4IC0xODRjMSAtNyAxIC0xNSAxIC0yMmMwIC0xMjMgLTg3IC0yMDkgLTE4MSAtMjQ4YzggLTU3IDE3IC0xMTAgMjUgLTE2MiBjNSAtMzEgNiAtNTggNiAtODBjMCAtMzAgLTUgLTUzIC0xNCAtNzBjLTM1IC02NCAtODggLTk5IC0xNTggLTEwM2MtNSAwIC0xMSAtMSAtMTYgLTFjLTM3IDAgLTcyIDEwIC0xMDggMjdjLTUwIDI0IC03NyA1OSAtODAgMTA1djExYzAgMjkgNyA1NSAyMCA3NmMxOCAyOCA0NSA0MiA3OSA0NGg2YzQ5IDAgOTMgLTQyIDk3IC04N3YtOWMwIC01MSAtMzQgLTg2IC0xMDUgLTEwNmMxNyAtMjQgNTEgLTM2IDEwMiAtMzZjNjIgMCAxMTYgNDMgMTQwIDg1IGM5IDE2IDEzIDQxIDEzIDc0YzAgMjAgLTEgNDIgLTUgNjdjLTggNTMgLTE4IDEwNiAtMjYgMTU5ek00NjEgOTM5Yy05NSAwIC0xMzUgLTE3NSAtMTM1IC0yODZjMCAtMjQgMiAtNDggNSAtNzFjNTAgMzkgOTIgODIgMTI3IDEyOGM0MCA1MyA2MCAxMDAgNjAgMTQwdjhjLTQgNTMgLTIyIDgxIC01NSA4MWgtMnpNNDA2IDExOWw1NCAtMzI2YzczIDI1IDExMCA3OCAxMTAgMTYxYzAgNyAwIDE1IC0xIDIzYy03IDk1IC01NyAxNDIgLTE1MSAxNDJoLTEyIHpNMzgyIDExN2MtNzIgLTIgLTEyOCAtNDcgLTEyOCAtMTIwdi03YzIgLTQ2IDQzIC05OSA3NSAtMTE1Yy0zIC0yIC03IC01IC0xMCAtMTBjLTcwIDMzIC0xMTYgODggLTEyMyAxNzJ2MTFjMCA2OCA0NCAxMjYgODggMTU5YzIzIDE3IDQ5IDI5IDc4IDM2bC0yOSAxNzBjLTIxIC0xMyAtNTIgLTM3IC05MiAtNzNjLTUwIC00NCAtODYgLTg0IC0xMDkgLTExOWMtNDUgLTY5IC02NyAtMTMwIC02NyAtMTgydi0xM2M1IC02OCAzNSAtMTI3IDkzIC0xNzYgczEyNSAtNzMgMjAzIC03M2MyNSAwIDUwIDMgNzUgOWMtMTkgMTExIC0zNiAyMjEgLTU0IDMzMXoiIC8+CiAgICAgIDwvZz4KICAgICAgPGcgaWQ9IkUwQTItaXR1Yml0MyI+CiAgICAgICAgIDxwYXRoIHRyYW5zZm9ybT0ic2NhbGUoMSwtMSkiIGQ9Ik0xOTggMTMzYzEwMiAwIDIwNyAtNDUgMjA3IC0xMzNjMCAtOTIgLTExOCAtMTMzIC0yMjcgLTEzM2MtMTAxIDAgLTE3OCA0NiAtMTc4IDEzM2MwIDg4IDkzIDEzMyAxOTggMTMzek0yOTMgLTIxYzAgMTQgLTMgMjkgLTggNDRjLTcgMjAgLTE4IDM4IC0zMyA1NGMtMjAgMjEgLTQzIDMxIC02OCAzMWwtMjAgLTJjLTE1IC01IC0yNyAtMTQgLTM2IC0yOGMtNCAtOSAtNiAtMTcgLTggLTI0cy0zIC0xNiAtMyAtMjdjMCAtMTUgMyAtMzQgOSAtNTcgczE4IC00MSAzNCAtNTVjMTUgLTE1IDM2IC0yMyA2MiAtMjNjNCAwIDEwIDEgMTggMmMxOSA1IDMyIDE1IDQwIDMwczEzIDM0IDEzIDU1eiIgLz4KICAgICAgPC9nPgogICA8L2RlZnM+CiAgIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+I2l0dWJpdDMgZy5lbmRpbmcsICNpdHViaXQzIGcuZmluZywgI2l0dWJpdDMgZy5yZWgsICNpdHViaXQzIGcudGVtcG8ge2ZvbnQtd2VpZ2h0OmJvbGQ7fSNpdHViaXQzIGcuZGlyLCAjaXR1Yml0MyBnLmR5bmFtLCAjaXR1Yml0MyBnLm1OdW0ge2ZvbnQtc3R5bGU6aXRhbGljO30jaXR1Yml0MyBnLmxhYmVsIHtmb250LXdlaWdodDpub3JtYWw7fSNpdHViaXQzIGVsbGlwc2UsICNpdHViaXQzIHBhdGgsICNpdHViaXQzIHBvbHlnb24sICNpdHViaXQzIHBvbHlsaW5lLCAjaXR1Yml0MyByZWN0IHtzdHJva2U6Y3VycmVudENvbG9yfSNpdHViaXQzIGcuY3Vyc29yIHtmaWxsOmRvZGdlcmJsdWU7IGNvbG9yOmRvZGdlcmJsdWU7fSNpdHViaXQzIGcuY3Vyc29yLmNob3JkIHtmaWxsOmxpbWVncmVlbjsgY29sb3I6bGltZWdyZWVuO308L3N0eWxlPgogICA8c3ZnIGNsYXNzPSJkZWZpbml0aW9uLXNjYWxlIiBjb2xvcj0iYmxhY2siIGZvbnQtZmFtaWx5PSJUaW1lcywgc2VyaWYiIHZpZXdCb3g9IjM1NSA4MCAxNDQwIDE0NDAiPgogICAgICA8ZyBjbGFzcz0icGFnZS1tYXJnaW4iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCwgMjAwKSI+CiAgICAgICAgIDxnIGlkPSJqa29kMzllIiBjbGFzcz0ibWRpdiBwYWdlTWlsZXN0b25lIiAvPgogICAgICAgICA8ZyBpZD0ia2p1cHNjdSIgY2xhc3M9InNjb3JlIHBhZ2VNaWxlc3RvbmUiIC8+CiAgICAgICAgIDxnIGlkPSJoaXBlcGNtIiBjbGFzcz0ic3lzdGVtIj4KICAgICAgICAgICAgPGcgaWQ9IngxNnUzYWU0IiBjbGFzcz0ic2VjdGlvbiBzeXN0ZW1NaWxlc3RvbmUiIC8+CiAgICAgICAgICAgIDxnIGlkPSJ5cjV2d2lpIiBjbGFzcz0ibWVhc3VyZSI+CiAgICAgICAgICAgICAgIDxnIGlkPSJoMXludnVtdSIgY2xhc3M9InN0YWZmIj4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSAyNDAgTDE2OTUgMjQwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDQyMCBMMTY5NSA0MjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yNTUgNjAwIEwxNjk1IDYwMCIgc3Ryb2tlLXdpZHRoPSIxMyIgLz4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSA3ODAgTDE2OTUgNzgwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDk2MCBMMTY5NSA5NjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICA8ZyBpZD0iZjF4d2J6aHIiIGNsYXNzPSJrZXlTaWciIC8+CiAgICAgICAgICAgICAgICAgIDxnIGlkPSJpMXNkbHhhMCIgY2xhc3M9ImxheWVyIj4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImpmdWN1amQiIGNsYXNzPSJub3RlIiBjb2xvcj0iI0MwNDg3NyIgZmlsbD0iI0MwNDg3NyI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGNsYXNzPSJub3RlaGVhZCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgaHJlZj0iI0UwQTItaXR1Yml0MyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODI1LCA5NjApIHNjYWxlKDAuNzIsIDAuNzIpIiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImsxdW16MHg1IiBjbGFzcz0ic3BhY2UiIC8+CiAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICA8ZyBpZD0iZzFvbDJudmoiIGNsYXNzPSJiYXJMaW5lIiAvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxnIGlkPSJzMWV4M3lhdiIgY2xhc3M9InN5c3RlbU1pbGVzdG9uZUVuZCB4MTZ1M2FlNCIgLz4KICAgICAgICAgPC9nPgogICAgICAgICA8ZyBpZD0idDFhMm5wY2YiIGNsYXNzPSJwYWdlTWlsZXN0b25lRW5kIGtqdXBzY3UiIC8+CiAgICAgICAgIDxnIGlkPSJ1eDY2dmF3IiBjbGFzcz0icGFnZU1pbGVzdG9uZUVuZCBqa29kMzllIiAvPgogICAgICA8L2c+CiAgIDwvc3ZnPgo8L3N2Zz4K" alt=""></div>
+    <i class="gapline"></i><b class="gaptag">40%</b>
+  </div></div>
+  <div class="card-body"><h3><span class="num">3</span>底部離琴鍵底 40%</h3>
+  <p>圖片底部到琴鍵底線的距離 = 圖片高度的 40%。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card pos-card" data-kind="pos" data-id="50">
+  <div class="keystage"><div class="wkey" style="--gap:0.5">
+    <i class="bk l"></i><i class="bk r"></i>
+    <svg class="kshape" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg>
+    <div class="rw"><div class="conf"></div><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTQ0IDE0NCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBvdmVyZmxvdz0idmlzaWJsZSIgaWQ9Iml0dWJpdDMiPgogICA8ZGVzYz5FbmdyYXZlZCBieSBWZXJvdmlvIDYuMy4wLTQyNWRkN2I8L2Rlc2M+CiAgIDxkZWZzPgogICAgICA8ZyBpZD0iRTA1MC1pdHViaXQzIj4KICAgICAgICAgPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgxLC0xKSIgZD0iTTQ0MSAtMjQ1Yy0yMyAtNCAtNDggLTYgLTc2IC02Yy01OSAwIC0xMDIgNyAtMTMwIDIwYy04OCA0MiAtMTUwIDkzIC0xODcgMTU0Yy0yNiA0NCAtNDMgMTAzIC00OCAxNzZjMCA2IC0xIDEzIC0xIDE5YzAgNTQgMTUgMTExIDQ1IDE3MGMyOSA1NyA2NSAxMDYgMTEwIDE0OHM5NiA4NSAxNTMgMTI3Yy0zIDE2IC04IDQ2IC0xMyA5MmMtNCA0MyAtNSA3MyAtNSA4OWMwIDExNyAxNiAxNzIgNjkgMjU3YzM0IDU0IDY0IDgyIDg5IDgyIGMyMSAwIDQzIC0zMCA2OSAtOTJzMzkgLTExNSA0MSAtMTU5di0xNWMwIC0xMDkgLTIxIC0xNjIgLTY3IC0yNDFjLTEzIC0yMCAtNjMgLTkwIC05OCAtMTE4Yy0xMyAtOSAtMjUgLTE5IC0zNyAtMjlsMzEgLTE4MWM4IDEgMTggMiAyOCAyYzU4IDAgMTAyIC0xMiAxMzMgLTM1YzU5IC00MyA5MiAtMTA0IDk4IC0xODRjMSAtNyAxIC0xNSAxIC0yMmMwIC0xMjMgLTg3IC0yMDkgLTE4MSAtMjQ4YzggLTU3IDE3IC0xMTAgMjUgLTE2MiBjNSAtMzEgNiAtNTggNiAtODBjMCAtMzAgLTUgLTUzIC0xNCAtNzBjLTM1IC02NCAtODggLTk5IC0xNTggLTEwM2MtNSAwIC0xMSAtMSAtMTYgLTFjLTM3IDAgLTcyIDEwIC0xMDggMjdjLTUwIDI0IC03NyA1OSAtODAgMTA1djExYzAgMjkgNyA1NSAyMCA3NmMxOCAyOCA0NSA0MiA3OSA0NGg2YzQ5IDAgOTMgLTQyIDk3IC04N3YtOWMwIC01MSAtMzQgLTg2IC0xMDUgLTEwNmMxNyAtMjQgNTEgLTM2IDEwMiAtMzZjNjIgMCAxMTYgNDMgMTQwIDg1IGM5IDE2IDEzIDQxIDEzIDc0YzAgMjAgLTEgNDIgLTUgNjdjLTggNTMgLTE4IDEwNiAtMjYgMTU5ek00NjEgOTM5Yy05NSAwIC0xMzUgLTE3NSAtMTM1IC0yODZjMCAtMjQgMiAtNDggNSAtNzFjNTAgMzkgOTIgODIgMTI3IDEyOGM0MCA1MyA2MCAxMDAgNjAgMTQwdjhjLTQgNTMgLTIyIDgxIC01NSA4MWgtMnpNNDA2IDExOWw1NCAtMzI2YzczIDI1IDExMCA3OCAxMTAgMTYxYzAgNyAwIDE1IC0xIDIzYy03IDk1IC01NyAxNDIgLTE1MSAxNDJoLTEyIHpNMzgyIDExN2MtNzIgLTIgLTEyOCAtNDcgLTEyOCAtMTIwdi03YzIgLTQ2IDQzIC05OSA3NSAtMTE1Yy0zIC0yIC03IC01IC0xMCAtMTBjLTcwIDMzIC0xMTYgODggLTEyMyAxNzJ2MTFjMCA2OCA0NCAxMjYgODggMTU5YzIzIDE3IDQ5IDI5IDc4IDM2bC0yOSAxNzBjLTIxIC0xMyAtNTIgLTM3IC05MiAtNzNjLTUwIC00NCAtODYgLTg0IC0xMDkgLTExOWMtNDUgLTY5IC02NyAtMTMwIC02NyAtMTgydi0xM2M1IC02OCAzNSAtMTI3IDkzIC0xNzYgczEyNSAtNzMgMjAzIC03M2MyNSAwIDUwIDMgNzUgOWMtMTkgMTExIC0zNiAyMjEgLTU0IDMzMXoiIC8+CiAgICAgIDwvZz4KICAgICAgPGcgaWQ9IkUwQTItaXR1Yml0MyI+CiAgICAgICAgIDxwYXRoIHRyYW5zZm9ybT0ic2NhbGUoMSwtMSkiIGQ9Ik0xOTggMTMzYzEwMiAwIDIwNyAtNDUgMjA3IC0xMzNjMCAtOTIgLTExOCAtMTMzIC0yMjcgLTEzM2MtMTAxIDAgLTE3OCA0NiAtMTc4IDEzM2MwIDg4IDkzIDEzMyAxOTggMTMzek0yOTMgLTIxYzAgMTQgLTMgMjkgLTggNDRjLTcgMjAgLTE4IDM4IC0zMyA1NGMtMjAgMjEgLTQzIDMxIC02OCAzMWwtMjAgLTJjLTE1IC01IC0yNyAtMTQgLTM2IC0yOGMtNCAtOSAtNiAtMTcgLTggLTI0cy0zIC0xNiAtMyAtMjdjMCAtMTUgMyAtMzQgOSAtNTcgczE4IC00MSAzNCAtNTVjMTUgLTE1IDM2IC0yMyA2MiAtMjNjNCAwIDEwIDEgMTggMmMxOSA1IDMyIDE1IDQwIDMwczEzIDM0IDEzIDU1eiIgLz4KICAgICAgPC9nPgogICA8L2RlZnM+CiAgIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+I2l0dWJpdDMgZy5lbmRpbmcsICNpdHViaXQzIGcuZmluZywgI2l0dWJpdDMgZy5yZWgsICNpdHViaXQzIGcudGVtcG8ge2ZvbnQtd2VpZ2h0OmJvbGQ7fSNpdHViaXQzIGcuZGlyLCAjaXR1Yml0MyBnLmR5bmFtLCAjaXR1Yml0MyBnLm1OdW0ge2ZvbnQtc3R5bGU6aXRhbGljO30jaXR1Yml0MyBnLmxhYmVsIHtmb250LXdlaWdodDpub3JtYWw7fSNpdHViaXQzIGVsbGlwc2UsICNpdHViaXQzIHBhdGgsICNpdHViaXQzIHBvbHlnb24sICNpdHViaXQzIHBvbHlsaW5lLCAjaXR1Yml0MyByZWN0IHtzdHJva2U6Y3VycmVudENvbG9yfSNpdHViaXQzIGcuY3Vyc29yIHtmaWxsOmRvZGdlcmJsdWU7IGNvbG9yOmRvZGdlcmJsdWU7fSNpdHViaXQzIGcuY3Vyc29yLmNob3JkIHtmaWxsOmxpbWVncmVlbjsgY29sb3I6bGltZWdyZWVuO308L3N0eWxlPgogICA8c3ZnIGNsYXNzPSJkZWZpbml0aW9uLXNjYWxlIiBjb2xvcj0iYmxhY2siIGZvbnQtZmFtaWx5PSJUaW1lcywgc2VyaWYiIHZpZXdCb3g9IjM1NSA4MCAxNDQwIDE0NDAiPgogICAgICA8ZyBjbGFzcz0icGFnZS1tYXJnaW4iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCwgMjAwKSI+CiAgICAgICAgIDxnIGlkPSJqa29kMzllIiBjbGFzcz0ibWRpdiBwYWdlTWlsZXN0b25lIiAvPgogICAgICAgICA8ZyBpZD0ia2p1cHNjdSIgY2xhc3M9InNjb3JlIHBhZ2VNaWxlc3RvbmUiIC8+CiAgICAgICAgIDxnIGlkPSJoaXBlcGNtIiBjbGFzcz0ic3lzdGVtIj4KICAgICAgICAgICAgPGcgaWQ9IngxNnUzYWU0IiBjbGFzcz0ic2VjdGlvbiBzeXN0ZW1NaWxlc3RvbmUiIC8+CiAgICAgICAgICAgIDxnIGlkPSJ5cjV2d2lpIiBjbGFzcz0ibWVhc3VyZSI+CiAgICAgICAgICAgICAgIDxnIGlkPSJoMXludnVtdSIgY2xhc3M9InN0YWZmIj4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSAyNDAgTDE2OTUgMjQwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDQyMCBMMTY5NSA0MjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0yNTUgNjAwIEwxNjk1IDYwMCIgc3Ryb2tlLXdpZHRoPSIxMyIgLz4KICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTI1NSA3ODAgTDE2OTUgNzgwIiBzdHJva2Utd2lkdGg9IjEzIiAvPgogICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMjU1IDk2MCBMMTY5NSA5NjAiIHN0cm9rZS13aWR0aD0iMTMiIC8+CiAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICA8ZyBpZD0iZjF4d2J6aHIiIGNsYXNzPSJrZXlTaWciIC8+CiAgICAgICAgICAgICAgICAgIDxnIGlkPSJpMXNkbHhhMCIgY2xhc3M9ImxheWVyIj4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImpmdWN1amQiIGNsYXNzPSJub3RlIiBjb2xvcj0iI0MwNDg3NyIgZmlsbD0iI0MwNDg3NyI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGNsYXNzPSJub3RlaGVhZCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgIDx1c2UgaHJlZj0iI0UwQTItaXR1Yml0MyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODI1LCA5NjApIHNjYWxlKDAuNzIsIDAuNzIpIiAvPgogICAgICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgICAgICAgPGcgaWQ9ImsxdW16MHg1IiBjbGFzcz0ic3BhY2UiIC8+CiAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICAgICA8ZyBpZD0iZzFvbDJudmoiIGNsYXNzPSJiYXJMaW5lIiAvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxnIGlkPSJzMWV4M3lhdiIgY2xhc3M9InN5c3RlbU1pbGVzdG9uZUVuZCB4MTZ1M2FlNCIgLz4KICAgICAgICAgPC9nPgogICAgICAgICA8ZyBpZD0idDFhMm5wY2YiIGNsYXNzPSJwYWdlTWlsZXN0b25lRW5kIGtqdXBzY3UiIC8+CiAgICAgICAgIDxnIGlkPSJ1eDY2dmF3IiBjbGFzcz0icGFnZU1pbGVzdG9uZUVuZCBqa29kMzllIiAvPgogICAgICA8L2c+CiAgIDwvc3ZnPgo8L3N2Zz4K" alt=""></div>
+    <i class="gapline"></i><b class="gaptag">50%</b>
+  </div></div>
+  <div class="card-body"><h3><span class="num">4</span>底部離琴鍵底 50%</h3>
+  <p>圖片底部到琴鍵底線的距離 = 圖片高度的 50%。</p>
+  <button class="pick" type="button">選這個</button></div></article></div>
+</section>
+
+<section aria-labelledby="h-anim">
+  <h2 id="h-anim">二、正確音閃爍（卡片圖形 + 琴鍵圖形一起動）</h2>
+  <p class="hint">先選速度，下面 10 種動態都會用這個速度播放。</p>
+  <div class="dur" role="group" aria-label="閃爍速度">
+    <button type="button" data-dur="3" aria-pressed="false">3 秒</button>
+    <button type="button" data-dur="4" aria-pressed="true">4 秒</button>
+    <button type="button" data-dur="5" aria-pressed="false">5 秒</button>
+  </div>
+  <div class="grid">
+<article class="card anim-card" data-kind="anim" data-id="1">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-bounce" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-bounce" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">1</span>彈跳發光</h3><p>現在用的：往上跳一下再小跳一下，帶一點粉色光。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="2">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-breathe" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-breathe" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">2</span>呼吸</h3><p>慢慢變大再慢慢變小，像在呼吸，最安靜。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="3">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-float" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-float" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">3</span>漂浮</h3><p>輕輕往上飄、再落回來，像氣球。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="4">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-sway" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-sway" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">4</span>搖擺</h3><p>左右輕輕搖，像在跟音樂打拍子。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="5">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-heart" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-heart" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">5</span>心跳</h3><p>咚咚跳兩下，然後休息，節奏感強。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="6">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-jelly" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-jelly" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">6</span>果凍</h3><p>壓扁再彈回來，Q 彈好玩。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="7">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-glow" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-glow" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">7</span>光暈</h3><p>不移動，只有粉色光慢慢亮起再暗下。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="8">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-spin" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-spin" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">8</span>轉一圈</h3><p>慢慢轉一圈，停一下，再轉。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="9">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-hop" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-hop" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">9</span>跳跳落地</h3><p>蹲一下、跳起來、落地時壓扁一點。</p>
+  <button class="pick" type="button">選這個</button></div></article>
+<article class="card anim-card" data-kind="anim" data-id="10">
+  <div class="animstage">
+    <div class="minicard"><svg class="s a-fade" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+    <span class="arrow">→</span>
+    <div class="minikey"><svg class="s a-fade" viewBox="-6 -6 112 112"><path d="M50 6 L96 92 L4 92 Z"/></svg></div>
+  </div>
+  <div class="card-body"><h3><span class="num">10</span>忽明忽暗</h3><p>顏色慢慢變淡再變回來，最溫和。</p>
+  <button class="pick" type="button">選這個</button></div></article></div>
+</section>
+
+<div class="result"><div class="in">
+  <output id="out" aria-live="polite">還沒選</output>
+  <button id="copy" type="button">複製我的選擇</button>
+</div></div>
+
+<script>
+const NAMES = {"1": "彈跳發光", "2": "呼吸", "3": "漂浮", "4": "搖擺", "5": "心跳", "6": "果凍", "7": "光暈", "8": "轉一圈", "9": "跳跳落地", "10": "忽明忽暗"};
+const COLORS = ["#FBC8D8", "#C04877", "#C3E5F8", "#2A78A8", "#EADBC8", "#FFFFFF"];
+const state = { pos: null, anim: null, dur: 4 };
+function burst(el) {
+  el.innerHTML = "";
+  for (let i = 0; i < 18; i++) {
+    const a = -Math.PI / 2 + (Math.random() - .5) * 2.4, r = 26 + Math.random() * 22, d = document.createElement("i");
+    const v = { "--dx": Math.cos(a) * r + "cqw", "--dy": Math.sin(a) * r * .9 + "cqw", "--fall": 34 + Math.random() * 20 + "cqw",
+      "--r": (Math.random() * 540 - 270) + "deg", "--d": Math.random() * .15 + "s", "--c": COLORS[i % 6] };
+    for (const k in v) d.style.setProperty(k, v[k]);
+    el.appendChild(d);
+  }
+}
+const confs = [...document.querySelectorAll(".conf")];
+const replay = () => confs.forEach(burst);
+replay(); setInterval(replay, 3200);
+document.querySelectorAll(".dur button").forEach((b) => b.addEventListener("click", () => {
+  state.dur = +b.dataset.dur;
+  document.body.style.setProperty("--dur", state.dur + "s");
+  document.querySelectorAll(".dur button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  // restart all shapes together so the card and the key stay in step
+  document.querySelectorAll(".s").forEach((s) => { s.style.animation = "none"; void s.offsetWidth; s.style.animation = ""; });
+  show();
+}));
+document.querySelectorAll(".pick").forEach((btn) => btn.addEventListener("click", () => {
+  const card = btn.closest(".card"), kind = card.dataset.kind;
+  document.querySelectorAll(`.card[data-kind="${kind}"]`).forEach((c) => c.classList.toggle("chosen", c === card));
+  state[kind] = card.dataset.id;
+  show();
+}));
+function text() {
+  const p = state.pos ? `獎勵圖位置 ${state.pos}%` : "獎勵圖位置：未選";
+  const a = state.anim ? `閃爍 #${state.anim}「${NAMES[state.anim]}」${state.dur} 秒` : `閃爍：未選（速度 ${state.dur} 秒）`;
+  return `v1.0.14：${p}；${a}`;
+}
+function show() { document.getElementById("out").textContent = text(); }
+document.getElementById("copy").addEventListener("click", async (e) => {
+  try { await navigator.clipboard.writeText(text()); e.target.textContent = "已複製"; }
+  catch (_) { e.target.textContent = "請手動複製上面的文字"; }
+  setTimeout(() => (e.target.textContent = "複製我的選擇"), 1800);
+});
+show();
+</script>
+</body>
+</html>
