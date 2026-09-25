@@ -9,7 +9,7 @@ import json
 PAGES = json.loads(r'''
 {
  "en": {
-  "title": "{app} \u2013 Real-Piano Music Start for Babies 18\u201336 Months",
+  "title": "{app} \u2013 Real-Piano Music Start, 18\u201336 Months",
   "desc": "Free app for babies and toddlers aged 18\u201336 months: an early absolute-pitch foundation, natural first sight-reading on the staff and real-piano play-along, with a no-overstimulation design. No ads, no sign-up.",
   "h1": "Put a tablet on your piano \u2014 a gentle music start for 18\u201336 months",
   "lead": "{app} listens to your acoustic or digital piano through the microphone. With a grown-up beside them, babies and toddlers aged 18\u201336 months see a note on the staff, find it on the real keys and hear right away if it was right. Four things make it different: a no-overstimulation design, an early absolute-pitch foundation, natural first sight-reading on the staff, and real-piano play-along. No piano? The on-screen keys work too.",

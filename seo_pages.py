@@ -20,7 +20,7 @@ from pathlib import Path
 import i18n
 from seo_i18n import PAGES
 
-BRAND = "Hear-a-Note"
+BRAND = "Hear-a-Note for Toddlers"
 # local names of the same brand (Traditional / Simplified Chinese)
 ALT_NAMES = ["\u807d\u97f3\u5bf6", "\u542c\u97f3\u5b9d"]
 
@@ -77,6 +77,13 @@ def songs(code):
 def languages_text():
     return ", ".join(name for _, name in i18n.LANGS)
 
+
+def brand_html(name):
+    # "Hear-a-Note for Toddlers" wraps between the two parts, never inside them
+    a, sep, b = name.partition(" for ")
+    if not sep:
+        return esc(name)
+    return f'<span class="nw">{esc(a)}</span> <span class="nw">for {esc(b)}</span>'
 
 def jsonld(code, p):
     t = i18n.STRINGS[code]
@@ -211,7 +218,6 @@ def page_html(code):
 </head>
 <body>
   <div class="topbar">
-    <a class="logo" href="{ORG_URL}{UTM}" title="MyTeachers123.com"><img src="/og/logo-myteachers123.png" alt="MyTeachers123.com" width="72" height="72"></a>
     <details class="lang-menu">
       <summary aria-label="{esc(p["lang_label"])}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 12h19M12 2.5c3 3 3 16 0 19M12 2.5c-3 3-3 16 0 19" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>{esc(LANG_NAME[code])}</span></summary>
       <ul>
@@ -220,7 +226,8 @@ def page_html(code):
     </details>
   </div>
   <header class="hero">
-    <p class="brand">{esc(t["appName"])}</p>
+    <a class="logo" href="{ORG_URL}{UTM}" title="MyTeachers123.com"><img src="/og/logo-myteachers123.png" alt="MyTeachers123.com" width="160" height="160"></a>
+    <p class="brand">{brand_html(t["appName"])}</p>
     <h1>{esc(p["h1"])}</h1>
     <p class="lead">{esc(p["lead"])}</p>
     <p class="cta"><a class="btn" href="{play}">{esc(p["play"])}</a></p>
@@ -325,7 +332,7 @@ CRAWLERS = [
 
 
 def robots():
-    out = ["# Hear-a-Note - everyone is welcome to read and cite these pages.",
+    out = ["# Hear-a-Note for Toddlers - everyone is welcome to read and cite these pages.",
            "# (If Cloudflare adds its own AI-crawler block above this, turn off its managed robots.txt.)", ""]
     for title, bots in CRAWLERS:
         out.append(f"# {title}")
@@ -342,7 +349,7 @@ def robots():
 def llms():
     p = PAGES["en"]
     t = i18n.STRINGS["en"]
-    L = ["# Hear-a-Note", "",
+    L = ["# Hear-a-Note for Toddlers", "",
          f"> {fill('en', p['desc'])}", "",
          fill("en", p["what_p"]), "",
          "## " + p["real_h"], "", fill("en", p["real_p"]), ""] + [f"{i}. {fill('en', x)}" for i, x in enumerate(p["real_steps"], 1)] + ["", p["real_note"], "",

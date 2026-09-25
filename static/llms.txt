@@ -1,12 +1,12 @@
-# Hear-a-Note
+# Hear-a-Note for Toddlers
 
 > Free app for babies and toddlers aged 18-36 months: an early absolute-pitch foundation, natural first sight-reading on the staff and real-piano play-along, with a no-overstimulation design. No ads, no sign-up.
 
-Hear-a-Note is a free web app that introduces babies and toddlers aged 18-36 months to the piano and to reading music. Every white key shows one big shape and color, and the note card above the keys shows the same note on a real staff. By matching the staff note to the shape and the key, children connect what they see, hear and play - long before they can read words.
+Hear-a-Note for Toddlers is a free web app that introduces babies and toddlers aged 18-36 months to the piano and to reading music. Every white key shows one big shape and color, and the note card above the keys shows the same note on a real staff. By matching the staff note to the shape and the key, children connect what they see, hear and play - long before they can read words.
 
 ## Real-piano play-along
 
-Most music apps keep children tapping glass. Hear-a-Note sends them to the real instrument: the tablet sits on the music stand, shows the note and listens. When your child plays the right key on the piano, the note lights up and soft confetti appears; a wrong key just gets a quiet "mew?".
+Most music apps keep children tapping glass. Hear-a-Note for Toddlers sends them to the real instrument: the tablet sits on the music stand, shows the note and listens. When your child plays the right key on the piano, the note lights up and soft confetti appears; a wrong key just gets a quiet "mew?".
 
 1. Open the app and put the phone or tablet on the piano's music stand.
 2. In the menu, choose "Play a real piano" and allow the microphone.
@@ -27,7 +27,7 @@ Works with acoustic pianos and digital keyboards. Best in a quiet room, one key 
 - Ways to play: Free play, play-along songs, a note-reading Challenge, and real-piano mode (listens through the microphone)
 - Languages: English, Spanish, Traditional Chinese, Simplified Chinese, Korean, Japanese, Vietnamese, French, Italian, Russian, German, Hindi
 
-## Four things that make Hear-a-Note different
+## Four things that make Hear-a-Note for Toddlers different
 
 - No-overstimulation design: soft colors and gentle sounds, no flashing effects, no ads, no endless levels, no reward loops and no autoplay feed. Made for short, happy moments with a grown-up - not for screen time for its own sake.
 - Early absolute-pitch foundation: every key plays a true, precisely tuned piano note (standard A = 440 Hz), so your baby hears exactly the same pitch every time - a solid first step for ear training and early absolute-pitch practice.
@@ -45,7 +45,7 @@ Works with acoustic pianos and digital keyboards. Best in a quiet room, one key 
 
 ## For piano teachers and music teachers
 
-Use Hear-a-Note as a warm-up for your youngest students, as a first look at the staff, or as five minutes of home practice between lessons.
+Use Hear-a-Note for Toddlers as a warm-up for your youngest students, as a first look at the staff, or as five minutes of home practice between lessons.
 
 - Introduce the treble and bass clef visually, before students can read: staff note -> shape -> key.
 - Real-piano mode listens to an acoustic or digital piano through the device microphone, so students answer on the instrument.
@@ -55,7 +55,7 @@ Use Hear-a-Note as a warm-up for your youngest students, as a first look at the 
 
 ## FAQ
 
-### What age is Hear-a-Note for?
+### What age is Hear-a-Note for Toddlers for?
 
 It is designed for babies and toddlers aged 18-36 months (1.5 to 3 years), played together with a parent or caregiver. The keys use shapes and colors instead of letters, so children do not need to read. Older children can keep going with the note-reading Challenge.
 

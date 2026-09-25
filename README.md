@@ -1,4 +1,4 @@
-# Hear-a-Note
+# Hear-a-Note for Toddlers
 
 A gentle piano app for babies and toddlers aged **18–36 months**, played together with a grown-up. It helps little ones learn to read music — the **treble clef** and the **bass clef** — by playing.
 
