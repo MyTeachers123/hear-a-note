@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Tell Bing (Copilot, Yahoo, DuckDuckGo use its index), Yandex, Seznam and Naver that pages changed.
-# Run after each deploy:  bash /opt/toddler-music-box/deploy/indexnow.sh
+# Run after each deploy:  bash /opt/hear-a-note/deploy/indexnow.sh
 set -euo pipefail
 main() {
   local host="kids.myteachers123.com"

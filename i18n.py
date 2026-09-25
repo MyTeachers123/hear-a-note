@@ -26,7 +26,7 @@ LANGS = [  # (code, name shown in the menu, in its own script)
 
 STRINGS = {
     "en": {
-        "appName": "Toddler Music Box",
+        "appName": "Hear-a-Note",
         "free": "Pick A Song", "exit": "Exit full screen", "fullscreen": "Full screen", "black": "Black keys", "staff": "Staff", "now": "Current note",
         "language": "Language", "menu": "Menu \u2014 double-tap to open", "high": "High",
         "twinkle": "Twinkle Twinkle Little Star", "mary": "Mary Had a Little Lamb", "ode": "Ode to Joy", "jingle": "Jingle Bells", "play": "Listen", "stop": "Stop",
@@ -37,7 +37,7 @@ STRINGS = {
         "notes": ["C", "D", "E", "F", "G", "A", "B"],
     },
     "es": {
-        "appName": "Caja de M\u00fasica para Peques",
+        "appName": "Hear-a-Note",
         "free": "Elige una canci\u00f3n", "exit": "Salir de pantalla completa", "fullscreen": "Pantalla completa", "black": "Teclas negras", "staff": "Pentagrama", "now": "Nota actual",
         "language": "Idioma", "menu": "Men\u00fa: toca dos veces para abrir", "high": "Agudo",
         "twinkle": "Estrellita, \u00bfd\u00f3nde est\u00e1s?", "mary": "Mar\u00eda ten\u00eda un corderito", "ode": "Himno de la alegr\u00eda", "jingle": "Cascabel", "play": "Escuchar", "stop": "Parar",
@@ -48,7 +48,7 @@ STRINGS = {
         "notes": ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"],
     },
     "zh-Hant": {
-        "appName": "\u5bf6\u5bf6\u97f3\u6a02\u76d2",
+        "appName": "\u807d\u97f3\u5bf6",
         "free": "\u9078\u4e00\u9996\u6b4c", "exit": "\u9000\u51fa\u5168\u5c4f", "fullscreen": "\u5168\u5c4f", "black": "\u9ed1\u9375", "staff": "\u4e94\u7dda\u8b5c", "now": "\u7576\u524d\u97f3",
         "language": "\u8a9e\u8a00", "menu": "\u9078\u55ae\uff08\u9ede\u5169\u4e0b\u6253\u958b\uff09", "high": "\u9ad8\u97f3",
         "twinkle": "\u5c0f\u661f\u661f", "mary": "\u746a\u8389\u6709\u96bb\u5c0f\u7dbf\u7f8a", "ode": "\u6b61\u6a02\u980c", "jingle": "\u9234\u5152\u97ff\u53ee\u5679", "play": "\u64ad\u653e", "stop": "\u505c\u6b62",
@@ -59,7 +59,7 @@ STRINGS = {
         "notes": ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"],
     },
     "zh-Hans": {
-        "appName": "\u5b9d\u5b9d\u97f3\u4e50\u76d2",
+        "appName": "\u542c\u97f3\u5b9d",
         "free": "\u9009\u4e00\u9996\u6b4c", "exit": "\u9000\u51fa\u5168\u5c4f", "fullscreen": "\u5168\u5c4f", "black": "\u9ed1\u952e", "staff": "\u4e94\u7ebf\u8c31", "now": "\u5f53\u524d\u97f3",
         "language": "\u8bed\u8a00", "menu": "\u83dc\u5355\uff08\u70b9\u4e24\u4e0b\u6253\u5f00\uff09", "high": "\u9ad8\u97f3",
         "twinkle": "\u5c0f\u661f\u661f", "mary": "\u739b\u4e3d\u6709\u53ea\u5c0f\u7ef5\u7f8a", "ode": "\u6b22\u4e50\u9882", "jingle": "\u94c3\u513f\u54cd\u53ee\u5f53", "play": "\u64ad\u653e", "stop": "\u505c\u6b62",
@@ -70,7 +70,7 @@ STRINGS = {
         "notes": ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"],
     },
     "ko": {
-        "appName": "\uc544\uae30 \ubba4\uc9c1\ubc15\uc2a4",
+        "appName": "Hear-a-Note",
         "free": "\ub178\ub798 \uace0\ub974\uae30", "exit": "\uc804\uccb4 \ud654\uba74 \ub044\uae30", "fullscreen": "\uc804\uccb4 \ud654\uba74", "black": "\uac80\uc740 \uac74\ubc18", "staff": "\uc624\uc120\ubcf4", "now": "\uc9c0\uae08 \uc74c",
         "language": "\uc5b8\uc5b4", "menu": "\uba54\ub274 (\ub450 \ubc88 \ud0ed\ud558\uc5ec \uc5f4\uae30)", "high": "\ub192\uc740",
         "twinkle": "\ubc18\uc9dd\ubc18\uc9dd \uc791\uc740 \ubcc4", "mary": "\uba54\ub9ac\uc758 \uc5b4\ub9b0 \uc591", "ode": "\ud658\ud76c\uc758 \uc1a1\uac00", "jingle": "\uc9d5\uae00\ubca8", "play": "\ub4e3\uae30", "stop": "\uc815\uc9c0",
@@ -81,7 +81,7 @@ STRINGS = {
         "notes": ["\ub3c4", "\ub808", "\ubbf8", "\ud30c", "\uc194", "\ub77c", "\uc2dc"],
     },
     "ja": {
-        "appName": "\u30d9\u30d3\u30fc\u30df\u30e5\u30fc\u30b8\u30c3\u30af\u30dc\u30c3\u30af\u30b9",
+        "appName": "Hear-a-Note",
         "free": "\u3046\u305f\u3092\u3048\u3089\u3076", "exit": "\u305c\u3093\u304c\u3081\u3093\u3092\u3084\u3081\u308b", "fullscreen": "\u305c\u3093\u304c\u3081\u3093", "black": "\u304f\u308d\u3044\u3051\u3093\u3070\u3093", "staff": "\u3054\u305b\u3093\u3075", "now": "\u3044\u307e\u306e\u304a\u3068",
         "language": "\u3052\u3093\u3054", "menu": "\u30e1\u30cb\u30e5\u30fc\uff082\u304b\u3044\u30bf\u30c3\u30d7\u3067\u3072\u3089\u304f\uff09", "high": "\u305f\u304b\u3044",
         "twinkle": "\u304d\u3089\u304d\u3089\u307c\u3057", "mary": "\u30e1\u30ea\u30fc\u3055\u3093\u306e\u3072\u3064\u3058", "ode": "\u3088\u308d\u3053\u3073\u306e\u3046\u305f", "jingle": "\u30b8\u30f3\u30b0\u30eb\u30d9\u30eb", "play": "\u304d\u304f", "stop": "\u3068\u3081\u308b",
@@ -92,7 +92,7 @@ STRINGS = {
         "notes": ["\u30c9", "\u30ec", "\u30df", "\u30d5\u30a1", "\u30bd", "\u30e9", "\u30b7"],
     },
     "vi": {
-        "appName": "H\u1ed9p Nh\u1ea1c Cho B\u00e9",
+        "appName": "Hear-a-Note",
         "free": "Ch\u1ecdn b\u00e0i h\u00e1t", "exit": "Tho\u00e1t to\u00e0n m\u00e0n h\u00ecnh", "fullscreen": "To\u00e0n m\u00e0n h\u00ecnh", "black": "Ph\u00edm \u0111en", "staff": "Khu\u00f4ng nh\u1ea1c", "now": "N\u1ed1t hi\u1ec7n t\u1ea1i",
         "language": "Ng\u00f4n ng\u1eef", "menu": "Menu \u2013 ch\u1ea1m hai l\u1ea7n \u0111\u1ec3 m\u1edf", "high": "Cao",
         "twinkle": "Ng\u00f4i sao l\u1ea5p l\u00e1nh", "mary": "Mary c\u00f3 m\u1ed9t ch\u00fa c\u1eebu non", "ode": "Kh\u00fac hoan ca", "jingle": "Jingle Bells", "play": "Nghe", "stop": "D\u1eebng",
@@ -103,7 +103,7 @@ STRINGS = {
         "notes": ["\u0110\u00f4", "R\u00ea", "Mi", "Fa", "Son", "La", "Si"],
     },
     "fr": {
-        "appName": "Bo\u00eete \u00e0 Musique B\u00e9b\u00e9",
+        "appName": "Hear-a-Note",
         "free": "Choisis une chanson", "exit": "Quitter le plein \u00e9cran", "fullscreen": "Plein \u00e9cran", "black": "Touches noires", "staff": "Port\u00e9e", "now": "Note actuelle",
         "language": "Langue", "menu": "Menu \u2013 touchez deux fois pour ouvrir", "high": "Aigu",
         "twinkle": "Ah ! vous dirai-je, maman", "mary": "Marie avait un petit agneau", "ode": "L'Hymne \u00e0 la joie", "jingle": "Vive le vent", "play": "\u00c9couter", "stop": "Arr\u00eater",
@@ -114,7 +114,7 @@ STRINGS = {
         "notes": ["Do", "R\u00e9", "Mi", "Fa", "Sol", "La", "Si"],
     },
     "it": {
-        "appName": "Carillon per Bimbi",
+        "appName": "Hear-a-Note",
         "free": "Scegli una canzone", "exit": "Esci da schermo intero", "fullscreen": "Schermo intero", "black": "Tasti neri", "staff": "Pentagramma", "now": "Nota attuale",
         "language": "Lingua", "menu": "Menu \u2013 tocca due volte per aprire", "high": "Acuto",
         "twinkle": "Brilla brilla la stellina", "mary": "Maria aveva un agnellino", "ode": "Inno alla gioia", "jingle": "Jingle Bells", "play": "Ascolta", "stop": "Ferma",
@@ -125,7 +125,7 @@ STRINGS = {
         "notes": ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"],
     },
     "ru": {
-        "appName": "\u041c\u0443\u0437\u044b\u043a\u0430\u043b\u044c\u043d\u0430\u044f \u0448\u043a\u0430\u0442\u0443\u043b\u043a\u0430",
+        "appName": "Hear-a-Note",
         "free": "\u0412\u044b\u0431\u0435\u0440\u0438 \u043f\u0435\u0441\u043d\u044e", "exit": "\u0412\u044b\u0439\u0442\u0438 \u0438\u0437 \u043f\u043e\u043b\u043d\u043e\u0433\u043e \u044d\u043a\u0440\u0430\u043d\u0430", "fullscreen": "\u0412\u043e \u0432\u0435\u0441\u044c \u044d\u043a\u0440\u0430\u043d", "black": "\u0427\u0451\u0440\u043d\u044b\u0435 \u043a\u043b\u0430\u0432\u0438\u0448\u0438", "staff": "\u041d\u043e\u0442\u043d\u044b\u0439 \u0441\u0442\u0430\u043d", "now": "\u0422\u0435\u043a\u0443\u0449\u0430\u044f \u043d\u043e\u0442\u0430",
         "language": "\u042f\u0437\u044b\u043a", "menu": "\u041c\u0435\u043d\u044e \u2014 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u0434\u0432\u0430\u0436\u0434\u044b, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u043a\u0440\u044b\u0442\u044c", "high": "\u0412\u044b\u0441\u043e\u043a\u0430\u044f",
         "twinkle": "\u0422\u044b \u0441\u0432\u0435\u0442\u0438, \u0437\u0432\u0435\u0437\u0434\u0430 \u043c\u043e\u044f", "mary": "\u0423 \u041c\u044d\u0440\u0438 \u0431\u044b\u043b \u0431\u0430\u0440\u0430\u0448\u0435\u043a", "ode": "\u041e\u0434\u0430 \u043a \u0440\u0430\u0434\u043e\u0441\u0442\u0438", "jingle": "\u0411\u0443\u0431\u0435\u043d\u0447\u0438\u043a\u0438", "play": "\u0421\u043b\u0443\u0448\u0430\u0442\u044c", "stop": "\u0421\u0442\u043e\u043f",
@@ -136,7 +136,7 @@ STRINGS = {
         "notes": ["\u0414\u043e", "\u0420\u0435", "\u041c\u0438", "\u0424\u0430", "\u0421\u043e\u043b\u044c", "\u041b\u044f", "\u0421\u0438"],
     },
     "de": {
-        "appName": "Baby-Spieluhr",
+        "appName": "Hear-a-Note",
         "free": "W\u00e4hle ein Lied", "exit": "Vollbild beenden", "fullscreen": "Vollbild", "black": "Schwarze Tasten", "staff": "Notenlinien", "now": "Aktueller Ton",
         "language": "Sprache", "menu": "Men\u00fc \u2013 zweimal tippen zum \u00d6ffnen", "high": "Hohes",
         "twinkle": "Funkel, funkel, kleiner Stern", "mary": "Maria hat ein kleines Lamm", "ode": "Ode an die Freude", "jingle": "Jingle Bells", "play": "Anh\u00f6ren", "stop": "Stopp",
@@ -147,7 +147,7 @@ STRINGS = {
         "notes": ["C", "D", "E", "F", "G", "A", "H"],   # German uses H for B
     },
     "hi": {
-        "appName": "\u0936\u093f\u0936\u0941 \u0938\u0902\u0917\u0940\u0924 \u092c\u0949\u0915\u094d\u0938",
+        "appName": "Hear-a-Note",
         "free": "\u0917\u0940\u0924 \u091a\u0941\u0928\u0947\u0902", "exit": "\u092a\u0942\u0930\u094d\u0923 \u0938\u094d\u0915\u094d\u0930\u0940\u0928 \u092c\u0902\u0926 \u0915\u0930\u0947\u0902", "fullscreen": "\u092a\u0942\u0930\u094d\u0923 \u0938\u094d\u0915\u094d\u0930\u0940\u0928", "black": "\u0915\u093e\u0932\u0940 \u0915\u0941\u0902\u091c\u093f\u092f\u093e\u0901", "staff": "\u0938\u094d\u0935\u0930\u0932\u093f\u092a\u093f", "now": "\u0935\u0930\u094d\u0924\u092e\u093e\u0928 \u0938\u094d\u0935\u0930",
         "language": "\u092d\u093e\u0937\u093e", "menu": "\u092e\u0947\u0928\u0942 \u2013 \u0916\u094b\u0932\u0928\u0947 \u0915\u0947 \u0932\u093f\u090f \u0926\u094b \u092c\u093e\u0930 \u091f\u0948\u092a \u0915\u0930\u0947\u0902", "high": "\u0924\u093e\u0930",
         "twinkle": "\u091a\u092e\u0915 \u091a\u092e\u0915 \u091b\u094b\u091f\u093e \u0924\u093e\u0930\u093e", "mary": "\u092e\u0948\u0930\u0940 \u0915\u093e \u091b\u094b\u091f\u093e \u092e\u0947\u092e\u0928\u093e", "ode": "\u0906\u0928\u0902\u0926 \u0915\u093e \u0917\u0940\u0924", "jingle": "\u091c\u093f\u0902\u0917\u0932 \u092c\u0947\u0932\u094d\u0938", "play": "\u0938\u0941\u0928\u0947\u0902", "stop": "\u0930\u094b\u0915\u0947\u0902",

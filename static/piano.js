@@ -41,6 +41,7 @@
   const freqToNum = (f) => Math.round(69 + 12 * Math.log2(f / 440));
 
   async function startMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("no microphone API");
     micStream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
     });
@@ -50,6 +51,14 @@
     an.fftSize = 2048;
     src.connect(an);
     const buf = new Float32Array(an.fftSize);
+    // Safari before 14.1 has no getFloatTimeDomainData: read bytes and convert to -1..1
+    if (!an.getFloatTimeDomainData) {
+      const bytes = new Uint8Array(an.fftSize);
+      an.getFloatTimeDomainData = (out) => {
+        an.getByteTimeDomainData(bytes);
+        for (let i = 0; i < out.length; i++) out[i] = (bytes[i] - 128) / 128;
+      };
+    }
 
     // Onset detection ("a new key press"): a sudden jump in volume → estimate pitch over the next frames
     // This distinguishes the same note played twice in a row (e.g. C C in Twinkle Twinkle)

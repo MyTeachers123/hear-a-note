@@ -1,6 +1,6 @@
 /* Service Worker: caches every file on first visit so the app then works fully offline.
   * When you change content, bump VERSION; old caches are deleted automatically. */
-const VERSION = "toddler-music-box-1.0.16";  // bump on every frontend change (e.g. 1.0.17)
+const VERSION = "hear-a-note-1.0.20";  // bump on every frontend change (e.g. 1.0.20)
 const PCS = ["C", "Cs", "D", "Ds", "E", "F", "Fs", "G", "Gs", "A", "As", "B"];
 const NOTES = [...PCS.map((p) => p + 3), ...PCS.map((p) => p + 4), "C5"];                // 25 notes
 const STAFF = [
@@ -12,9 +12,8 @@ const STAFF = [
 const PRECACHE = [
   "./",
   "index.html",
-  "style.css",
-  "app.js",
-  "piano.js",
+  "style.compat.css",
+  "app.bundle.js",
   "songs.json",
   "i18n.json",
   "manifest.webmanifest",

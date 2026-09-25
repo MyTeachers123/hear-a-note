@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# EC2 security hardening (run once after the site is live): bash /opt/toddler-music-box/deploy/harden.sh
+# EC2 security hardening (run once after the site is live): bash /opt/hear-a-note/deploy/harden.sh
 #
 #  1. SSH: key-only login, no root, no passwords, only the ubuntu user
 #  2. Firewall (ufw): ports 80/443 only accept Cloudflare (nobody can bypass Cloudflare to hit the server)
@@ -10,7 +10,7 @@
 #
 # ⚠ Before running: keep this SSH window open; afterwards, test logging in from a NEW window.
 set -euo pipefail
-APP_DIR="/opt/toddler-music-box"
+APP_DIR="/opt/hear-a-note"
 
 echo "==> 1/6 Hardening SSH"
 # File name starts with 00-: sshd uses the first value it reads, so this must win over cloud-init's 50- file
@@ -70,10 +70,10 @@ echo "==> 5/6 Read-only app + low-privilege user"
 id toddler &>/dev/null || sudo useradd --system --no-create-home --shell /usr/sbin/nologin toddler
 sudo chown -R ubuntu:ubuntu "$APP_DIR"
 sudo chmod -R go-w "$APP_DIR"            # only ubuntu can change files; toddler and nginx can only read
-sed "s|__APP_DIR__|$APP_DIR|g" "$APP_DIR/deploy/toddler-music-box.service" \
-  | sudo tee /etc/systemd/system/toddler-music-box.service > /dev/null
+sed "s|__APP_DIR__|$APP_DIR|g" "$APP_DIR/deploy/hear-a-note.service" \
+  | sudo tee /etc/systemd/system/hear-a-note.service > /dev/null
 sudo systemctl daemon-reload
-sudo systemctl restart toddler-music-box
+sudo systemctl restart hear-a-note
 
 echo "==> 6/6 Certificate private key permissions"
 if [ -d /etc/ssl/cloudflare ]; then
@@ -88,12 +88,12 @@ sleep 2
 echo
 echo "================ Results ================"
 printf "Backend health:        "; curl -s http://127.0.0.1:8000/api/health; echo
-printf "Backend runs as:       "; ps -o user= -p "$(systemctl show -p MainPID --value toddler-music-box)"
+printf "Backend runs as:       "; ps -o user= -p "$(systemctl show -p MainPID --value hear-a-note)"
 printf "Can toddler write code? "; sudo -u toddler touch "$APP_DIR/test" 2>/dev/null && { echo "yes ✗"; rm -f "$APP_DIR/test"; } || echo "no ✓ (read-only)"
 printf "SSH password login:    "; sudo sshd -T | grep -i '^passwordauthentication'
 printf "SSH root login:        "; sudo sshd -T | grep -i '^permitrootlogin'
 printf "fail2ban:              "; sudo fail2ban-client status sshd | grep 'Currently banned' | xargs
-printf "systemd security score: "; systemd-analyze security toddler-music-box --no-pager 2>/dev/null | tail -1
+printf "systemd security score: "; systemd-analyze security hear-a-note --no-pager 2>/dev/null | tail -1
 sudo ufw status | head -5
 echo
 echo "⚠ Now open a NEW PowerShell window and log in with the same ssh command. Only close this window after that works."

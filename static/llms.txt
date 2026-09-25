@@ -1,32 +1,51 @@
-# Toddler Music Box
+# Hear-a-Note
 
-> Free piano and music-reading game for toddlers aged 2-5. Kids match shapes and colors to learn treble and bass clef notes. No ads, no sign-up, works offline.
+> Free app for babies and toddlers aged 18-36 months: an early absolute-pitch foundation, natural first sight-reading on the staff and real-piano play-along, with a no-overstimulation design. No ads, no sign-up.
 
-Toddler Music Box is a free web app that introduces children aged 2 to 5 to the piano and to reading music. Every white key shows one big shape and color, and the note card above the keys shows the same note on a real staff. By matching the staff note to the shape and the key, children connect what they see, hear and play - long before they can read words.
+Hear-a-Note is a free web app that introduces babies and toddlers aged 18-36 months to the piano and to reading music. Every white key shows one big shape and color, and the note card above the keys shows the same note on a real staff. By matching the staff note to the shape and the key, children connect what they see, hear and play - long before they can read words.
+
+## Real-piano play-along
+
+Most music apps keep children tapping glass. Hear-a-Note sends them to the real instrument: the tablet sits on the music stand, shows the note and listens. When your child plays the right key on the piano, the note lights up and soft confetti appears; a wrong key just gets a quiet "mew?".
+
+1. Open the app and put the phone or tablet on the piano's music stand.
+2. In the menu, choose "Play a real piano" and allow the microphone.
+3. Pick a song or the Challenge: the card shows the note on the staff and the shape to look for.
+4. Your child plays it on the real piano - the app hears it, shows the answer and moves on.
+
+Works with acoustic pianos and digital keyboards. Best in a quiet room, one key at a time. The sound is analyzed on the device and never recorded or uploaded.
 
 ## Key facts
 
-- Age: 2 to 5 years (toddlers and preschoolers)
+- Age: 18-36 months (1.5 to 3 years), played together with a grown-up
 - Price: Free. No ads and no in-app purchases
 - Account and privacy: No sign-up. No personal data collected
-- Devices: Any modern browser on iPhone, iPad, Android, Chromebook, Windows and Mac. Can be added to the home screen
+- Devices: Any modern browser on iPhone, iPad, Android, Chromebook, Windows and Mac. Can be added to the home screen. Also runs on older iPads and iPhones (iOS 12 and later)
 - Offline: Works offline after the first visit
 - What children learn: Treble clef and Bass clef: one octave from Do to high Do, with black keys
 - Songs: Twinkle Twinkle Little Star, Mary Had a Little Lamb, Ode to Joy, Jingle Bells
 - Ways to play: Free play, play-along songs, a note-reading Challenge, and real-piano mode (listens through the microphone)
 - Languages: English, Spanish, Traditional Chinese, Simplified Chinese, Korean, Japanese, Vietnamese, French, Italian, Russian, German, Hindi
 
-## For parents of 2-5 year olds
+## Four things that make Hear-a-Note different
+
+- No-overstimulation design: soft colors and gentle sounds, no flashing effects, no ads, no endless levels, no reward loops and no autoplay feed. Made for short, happy moments with a grown-up - not for screen time for its own sake.
+- Early absolute-pitch foundation: every key plays a true, precisely tuned piano note (standard A = 440 Hz), so your baby hears exactly the same pitch every time - a solid first step for ear training and early absolute-pitch practice.
+- Natural first sight-reading on the staff: every note appears on a real treble or bass clef staff, together with a shape and color your baby already knows. No reading needed - children naturally link the note they see to the key they play.
+- Real-piano play-along: the tablet sits on the music stand and listens through the microphone. When your child plays the right key on an acoustic piano or digital keyboard, the note lights up and soft confetti appears - little hands stay on real keys, not on glass.
+
+## For parents of babies and toddlers aged 18-36 months
 
 - Made for little hands: fullscreen, big keys and no words on the keys - only shapes and colors toddlers already know.
 - Listen first, then play: pick a song and the app plays it slowly while each key lights up; then your child plays along.
 - Gentle feedback: a right note brings soft confetti, a wrong note is a quiet kitten "mew" - never scolding.
 - Safe by design: no ads, nothing for children to tap by accident, a volume limit for little ears, and menus that fold away while your child plays.
 - Grows with your child: when they are ready, the Challenge asks them to read all 8 notes of a clef on their own.
+- Toddler-proof: fullscreen and locked to landscape; the menus fold away and only open with a grown-up's double-tap, so little fingers do not tap their way out. For a complete lock, turn on Guided Access (iPhone, iPad) or screen pinning (Android).
 
 ## For piano teachers and music teachers
 
-Use Toddler Music Box as a warm-up for your youngest students, as a first look at the staff, or as five minutes of home practice between lessons.
+Use Hear-a-Note as a warm-up for your youngest students, as a first look at the staff, or as five minutes of home practice between lessons.
 
 - Introduce the treble and bass clef visually, before students can read: staff note -> shape -> key.
 - Real-piano mode listens to an acoustic or digital piano through the device microphone, so students answer on the instrument.
@@ -36,9 +55,9 @@ Use Toddler Music Box as a warm-up for your youngest students, as a first look a
 
 ## FAQ
 
-### What age is Toddler Music Box for?
+### What age is Hear-a-Note for?
 
-It is designed for children aged 2 to 5. The keys use shapes and colors instead of letters, so children do not need to read.
+It is designed for babies and toddlers aged 18-36 months (1.5 to 3 years), played together with a parent or caregiver. The keys use shapes and colors instead of letters, so children do not need to read. Older children can keep going with the note-reading Challenge.
 
 ### Is it really free?
 
@@ -79,5 +98,5 @@ As a warm-up, as a first introduction to the staff and clefs, or as short home p
 - [Information page in Russian](https://kids.myteachers123.com/learn/ru/)
 - [Information page in German](https://kids.myteachers123.com/learn/de/)
 - [Information page in Hindi](https://kids.myteachers123.com/learn/hi/)
-- [Source code (MIT)](https://github.com/MyTeachers123/toddler-music-box)
+- [Source code (MIT)](https://github.com/MyTeachers123/hear-a-note)
 - [Publisher: MyTeachers123.com](https://myteachers123.com/) - a multilingual platform that helps parents find family daycare for infants and toddlers

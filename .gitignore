@@ -1,2 +1,7 @@
 __pycache__/
 .venv/
+# videos, subtitles and posters for YouTube / social media (kept out of GitHub)
+media/
+# build tools for the old-browser bundle
+compat/node_modules/
+compat/.build/

@@ -1,0 +1,17 @@
+{
+  "name": "hear-a-note-compat",
+  "private": true,
+  "description": "Builds static/app.bundle.js: ES5 + polyfills so the app runs on old iPads (Safari 9+) and new browsers",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "es-check es5 ../static/app.bundle.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "core-js": "^3.50.0",
+    "esbuild": "^0.25.12",
+    "whatwg-fetch": "^3.6.20",
+    "es-check": "^9.8.1"
+  }
+}

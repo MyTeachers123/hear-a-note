@@ -20,9 +20,13 @@ from pathlib import Path
 import i18n
 from seo_i18n import PAGES
 
+BRAND = "Hear-a-Note"
+# local names of the same brand (Traditional / Simplified Chinese)
+ALT_NAMES = ["\u807d\u97f3\u5bf6", "\u542c\u97f3\u5b9d"]
+
 SITE = "https://kids.myteachers123.com"
 ORG_URL = "https://myteachers123.com/"
-GITHUB = "https://github.com/MyTeachers123/toddler-music-box"
+GITHUB = "https://github.com/MyTeachers123/hear-a-note"
 INDEXNOW_KEY = "7d3f9c2a1b8e4f6a9c0d5e2b7a1f4c8d"
 ROOT = Path(__file__).parent / "static"
 TODAY = datetime.date.today().isoformat()
@@ -33,9 +37,17 @@ OG_LOCALE = {"en": "en_US", "es": "es_ES", "zh-Hant": "zh_TW", "zh-Hans": "zh_CN
              "vi": "vi_VN", "fr": "fr_FR", "it": "it_IT", "ru": "ru_RU", "de": "de_DE", "hi": "hi_IN"}
 CODES = [c for c, _ in i18n.LANGS]
 LANG_NAME = dict(i18n.LANGS)
-OG_IMAGE = f"{SITE}/og/og-1200x630.png"
+OG_IMAGE = f"{SITE}/og/og-1200x630.png"   # English; each language page uses og/og-<slug>.png
+
+
+def og_image(code):
+    return f"{SITE}/og/og-{SLUG[code]}.png"
 SHOT = f"{SITE}/og/screenshot-1280x720.png"
-UTM = "?utm_source=kids.myteachers123.com&utm_medium=referral&utm_campaign=toddler_music_box"
+SCENE = f"{SITE}/og/real-piano-scene.png"          # the tablet on a real piano: the app's main feature
+# YouTube companion video. Fill in "id" (the part after watch?v=) and "upload_date" after uploading,
+# then run: python seo_pages.py  -> every page gets a link + VideoObject structured data.
+YOUTUBE = {"id": None, "upload_date": None, "duration": "PT26M29S"}
+UTM = "?utm_source=kids.myteachers123.com&utm_medium=referral&utm_campaign=hear_a_note"
 
 
 def url(code):
@@ -49,7 +61,8 @@ def ascii_html(s):
 
 def fill(code, s):
     t = i18n.STRINGS[code]
-    return s.replace("{app}", t["appName"]).replace("{treble}", t["treble"]).replace("{bass}", t["bass"])
+    return (s.replace("{app}", t["appName"]).replace("{treble}", t["treble"]).replace("{bass}", t["bass"])
+             .replace("{modePiano}", t["modePiano"]))
 
 
 def esc(s):
@@ -71,10 +84,10 @@ def jsonld(code, p):
     app = {
         "@type": "WebApplication",
         "@id": f"{SITE}/#app",
-        "name": "Toddler Music Box",
-        "alternateName": sorted({i18n.STRINGS[c]["appName"] for c in CODES} - {"Toddler Music Box"}),
+        "name": BRAND,
+        "alternateName": ALT_NAMES,
         "url": f"{SITE}/",
-        "description": p["desc"],
+        "description": fill(code, p["desc"]),
         "applicationCategory": "EducationalApplication",
         "applicationSubCategory": "Music education game for young children",
         "operatingSystem": "Any modern web browser (iOS, iPadOS, Android, ChromeOS, Windows, macOS)",
@@ -83,17 +96,17 @@ def jsonld(code, p):
         "isFamilyFriendly": True,
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
         "inLanguage": CODES,
-        "typicalAgeRange": "2-5",
+        "typicalAgeRange": "1.5-3",
         "audience": [
-            {"@type": "ParentAudience", "childMinAge": 2, "childMaxAge": 5},
+            {"@type": "ParentAudience", "childMinAge": 1.5, "childMaxAge": 3},
             {"@type": "EducationalAudience", "educationalRole": "teacher"},
         ],
         "educationalUse": ["Music education", "Early childhood music", "Piano practice"],
         "teaches": ["Treble clef note reading", "Bass clef note reading", "Piano keyboard basics",
                     "Matching notes on the staff to piano keys"],
-        "featureList": [p["f_modes_v"], p["f_offline_v"], p["f_account_v"], fill(code, p["f_music_v"])],
-        "screenshot": SHOT,
-        "image": OG_IMAGE,
+        "featureList": [fill(code, p["real_p"]), *[fill(code, x) for x in p["why"]], p["f_modes_v"], p["f_offline_v"], p["f_account_v"], fill(code, p["f_music_v"])],
+        "screenshot": [SCENE, SHOT],
+        "image": og_image(code),
         "license": "https://opensource.org/licenses/MIT",
         "sameAs": [GITHUB],
         "author": {"@id": ORG_URL + "#org"},
@@ -103,8 +116,8 @@ def jsonld(code, p):
         "@context": "https://schema.org",
         "@graph": [
             {"@type": "Organization", "@id": ORG_URL + "#org", "name": "MyTeachers123", "url": ORG_URL,
-             "logo": f"{SITE}/icons/icon-512.png"},
-            {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": "Toddler Music Box",
+             "logo": f"{SITE}/og/logo-myteachers123.png"},
+            {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": BRAND, "alternateName": ALT_NAMES,
              "inLanguage": CODES, "publisher": {"@id": ORG_URL + "#org"}},
             app,
             {"@type": ["WebPage", "FAQPage"], "@id": page + "#webpage", "url": page, "name": fill(code, p["title"]),
@@ -113,11 +126,28 @@ def jsonld(code, p):
              "breadcrumb": {"@id": page + "#breadcrumb"},
              "mainEntity": [{"@type": "Question", "name": fill(code, q),
                              "acceptedAnswer": {"@type": "Answer", "text": fill(code, a)}} for q, a in p["faq"]]},
+            *([{"@type": "VideoObject", "@id": f"{SITE}/#video", "name": fill(code, p["video_h"]),
+                "description": fill(code, p["video_p"]), "thumbnailUrl": f"https://i.ytimg.com/vi/{YOUTUBE['id']}/maxresdefault.jpg",
+                "uploadDate": YOUTUBE["upload_date"], "duration": YOUTUBE["duration"],
+                "embedUrl": f"https://www.youtube.com/embed/{YOUTUBE['id']}", "url": f"https://www.youtube.com/watch?v={YOUTUBE['id']}",
+                "inLanguage": CODES, "isFamilyFriendly": True, "about": {"@id": f"{SITE}/#app"},
+                "publisher": {"@id": ORG_URL + "#org"}}] if YOUTUBE["id"] else []),
             {"@type": "BreadcrumbList", "@id": page + "#breadcrumb", "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": t["appName"], "item": f"{SITE}/"},
                 {"@type": "ListItem", "position": 2, "name": fill(code, p["what_h"]), "item": page}]},
         ],
     }
+
+
+def video_section(code, p):
+    if not YOUTUBE["id"]:
+        return ""
+    return f"""    <section id="video">
+      <h2>{esc(p["video_h"])}</h2>
+      <p>{esc(p["video_p"])}</p>
+      <p class="cta"><a class="btn alt" href="https://www.youtube.com/watch?v={YOUTUBE['id']}">{esc(p["video_cta"])}</a></p>
+    </section>
+"""
 
 
 def page_html(code):
@@ -142,7 +172,7 @@ def page_html(code):
         for c in CODES)
     ld = json.dumps(jsonld(code, PAGES[code]), ensure_ascii=False, indent=1).replace("</", "<\\/")
     doc = f"""<!doctype html>
-<html lang="{code}">
+<html lang="{code}" itemscope itemtype="https://schema.org/WebPage">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -155,11 +185,13 @@ def page_html(code):
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Toddler Music Box">
+  <meta property="og:site_name" content="{esc(i18n.STRINGS[code]["appName"])}">
   <meta property="og:title" content="{esc(p["title"])}">
   <meta property="og:description" content="{esc(p["desc"])}">
   <meta property="og:url" content="{url(code)}">
-  <meta property="og:image" content="{OG_IMAGE}">
+  <meta property="og:image" content="{og_image(code)}">
+  <meta property="og:image:secure_url" content="{og_image(code)}">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="{esc(p["img_alt"])}">
@@ -168,25 +200,52 @@ def page_html(code):
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{esc(p["title"])}">
   <meta name="twitter:description" content="{esc(p["desc"])}">
-  <meta name="twitter:image" content="{OG_IMAGE}">
+  <meta name="twitter:image" content="{og_image(code)}">
+  <meta itemprop="name" content="{esc(p["title"])}">
+  <meta itemprop="description" content="{esc(p["desc"])}">
+  <meta itemprop="image" content="{og_image(code)}">
   <link rel="stylesheet" href="/learn/learn.css">
   <script type="application/ld+json">
 {ld}
   </script>
 </head>
 <body>
+  <div class="topbar">
+    <a class="logo" href="{ORG_URL}{UTM}" title="MyTeachers123.com"><img src="/og/logo-myteachers123.png" alt="MyTeachers123.com" width="72" height="72"></a>
+    <details class="lang-menu">
+      <summary aria-label="{esc(p["lang_label"])}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 12h19M12 2.5c3 3 3 16 0 19M12 2.5c-3 3-3 16 0 19" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>{esc(LANG_NAME[code])}</span></summary>
+      <ul>
+{langs}
+      </ul>
+    </details>
+  </div>
   <header class="hero">
-    <p class="brand"><img src="/icons/icon-192.png" alt="" width="48" height="48">{esc(t["appName"])}</p>
+    <p class="brand">{esc(t["appName"])}</p>
     <h1>{esc(p["h1"])}</h1>
     <p class="lead">{esc(p["lead"])}</p>
     <p class="cta"><a class="btn" href="{play}">{esc(p["play"])}</a></p>
     <p class="note">{esc(p["play_note"])}</p>
-    <img class="shot" src="/og/screenshot-1280x720.png" width="1280" height="720" alt="{esc(p["img_alt"])}">
+    <img class="shot" src="/og/real-piano-scene.png" width="1600" height="1000" alt="{esc(p["real_alt"])}">
   </header>
   <main>
+    <section id="real-piano" class="real">
+      <h2>{esc(p["real_h"])}</h2>
+      <p>{esc(p["real_p"])}</p>
+      <ol>
+{li(PAGES[code]["real_steps"])}
+      </ol>
+      <p class="small">{esc(p["real_note"])}</p>
+    </section>
+    <section id="why" class="why">
+      <h2>{esc(p["why_h"])}</h2>
+      <ul>
+{li(PAGES[code]["why"])}
+      </ul>
+    </section>
     <section id="what">
       <h2>{esc(p["what_h"])}</h2>
       <p>{esc(p["what_p"])}</p>
+      <img class="shot inner" src="/og/screenshot-1280x720.png" width="1280" height="720" alt="{esc(p["img_alt"])}" loading="lazy">
     </section>
     <section id="facts">
       <h2>{esc(p["facts_h"])}</h2>
@@ -214,7 +273,7 @@ def page_html(code):
       </ol>
       <p class="cta"><a class="btn" href="{play}">{esc(p["play"])}</a></p>
     </section>
-    <section id="faq">
+{video_section(code, p)}    <section id="faq">
       <h2>{esc(p["faq_h"])}</h2>
 {faq}
     </section>
@@ -266,7 +325,7 @@ CRAWLERS = [
 
 
 def robots():
-    out = ["# Toddler Music Box - everyone is welcome to read and cite these pages.",
+    out = ["# Hear-a-Note - everyone is welcome to read and cite these pages.",
            "# (If Cloudflare adds its own AI-crawler block above this, turn off its managed robots.txt.)", ""]
     for title, bots in CRAWLERS:
         out.append(f"# {title}")
@@ -283,9 +342,10 @@ def robots():
 def llms():
     p = PAGES["en"]
     t = i18n.STRINGS["en"]
-    L = [f"# Toddler Music Box", "",
-         f"> {p['desc']}", "",
-         p["what_p"], "",
+    L = ["# Hear-a-Note", "",
+         f"> {fill('en', p['desc'])}", "",
+         fill("en", p["what_p"]), "",
+         "## " + p["real_h"], "", fill("en", p["real_p"]), ""] + [f"{i}. {fill('en', x)}" for i, x in enumerate(p["real_steps"], 1)] + ["", p["real_note"], "",
          "## Key facts", ""]
     for a, b in [(p["f_age"], p["f_age_v"]), (p["f_price"], p["f_price_v"]), (p["f_account"], p["f_account_v"]),
                  (p["f_devices"], p["f_devices_v"]), (p["f_offline"], p["f_offline_v"]),
@@ -294,15 +354,18 @@ def llms():
                  (p["f_langs"], "English, Spanish, Traditional Chinese, Simplified Chinese, Korean, Japanese, "
                                 "Vietnamese, French, Italian, Russian, German, Hindi")]:
         L.append(f"- {a}: {b}")
-    L += ["", "## " + p["parents_h"], ""] + [f"- {x}" for x in p["parents"]]
-    L += ["", "## " + p["teachers_h"], "", p["teachers_p"], ""] + [f"- {x}" for x in p["teachers"]]
+    L += ["", "## " + fill("en", p["why_h"]), ""] + [f"- {fill('en', x)}" for x in p["why"]]
+    L += ["", "## " + p["parents_h"], ""] + [f"- {fill('en', x)}" for x in p["parents"]]
+    L += ["", "## " + p["teachers_h"], "", fill("en", p["teachers_p"]), ""] + [f"- {fill('en', x)}" for x in p["teachers"]]
     L += ["", "## FAQ", ""]
     for q, a in p["faq"]:
-        L += [f"### {q}", "", a, ""]
+        L += [f"### {fill('en', q)}", "", fill("en", a), ""]
     names = {"en": "English", "es": "Spanish", "zh-Hant": "Traditional Chinese", "zh-Hans": "Simplified Chinese",
              "ko": "Korean", "ja": "Japanese", "vi": "Vietnamese", "fr": "French", "it": "Italian",
              "ru": "Russian", "de": "German", "hi": "Hindi"}
     L += ["## Links", "", f"- [Open the app (free)]({SITE}/)"]
+    if YOUTUBE["id"]:
+        L.append(f"- [Video: 26-minute piano companion for 18-36 months (YouTube)](https://www.youtube.com/watch?v={YOUTUBE['id']})")
     L += [f"- [Information page in {names[c]}]({url(c)})" for c in CODES]
     L += [f"- [Source code (MIT)]({GITHUB})",
           f"- [Publisher: MyTeachers123.com]({ORG_URL}) - a multilingual platform that helps parents find family daycare for infants and toddlers", ""]

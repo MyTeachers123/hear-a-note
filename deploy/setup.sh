@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run once on a fresh EC2 instance (Ubuntu 24.04 or 26.04 LTS):
-#   curl -fsSL https://raw.githubusercontent.com/MyTeachers123/toddler-music-box/main/deploy/setup.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/MyTeachers123/hear-a-note/main/deploy/setup.sh | bash
 # It installs packages → downloads the code → generates sounds → starts the Python backend → configures Nginx → sets up HTTPS
 #
 # Two HTTPS modes (SSL_MODE):
@@ -12,8 +12,8 @@ set -euo pipefail
 
 DOMAIN="${DOMAIN:-kids.myteachers123.com}"
 EMAIL="${EMAIL:-info@myteachers123.com}"
-REPO="${REPO:-https://github.com/MyTeachers123/toddler-music-box.git}"
-APP_DIR="/opt/toddler-music-box"
+REPO="${REPO:-https://github.com/MyTeachers123/hear-a-note.git}"
+APP_DIR="/opt/hear-a-note"
 SSL_MODE="${SSL_MODE:-cloudflare}"
 
 echo "==> 1/6 Installing system packages"
@@ -40,17 +40,17 @@ python3 -m venv .venv
 echo "==> 4/6 Starting the Python backend (systemd, low-privilege user toddler)"
 id toddler &>/dev/null || sudo useradd --system --no-create-home --shell /usr/sbin/nologin toddler
 sudo chmod -R go-w "$APP_DIR"
-sed "s|__APP_DIR__|$APP_DIR|g" deploy/toddler-music-box.service \
-  | sudo tee /etc/systemd/system/toddler-music-box.service > /dev/null
+sed "s|__APP_DIR__|$APP_DIR|g" deploy/hear-a-note.service \
+  | sudo tee /etc/systemd/system/hear-a-note.service > /dev/null
 sudo systemctl daemon-reload
-sudo systemctl enable --now toddler-music-box
-sudo systemctl restart toddler-music-box
+sudo systemctl enable --now hear-a-note
+sudo systemctl restart hear-a-note
 
 echo "==> 5/6 Configuring Nginx (mode: $SSL_MODE)"
 sudo mkdir -p /etc/nginx/snippets
-sudo cp deploy/security-headers.conf /etc/nginx/snippets/toddler-music-box-security.conf
+sudo cp deploy/security-headers.conf /etc/nginx/snippets/hear-a-note-security.conf
 sed "s|__APP_DIR__|$APP_DIR|g" deploy/app-locations.conf \
-  | sudo tee /etc/nginx/snippets/toddler-music-box-app.conf > /dev/null
+  | sudo tee /etc/nginx/snippets/hear-a-note-app.conf > /dev/null
 if [ "$SSL_MODE" = "cloudflare" ]; then
   if [ ! -s /etc/ssl/cloudflare/origin.pem ] || [ ! -s /etc/ssl/cloudflare/origin.key ]; then
     echo "✗ Cloudflare Origin certificate not found. Create it first:"
@@ -66,8 +66,8 @@ else
   CONF=deploy/nginx.conf
 fi
 sed "s|__DOMAIN__|$DOMAIN|g" "$CONF" \
-  | sudo tee /etc/nginx/sites-available/toddler-music-box > /dev/null
-sudo ln -sf /etc/nginx/sites-available/toddler-music-box /etc/nginx/sites-enabled/toddler-music-box
+  | sudo tee /etc/nginx/sites-available/hear-a-note > /dev/null
+sudo ln -sf /etc/nginx/sites-available/hear-a-note /etc/nginx/sites-enabled/hear-a-note
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx

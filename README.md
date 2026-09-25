@@ -1,6 +1,12 @@
-# Toddler Music Box
+# Hear-a-Note
 
-A colorful piano app that helps toddlers learn to read music — the **treble clef** and the **bass clef** — by playing.
+A gentle piano app for babies and toddlers aged **18–36 months**, played together with a grown-up. It helps little ones learn to read music — the **treble clef** and the **bass clef** — by playing.
+
+- **No-overstimulation design:** soft colors and sounds, no flashing effects, no ads, no endless levels, no autoplay feed.
+- **Early absolute-pitch foundation:** every key is a precisely tuned piano note (A = 440 Hz), the same pitch every time.
+- **Natural first sight-reading on the staff:** every note is shown on a real staff, together with a shape and color.
+- **Real-piano play-along:** put the tablet on your piano; the app listens and reacts when your child plays the right key.
+
 No letters or numbers on the keys: kids learn from **shapes, colors and the notes on the staff**.
 
 Free, no ads, no accounts, no data collected. Works offline once it has been opened.
@@ -11,7 +17,7 @@ Free, no ads, no accounts, no data collected. Works offline once it has been ope
 
 ## Getting started
 
-1. Open the app in a browser on a phone, tablet or computer.
+1. Open the app in a browser on a phone, tablet or computer. Older iPads and iPhones work too: iOS 12 and later (for example iPad mini 2, iPad mini 3, iPad Air); iOS 9 to 11 (iPad 2, 3, 4, iPad mini 1) should work but is less tested. The very first iPad (iOS 5) is too old for web audio.
 2. Tap anywhere — the first tap turns the sound on. On phones and tablets it also goes fullscreen and turns the screen sideways (landscape). On computers the app stays in the normal window, so no "Press Esc" banner covers the screen.
 3. Tap the keys and play!
 
@@ -97,7 +103,7 @@ A web app can't block the phone's "home" gesture, so for full lock-down:
 
 ## For parents and teachers: information pages
 
-Read what the app is, how it helps children aged 2 to 5, and how piano and music teachers can use it:
+Read what the app is, how it helps babies and toddlers aged 18–36 months, and how piano and music teachers can use it:
 [English](https://kids.myteachers123.com/learn/en/) · [Español](https://kids.myteachers123.com/learn/es/) · [Traditional Chinese](https://kids.myteachers123.com/learn/zh-hant/) · [Simplified Chinese](https://kids.myteachers123.com/learn/zh-hans/) · [Korean](https://kids.myteachers123.com/learn/ko/) · [Japanese](https://kids.myteachers123.com/learn/ja/) · [Vietnamese](https://kids.myteachers123.com/learn/vi/) · [Français](https://kids.myteachers123.com/learn/fr/) · [Italiano](https://kids.myteachers123.com/learn/it/) · [Russian](https://kids.myteachers123.com/learn/ru/) · [Deutsch](https://kids.myteachers123.com/learn/de/) · [Hindi](https://kids.myteachers123.com/learn/hi/)
 
 A link like `https://kids.myteachers123.com/?lang=ja` opens the app in that language.
@@ -117,6 +123,13 @@ uvicorn app:app --reload --port 8000
 
 Then open http://localhost:8000. All UI text is in `i18n.py` (12 languages).
 The information pages, `sitemap.xml`, `robots.txt` and `llms.txt` are built from `seo_i18n.py` with `python seo_pages.py`.
+
+**Old iPads and iPhones.** The page loads `app.bundle.js` and `style.compat.css`, which are built from `app.js`, `piano.js` and `style.css` so the app also runs on older Safari (built for iOS 9 and later), not only on new browsers. After changing any of those three files, rebuild:
+
+```bash
+cd compat && npm install && npm run build && cd ..
+python compat/compat_css.py
+```
 
 ## License
 

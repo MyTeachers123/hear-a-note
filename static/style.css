@@ -881,7 +881,7 @@ html, body { background: #111; }
 }
 .rw-layer { position: absolute; inset: 0; }
 .rw-answer {
-  position: absolute; left: 50%; top: 50%; width: 62%; translate: -50% -50%;
+  position: absolute; left: 19%; top: 19%; width: 62%;             /* centered in the square box (no translate: older Safari) */
   display: flex; flex-direction: column; align-items: center; gap: 2%; z-index: 2;
   animation: rw-in 3.2s cubic-bezier(.33, 0, .25, 1) both;
 }
@@ -908,8 +908,11 @@ html, body { background: #111; }
 .bubble-party.bye { transition: opacity .5s; opacity: 0; }
 .pb {
   position: absolute; left: var(--x); top: var(--y);
-  width: var(--s); aspect-ratio: 1; margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
   border-radius: 50%; pointer-events: auto; cursor: pointer; touch-action: manipulation;
+  background:                                          /* older Safari: no color-mix() */
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.95) 0, rgba(255,255,255,.95) 9%, transparent 10%),
+    radial-gradient(circle at 50% 50%, transparent 58%, var(--tint) 72%, rgba(255,255,255,.35) 100%);
   background:
     radial-gradient(circle at 32% 28%, rgba(255,255,255,.95) 0 9%, transparent 10%),
     radial-gradient(circle at 68% 74%, rgba(255,255,255,.5) 0 5%, transparent 6%),

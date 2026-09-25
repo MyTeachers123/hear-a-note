@@ -1,7 +1,7 @@
 {
-  "name": "Toddler Music Box",
-  "short_name": "Music Box",
-  "description": "Free piano and music-reading game for toddlers aged 2-5. Kids match shapes and colors to learn treble and bass clef notes. No ads, no sign-up, works offline.",
+  "name": "Hear-a-Note",
+  "short_name": "Hear-a-Note",
+  "description": "Free app for babies and toddlers aged 18-36 months: early absolute-pitch foundation, natural first sight-reading on the staff and real-piano play-along, with a no-overstimulation design. No ads, no sign-up, works offline.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
