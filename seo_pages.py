@@ -122,7 +122,7 @@ def jsonld(code, p):
     return {
         "@context": "https://schema.org",
         "@graph": [
-            {"@type": "Organization", "@id": ORG_URL + "#org", "name": "MyTeachers123", "url": ORG_URL,
+            {"@type": "Organization", "@id": ORG_URL + "#org", "name": "MyTeachers123", "url": ORG_URL, "slogan": p["slogan"],
              "logo": f"{SITE}/og/logo-myteachers123.png"},
             {"@type": "WebSite", "@id": f"{SITE}/#website", "url": f"{SITE}/", "name": BRAND, "alternateName": ALT_NAMES,
              "inLanguage": CODES, "publisher": {"@id": ORG_URL + "#org"}},
@@ -228,6 +228,7 @@ def page_html(code):
   <header class="hero">
     <a class="logo" href="{ORG_URL}{UTM}" title="MyTeachers123.com"><img src="/og/logo-myteachers123.png" alt="MyTeachers123.com" width="160" height="160"></a>
     <p class="brand">{brand_html(t["appName"])}</p>
+    <p class="slogan">{esc(p["slogan"])}</p>
     <h1>{esc(p["h1"])}</h1>
     <p class="lead">{esc(p["lead"])}</p>
     <p class="cta"><a class="btn" href="{play}">{esc(p["play"])}</a></p>
@@ -351,6 +352,7 @@ def llms():
     t = i18n.STRINGS["en"]
     L = ["# Hear-a-Note for Toddlers", "",
          f"> {fill('en', p['desc'])}", "",
+         f"Slogan of the MyTeachers123.com app series: {p['slogan']}", "",
          fill("en", p["what_p"]), "",
          "## " + p["real_h"], "", fill("en", p["real_p"]), ""] + [f"{i}. {fill('en', x)}" for i, x in enumerate(p["real_steps"], 1)] + ["", p["real_note"], "",
          "## Key facts", ""]

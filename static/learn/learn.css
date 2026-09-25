@@ -92,8 +92,10 @@ section.why li { margin: 10px 0; }
 .lang-menu a:hover, .lang-menu a:focus { background: #FFF0F5; }
 .lang-menu a[aria-current="page"] { background: var(--pink); }
 .hero .brand { display: block; font-size: clamp(32px, 6vw, 52px); font-weight: 300; letter-spacing: .01em; line-height: 1.15; margin: 6px 0 12px; }
-.hero h1 { font-size: clamp(17px, 2.3vw, 20px); font-weight: 400; color: var(--muted); line-height: 1.5; margin: 0 auto 12px; max-width: 720px; }
+.hero h1 { font-size: clamp(15px, 1.9vw, 17px); font-weight: 400; color: #6b6b72; line-height: 1.55; margin: 0 auto 14px; max-width: 640px; }
 .nw { white-space: nowrap; }
+/* Brand slogan of the MyTeachers123.com app series ("Short play, real learning."): the visual line under the name */
+.hero .slogan { font-size: clamp(19px, 2.8vw, 25px); font-weight: 300; letter-spacing: .02em; color: var(--pink-dark); margin: 0 0 14px; }
 @media (max-width: 600px) { .logo img { width: 120px; height: 120px; } }
 section.real { background: #FFF0F5; }
 section.real ol li { margin: 8px 0; }

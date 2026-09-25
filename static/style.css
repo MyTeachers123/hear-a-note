@@ -960,3 +960,10 @@ html, body { background: #111; }
 .noscript { position: relative; z-index: 100; max-width: 720px; margin: 24px auto; padding: 16px 20px; background: #fff;
   color: #1d1d1f; border: 3px solid #111; border-radius: 16px; font: 16px/1.6 system-ui, sans-serif; }
 .noscript a { color: #2A78A8; }
+
+/* iPhone / iPad only (for grown-ups): how to open from the home screen and lock the app */
+.ios-tip { margin: 0; max-width: 36em; font-size: 13px; line-height: 1.4; text-align: right; color: #4f4f55; }
+.ios-tip[hidden], #app.menu-folded .top .ios-tip { display: none; }
+
+/* hidden menus stay hidden even though .cs sets its own display */
+.cs[hidden] { display: none !important; }

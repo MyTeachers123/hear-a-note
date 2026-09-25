@@ -191,11 +191,14 @@
 }
   </script>
   <link rel="stylesheet" href="style.compat.css">
+  <!-- very old tablets (first iPad, iOS 5): pixel layout + legacy.css; does nothing on newer browsers -->
+  <script src="legacy.js"></script>
 </head>
 <body>
 <noscript>
   <div class="noscript">
     <h1>Hear-a-Note for Toddlers</h1>
+    <p><em>Short play, real learning.</em> Like every app in the MyTeachers123.com series, it is built to work with the real world &ndash; here, your real piano &ndash; not around screen fun.</p>
     <p>A free music start for babies and toddlers aged 18-36 months, played together with a grown-up: no-overstimulation design, early absolute-pitch foundation, natural first sight-reading on the staff and real-piano play-along. Put a phone or tablet on the music stand of your real piano: the app shows a note on the staff, listens through the microphone and cheers when the child plays the right key (on-screen keys work too). Every white key shows a big shape and color, and the note card shows the same note on a real treble or bass clef staff, so toddlers connect what they see, hear and play. No ads, no sign-up, no personal data, works offline. Also used by piano and music teachers as a first introduction to the staff. Please turn on JavaScript to play.</p>
     <p>For parents and teachers:
       <a href="/learn/en/" hreflang="en" lang="en">English</a> &middot;
@@ -254,6 +257,8 @@
         <span id="pianoStatus" class="piano-status" aria-live="polite"></span>
         <span id="status" class="status" aria-live="polite"></span>
       </div>
+      <!-- iPhone / iPad only (for grown-ups): how to open without the browser bar and lock the app -->
+      <p id="iosTip" class="ios-tip" hidden></p>
     </header>
   </div>
 

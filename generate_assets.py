@@ -64,6 +64,28 @@ def write_wav(path: Path, data: np.ndarray) -> None:
         w.writeframes(pcm.tobytes())
 
 
+# One file with every sound, for very old tablets without Web Audio (for example the first iPad, iOS 5):
+# they can only play one <audio> file at a time, so the app jumps to a sound's slot inside this file.
+SPRITE_SLOT = 2.0                                        # seconds per sound (1.6 s note + silence)
+
+
+def write_sprite() -> None:
+    names = list(NOTES) + ["oops"]
+    slot = int(SPRITE_SLOT * SAMPLE_RATE)
+    out = np.zeros(slot * len(names), dtype="<i2")
+    for i, name in enumerate(names):
+        with wave.open(str(ROOT / "sounds" / f"{name}.wav"), "rb") as w:
+            pcm = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2")[:slot]
+        out[i * slot:i * slot + len(pcm)] = pcm
+    with wave.open(str(ROOT / "sounds" / "sprite.wav"), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SAMPLE_RATE)
+        w.writeframes(out.tobytes())
+    (ROOT / "sounds" / "sprite.json").write_text(json.dumps({"slot": SPRITE_SLOT, "names": names}), encoding="utf-8")
+    print(f"✓ sound sprite ({len(names)} sounds) → static/sounds/sprite.wav")
+
+
 # ---------------------------------------------------------------- 2. Icons
 # Every icon is made from the transparent logo in assets/logo.png.
 # Launchers often crop icons to a circle, so the logo is always scaled down until its whole
@@ -273,6 +295,7 @@ def main() -> None:
         write_wav(ROOT / "sounds" / f"{name}.wav", synth_piano(freq))
     write_wav(ROOT / "sounds" / "oops.wav", synth_oops())
     print(f"✓ {len(NOTES)} sound files + oops.wav → static/sounds/")
+    write_sprite()
 
     write_icons()
 

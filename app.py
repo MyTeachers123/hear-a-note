@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 
 STATIC = Path(__file__).parent / "static"
 
-app = FastAPI(title="Hear-a-Note for Toddlers API", version="1.0.21")
+app = FastAPI(title="Hear-a-Note for Toddlers API", version="1.0.23")
 
 
 @app.get("/api/health")

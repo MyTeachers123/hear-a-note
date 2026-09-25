@@ -1,5 +1,7 @@
 # Hear-a-Note for Toddlers
 
+*Short play, real learning.* Part of the MyTeachers123.com app series: every app works with the child's real world (here, a real piano) instead of keeping them busy on a screen.
+
 A gentle piano app for babies and toddlers aged **18–36 months**, played together with a grown-up. It helps little ones learn to read music — the **treble clef** and the **bass clef** — by playing.
 
 - **No-overstimulation design:** soft colors and sounds, no flashing effects, no ads, no endless levels, no autoplay feed.
@@ -17,7 +19,8 @@ Free, no ads, no accounts, no data collected. Works offline once it has been ope
 
 ## Getting started
 
-1. Open the app in a browser on a phone, tablet or computer. Older iPads and iPhones work too: iOS 12 and later (for example iPad mini 2, iPad mini 3, iPad Air); iOS 9 to 11 (iPad 2, 3, 4, iPad mini 1) should work but is less tested. The very first iPad (iOS 5) is too old for web audio.
+1. Open the app in a browser on a phone, tablet or computer. Older iPads and iPhones work too: iOS 12 and later (for example iPad mini 2, iPad mini 3, iPad Air); iOS 9 to 11 (iPad 2, 3, 4, iPad mini 1) should work but is less tested. Very old tablets (the first iPad on iOS 5, Android 4) get a simple version with the on-screen keys only ("No piano"; real-piano mode needs a newer device) - not yet tested on a real first-generation iPad.
+   On iPad and iPhone the app does not use Safari's full screen (it shows an exit button and warns about typing); instead use Share -> **Add to Home Screen**, and turn on **Guided Access** (Settings -> Accessibility) to lock the app.
 2. Tap anywhere — the first tap turns the sound on. On phones and tablets it also goes fullscreen and turns the screen sideways (landscape). On computers the app stays in the normal window, so no "Press Esc" banner covers the screen.
 3. Tap the keys and play!
 

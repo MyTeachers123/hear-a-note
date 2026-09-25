@@ -75,6 +75,12 @@
   const keysEl = document.getElementById("keys");
   const songSel = document.getElementById("song");
   const modeSel = document.getElementById("mode");      // "screen" = on-screen keys (default) | "piano" = real piano (mic)
+  // Very old tablets (first iPad, iOS 5; old Android): no Web Audio and no microphone access.
+  // They still get the on-screen keys ("No piano"): sounds come from one <audio> file (see spriteInit),
+  // the layout from legacy.js + legacy.css, and the real-piano choice is hidden.
+  const LEGACY = document.documentElement.classList.contains("legacy");
+  const HAS_WEB_AUDIO = !!(window.AudioContext || window.webkitAudioContext);
+  const CAN_LISTEN = HAS_WEB_AUDIO && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   const pianoStatus = document.getElementById("pianoStatus");
   const statusEl = document.getElementById("status");
 
@@ -137,6 +143,8 @@
     menuBtn.title = T.menu;
     setPlayBtn();
     setExitBtn();
+    const tipEl = document.getElementById("iosTip");
+    if (tipEl) tipEl.textContent = T.iosTip;
     if (pianoState) pianoStatus.textContent = T[pianoState] || "";
     nowEl.setAttribute("aria-label", T.now);          // no visible label; screen readers still hear "Current note"
     langSel.setAttribute("aria-label", T.language);
@@ -404,6 +412,7 @@
       b.style.setProperty("--cl", lineOf(note));
       // Only a big, simple shape on each key — easy for toddlers to see
       b.innerHTML = `<span class="shape" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="${SHAPES_SVG[shape]}"/></svg></span>`;
+      if (LEGACY) b.querySelector("path").setAttribute("fill", colorOf(note));   // no CSS variables there
       b._info = k;
       keysEl.appendChild(b);
       keyEls[note] = b;
@@ -426,6 +435,7 @@
 
   // Uses offsetLeft/offsetWidth (layout coordinates) so it stays correct when CSS rotates the screen 90°
   function layoutBlackKeys() {
+    if (window.__legacyLayout) window.__legacyLayout();   // very old tablets: white keys placed by legacy.js
     for (const k of BLACK_SLOTS) {
       const el = keyEls[noteOf(k)];
       const L = whiteEls[k.between[0]];
@@ -529,6 +539,7 @@
   const quiet = (p) => { if (p && typeof p.catch === "function") p.catch(() => {}); return p; };
   const resumeCtx = () => { if (ctx && ctx.state !== "running" && ctx.resume) quiet(ctx.resume()); };
   function unlockAudio() {
+    if (!HAS_WEB_AUDIO) { spriteUnlock(); return; }
     try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch (_) {}
     if (IS_IOS && !silentEl) {
       silentEl = new Audio("media/silence.wav");
@@ -543,7 +554,37 @@
     if (document.visibilityState === "visible") resumeCtx();
   });
 
+  // Very old tablets: one <audio> element plays every sound from static/sounds/sprite.wav (one sound at a
+  // time; the first tap unlocks it, after that songs can play it too).
+  let sprite = null, spriteMap = null, spriteEnd = 0, spriteUnlocked = false;
+  function spriteInit() {
+    if (sprite) return;
+    sprite = new Audio("sounds/sprite.wav");
+    sprite.preload = "auto";
+    sprite.addEventListener("timeupdate", () => {
+      if (spriteEnd && sprite.currentTime >= spriteEnd) { sprite.pause(); spriteEnd = 0; }
+    });
+    fetch("sounds/sprite.json").then((r) => r.json()).then((j) => { spriteMap = j; }).catch(() => {});
+  }
+  function spriteUnlock() {
+    if (!sprite || spriteUnlocked) return;
+    spriteUnlocked = true;
+    quiet(sprite.play());                            // inside the tap: from now on the page may play it
+    if (!spriteEnd) sprite.pause();
+  }
+  function spritePlay(name) {
+    if (!sprite || !spriteMap) return;
+    const i = spriteMap.names.indexOf(name);
+    if (i < 0) return;
+    const at = i * spriteMap.slot;
+    try { sprite.currentTime = at; } catch (_) { /* not loaded yet */ }
+    spriteEnd = at + spriteMap.slot - 0.25;
+    spriteUnlocked = true;
+    quiet(sprite.play());
+  }
+
   async function initAudio() {
+    if (!HAS_WEB_AUDIO) { spriteInit(); return; }
     if (ctx) return;
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     const comp = ctx.createDynamicsCompressor();   // prevents clipping when many keys are pressed
@@ -564,6 +605,7 @@
   }
 
   function play(note) {
+    if (!HAS_WEB_AUDIO) { spritePlay(note); return; }
     if (!ctx) return;
     if (ctx.state === "suspended") resumeCtx();
     const buf = buffers[note];
@@ -584,6 +626,11 @@
   let micQuietUntil = 0, oopsSrc = null, oopsAt = 0;
   function playOops() {
     micQuietUntil = performance.now() + 600;
+    if (!HAS_WEB_AUDIO) {
+      const t = performance.now();
+      if (t - oopsAt < 700) return;
+      oopsAt = t; spritePlay("oops"); return;
+    }
     if (!ctx || !buffers.oops) return;
     if (ctx.state === "suspended") resumeCtx();
     const now = performance.now();
@@ -992,7 +1039,10 @@
   function enterFullscreen(force = false) {
     const el = document.documentElement;
     const req = el.requestFullscreen || el.webkitRequestFullscreen;
-    if (!req || fsElement() || isInstalled()) return;
+    // iPhone / iPad: Safari's own fullscreen always shows an "X" button a child can tap, and after many quick
+    // taps it warns "It looks like you are typing while in full screen" and offers to exit. So no browser
+    // fullscreen there: the menu shows grown-ups how to use Add to Home Screen + Guided Access instead.
+    if (IS_IOS || !req || fsElement() || isInstalled()) return;
     if (!force && (exited || !TOUCH_DEVICE)) return;
     // Must be called synchronously inside the tap, or the browser refuses
     Promise.resolve(req.call(el, { navigationUI: "hide" })).then(lockLandscape).catch(() => {});
@@ -1011,6 +1061,11 @@
   // "Exit" (for grown-ups, in the menus): leave fullscreen and stop holding the child in the app.
   // After that the same button says "Full screen" and brings the child-safe mode back.
   const exitBtn = document.getElementById("exitBtn");
+  const iosTip = document.getElementById("iosTip");
+  if (IS_IOS) {
+    exitBtn.hidden = true;                           // no browser fullscreen on iOS (see enterFullscreen)
+    iosTip.hidden = isInstalled();                   // already opened from the home screen: nothing to explain
+  }
   function setExitBtn() {
     exitBtn.textContent = exited ? T.fullscreen : T.exit;
     exitBtn.setAttribute("aria-pressed", String(exited));
@@ -1243,7 +1298,8 @@
       else if (e.key === "Escape" || e.key === "Tab") { close(e.key === "Escape"); }
       e.stopPropagation();                           // the computer-keyboard piano ignores keys used in a menu
     });
-    new MutationObserver(render).observe(sel, { attributes: true, childList: true, subtree: true, characterData: true });
+    const MO = window.MutationObserver || window.WebKitMutationObserver;   // (very old tablets: the timer below renders)
+    if (MO) new MO(render).observe(sel, { attributes: true, childList: true, subtree: true, characterData: true });
     const api = { sel, btn, render, close };
     customSelects.push(api);
     render();
@@ -1264,6 +1320,7 @@
   setInterval(updateSongHint, 300);
 
   for (const s of [clefSel, modeSel, langSel, songSel]) enhanceSelect(s);
+  if (!CAN_LISTEN) (modeSel.closest(".cs") || modeSel).hidden = true;   // no microphone: only "No piano"
 
   nowStaff.src = `staff/${clef}/clef.svg`;
   initAudio();                                   // decode all sounds now; they start playing after the first tap

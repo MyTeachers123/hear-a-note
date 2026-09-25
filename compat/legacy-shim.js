@@ -6,7 +6,56 @@
  *  4. Container query units cqw / cqh (Safari 16+) -> --cqw / --cqh custom properties (used by style.compat.css)
  *  5. aspect-ratio (Safari 15+) -> square shapes get their height from JS
  *  6. Flexbox gap (Safari 14.1+) -> class "no-flex-gap" on <html> (style.compat.css adds margins)
+ *  0. (first) bind, matches/closest, performance.now, requestAnimationFrame for very old tablets (iOS 5)
  */
+/* 0. Very old browsers (first iPad, iOS 5 / Safari 5.1; Android 4): basic functions the rest relies on */
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (that) {
+    var fn = this, pre = Array.prototype.slice.call(arguments, 1);
+    return function () { return fn.apply(that, pre.concat(Array.prototype.slice.call(arguments))); };
+  };
+}
+(function (E) {
+  if (!E) return;
+  if (!E.matches) E.matches = E.webkitMatchesSelector || E.msMatchesSelector || function (sel) {
+    var all = (this.ownerDocument || document).querySelectorAll(sel), i = 0;
+    while (all[i] && all[i] !== this) i++;
+    return !!all[i];
+  };
+  if (!E.closest) E.closest = function (sel) {
+    for (var el = this; el && el.nodeType === 1; el = el.parentNode) if (el.matches(sel)) return el;
+    return null;
+  };
+})(window.Element && Element.prototype);
+(function (C) {                                     // ChildNode.remove (Safari 7+)
+  if (C && !C.remove) C.remove = function () { if (this.parentNode) this.parentNode.removeChild(this); };
+})(window.Element && Element.prototype);
+(function () {                                      // new Event("change") / new CustomEvent(...) (Safari 6+)
+  var ok = true;
+  try { new window.Event("x"); } catch (e) { ok = false; }
+  if (ok) return;
+  var make = function (kind) {
+    return function (type, o) {
+      o = o || {};
+      var ev = document.createEvent(kind);
+      if (kind === "CustomEvent") ev.initCustomEvent(type, !!o.bubbles, !!o.cancelable, o.detail);
+      else ev.initEvent(type, !!o.bubbles, !!o.cancelable);
+      return ev;
+    };
+  };
+  var E = make("Event"); E.prototype = window.Event && window.Event.prototype; window.Event = E;
+  var CE = make("CustomEvent"); CE.prototype = window.CustomEvent && window.CustomEvent.prototype; window.CustomEvent = CE;
+})();
+if (!window.performance) window.performance = {};
+if (!window.performance.now) {
+  (function () { var t0 = Date.now(); window.performance.now = function () { return Date.now() - t0; }; })();
+}
+if (!window.requestAnimationFrame) {
+  window.requestAnimationFrame = window.webkitRequestAnimationFrame ||
+    function (cb) { return setTimeout(function () { cb(window.performance.now()); }, 16); };
+  window.cancelAnimationFrame = window.webkitCancelAnimationFrame || function (id) { clearTimeout(id); };
+}
+
 (function () {
   "use strict";
   var doc = document, win = window, root = doc.documentElement;
@@ -97,7 +146,7 @@
     var app = doc.getElementById("app");
     if (!app) return;
     /* 3. app size (only when dvh is missing: the CSS fallback 100vh is too tall on iPad Safari) */
-    if (!DVH) {
+    if (!DVH && !/\blegacy\b/.test(root.className)) {   // (legacy.js lays out very old tablets itself)
       var w = win.innerWidth, h = win.innerHeight;
       var rotate = win.matchMedia && matchMedia("(orientation: portrait) and (pointer: coarse)").matches;
       app.style.width = (rotate ? h : w) + "px";
