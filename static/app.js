@@ -170,6 +170,7 @@
 
   // After a right note the card keeps showing that answer for a moment (HOLD_MS) before the next target appears.
   const HOLD_MS = 750;
+  const QUIZ_HOLD_MS = 1000;                         // challenge: the right answer stays 1 s before the next question
   let holdUntil = 0, holdT = 0;
   function showNow(note, hideAnswer = false, fromHold = false) {
     if (!fromHold) clearTimeout(holdT);            // any direct update cancels a waiting one
@@ -197,9 +198,10 @@
 
   // The note to press: its shape on the card and the same shape on the right key bounce and blink
   // together, in step (both animations are restarted at the same moment). In the quiz only the "?" moves,
-  // so the answer is not given away. Nothing moves during the Listen demo or in free play.
+  // so the answer is not given away. During the Listen demo the note being played bounces on the card and on
+  // its key together, once per beat. Nothing moves in free play.
   function currentTarget() {
-    if (demo) return null;
+    if (demo) return demo.cur || null;
     if (quiz) return quiz.notes[quiz.pos];
     if (song) return curNotes[songPos];
     return null;
@@ -234,7 +236,7 @@
   }
 
   /* ---------------- Right-note reward: the note on a clef-free staff + a soft confetti burst ---------------- */
-  // 2 x the key's shape, centered, 10 px from the key's bottom (never over the black keys); plays to the end, about 3 s,
+  // 1.2 x the key's shape, centered, 10 px from the key's bottom (never over the black keys); plays to the end, about 3 s,
   // even when the next note is already sounding (each reward is its own layer). pointer-events: none.
   // Colors: Sakura Sky pink + blue, beige, white only.
   const RW_MS = 3200;
@@ -256,7 +258,7 @@
     box.setAttribute("aria-hidden", "true");
     // only the note on a see-through staff + the see-through effect (no shape, no white background)
     box.innerHTML = `<div class="rw-layer"></div><div class="rw-answer"><img src="staff/${clef}/plain/${note}.svg" alt="" draggable="false"></div>`;
-    // The staff note is 2 x the key's shape, centered on the key, 10 px above the key's bottom edge,
+    // The staff note is 1.2 x the key's shape, centered on the key, 10 px above the key's bottom edge,
     // and never over the black keys (it shrinks if there is not enough room below them).
     // Layout coordinates (offsetLeft/Top, not screen coordinates), so it also works on rotated phones.
     const shapeEl = key.querySelector(".shape");
@@ -267,7 +269,7 @@
     if (shapeEl && !key.classList.contains("black")) {
       const blackBottom = black ? black.offsetTop + black.offsetHeight : key.offsetTop;
       const room = keyBottom - PAD_BOTTOM - blackBottom - 4;       // white part of the key below the black keys
-      img = Math.min(shapeEl.offsetWidth * 2, room);
+      img = Math.min(shapeEl.offsetWidth * 1.2, room);
       cx = key.offsetLeft + key.offsetWidth / 2;
       cy = keyBottom - PAD_BOTTOM - img / 2;
     } else {                                                        // (a black key: centered on it)
@@ -447,6 +449,7 @@
     el.classList.add("down");
     setTimeout(() => el.classList.remove("down"), 180);
     if (demo) { play(note); bubble(el, x, y); return; }   // while the song is being played to the child: just sound
+    if (quiz && performance.now() < holdUntil) { play(note); return; }   // challenge: answer still showing, next question not yet
     const target = quiz ? quiz.notes[quiz.pos] : song ? curNotes[songPos] : null;
     if (target && note !== target) {
       playOops();
@@ -635,6 +638,7 @@
   function onPianoNote(num) {
     stillPlaying();
     if (demo || performance.now() < micQuietUntil) return;   // ignore our own speaker (demo / "mew")
+    if (quiz && performance.now() < holdUntil) return;       // challenge: next question not shown yet
     const target = quiz ? quiz.notes[quiz.pos] : song ? curNotes[songPos] : null;
     // The mic is sometimes off by an octave → compare pitch class only (Do/Re/Mi…) and map to the current clef's octave
     const pc = PC[num % 12];
@@ -764,6 +768,7 @@
       clearTimeout(revealKey.t);
       keyEls[target].classList.remove("reveal");
       if (quiz.pos >= QUIZ_LEN) return finishQuiz(true);
+      holdUntil = Math.max(holdUntil, performance.now() + QUIZ_HOLD_MS);   // show the right answer 1 s first
       foldMenus();                                   // the child keeps playing → menus stay out of the way
       showQuizTarget();
     } else {
@@ -825,7 +830,7 @@
 
   /* ---------------- Listen: the app plays the song slowly, showing every note ---------------- */
   // Each note: the key bounces + lights up, the card shows its staff note and shape, and it sounds.
-  const BEAT_MS = 460;                               // lively and fun (about 130 beats per minute)
+  const BEAT_MS = 540;                               // lively but a little calmer (about 110 beats per minute)
   const playBtn = document.getElementById("playBtn");
   let demo = null;                                   // { i, timer } while playing
 
@@ -843,6 +848,7 @@
     const el = keyEls[note];
     el.classList.add("next", "down");
     setTimeout(() => el.classList.remove("down"), 220);
+    demo.cur = note;                                 // the card shape and this key's shape bounce together
     showNow(note);
     play(note);
     const beats = demo.beats[demo.i] || 1;
@@ -856,7 +862,9 @@
     // A song plays its melody; free play ("Pick A Song") plays the scale Do → high Do of the current clef
     const notes = song ? curNotes : WHITE_SLOTS.map(noteOf);
     const beats = song && song.beats ? song.beats : notes.map(() => 1);
-    demo = { i: 0, timer: 0, notes, beats };
+    demo = { i: 0, timer: 0, notes, beats, cur: null };
+    document.getElementById("app").style.setProperty("--beat", BEAT_MS + "ms");
+    document.getElementById("app").classList.add("demo-on");
     setPlayBtn();
     demoStep();
   }
@@ -864,6 +872,7 @@
     if (!demo) return;
     clearTimeout(demo.timer);
     demo = null;
+    document.getElementById("app").classList.remove("demo-on");
     setPlayBtn();
     songPos = 0;                                     // now it's the child's turn, from the first note
     highlightNext();                                 // (free play: clears the highlight and the counter)

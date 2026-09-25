@@ -946,3 +946,6 @@ html, body { background: #111; }
 .cs-icononly .cs-ico { width: 40px; height: 40px; }
 .cs-icononly .cs-ico img { width: 40px; height: 40px; }
 .cs-icononly .cs-opt { justify-content: center; }
+
+/* Listen demo: the card shape and the key shape bounce once per beat, together */
+#app.demo-on .cue { animation-duration: var(--beat, 540ms); animation-iteration-count: infinite; }

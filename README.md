@@ -49,10 +49,10 @@ The card above the keys shows **the note on the staff → the key to press**.
 Pick a song from the **song menu**: *Twinkle Twinkle Little Star*, *Mary Had a Little Lamb*, *Ode to Joy* or *Jingle Bells*.
 All four fit the eight white keys and work in treble clef and in bass clef.
 
-- **Pick A Song** gently wiggles until a song is chosen. Each song has a little picture in the list. As soon as a song is picked, the app plays it by itself at a lively, easy-to-follow pace to show the child how it goes. **▶ Listen** plays it again (with **Pick A Song** — free play — it plays the scale, Do up to high Do). Each note lights up its key and shows on the current note card, so children can watch and listen before they try. Tap anywhere on the screen (or **■ Stop**) to stop it at once.
+- **Pick A Song** gently wiggles until a song is chosen. Each song has a little picture in the list. As soon as a song is picked, the app plays it by itself at a lively, easy-to-follow pace to show the child how it goes. **▶ Listen** plays it again (with **Pick A Song** — free play — it plays the scale, Do up to high Do). Each note lights up its key and shows on the current note card, and the shape on the card and the same shape on the key bounce together on every beat, so children can watch and listen before they try. Tap anywhere on the screen (or **■ Stop**) to stop it at once.
 - Then it's the child's turn: the next key to press bounces.
 - The shape on the current note card and the same shape on the right key bounce and glow together, so the child sees which key to press. Tapping the card plays that note.
-- Only the right key plays its note and moves the song forward. The current note card then shows the answer for a moment. Centered on the key (twice the size of its shape, near the bottom, never over the black keys), the note on a see-through staff (no clef, just the five lines and the note) appears with a soft burst of confetti. It stays about 3 seconds and always finishes, even when the next note is already playing. There are no words or counters on the screen for the child. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
+- Only the right key plays its note and moves the song forward. The current note card then shows the answer for a moment. Centered on the key (1.2 times the size of its shape, near the bottom, never over the black keys), the note on a see-through staff (no clef, just the five lines and the note) appears with a soft burst of confetti. It stays about 3 seconds and always finishes, even when the next note is already playing. There are no words or counters on the screen for the child. A wrong key plays a soft, low, short kitten "mew" and wiggles — no scolding, the song just waits. Many wrong taps in a row never pile up into noise.
 - In free play (**Pick A Song**, nothing chosen yet) every key simply plays, with no right or wrong.
 
 ### Play mode: no piano or a real piano
@@ -70,6 +70,7 @@ Switch back to **No piano** to turn the microphone off.
 Tap **Challenge** to test reading notes in the selected clef:
 - The app tests **all 8 notes** of the selected clef, once each, in a new random order every time. The card shows only the note on the staff (the answer is a "?"), so the child has to read the staff.
 - Answer on the on-screen keys, or on a real piano when the play mode is **Play a real piano**.
+- After a right answer, the card shows the answer for 1 second before the next question appears.
 - Wrong → a soft kitten "mew?" and the correct key flashes. Right → the note plays, the card shows the answer with a little surprise, and then the next note appears.
 - All 8 done → see-through bubbles burst out and fill the whole screen for 3 seconds. Tap them to pop them!
 - Five wrong answers in a row → the challenge ends gently. Try again anytime.
